@@ -1,0 +1,52 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# render.yaml — deploy the web app to Render's FREE tier (no credit card).
+#
+# How to use (you do this part — I can't create accounts on your behalf):
+#   1. Push this project to a GitHub repo.
+#   2. On https://render.com → New → Blueprint → pick the repo.
+#   3. Render reads this file and deploys. You get a public https URL.
+#
+# PRINTING: a cloud server cannot reach the store's printer directly, so this
+# config uses REMOTE print mode — print jobs queue in the app's DB and the
+# store-side print bridge (scripts/print_bridge.py, running on any device on
+# the store WiFi) claims them and drives the Brother QL-810W. See docs/BRIDGE.md.
+# After the first deploy, copy the generated STL_BRIDGE_TOKEN from the Render
+# dashboard (Environment tab) into the bridge device's config.
+# ─────────────────────────────────────────────────────────────────────────────
+services:
+  - type: web
+    name: spicetown-labels
+    runtime: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt gunicorn"
+    startCommand: "gunicorn -w 1 --threads 4 -k gthread -b 0.0.0.0:$PORT wsgi:app"
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: STL_ENV
+        value: production
+      - key: PYTHON_VERSION
+        value: "3.12.6"
+      - key: STL_DATA_PROVIDER
+        value: file
+      - key: STL_PRODUCTS_FILE
+        value: ./data/products.csv
+      # Ephemeral disk on free tier — keep the DB in /tmp; the startup bulk-load
+      # repopulates it from products.csv on every boot.
+      - key: STL_DB_PATH
+        value: /tmp/spicetown.db
+      - key: STL_LOG_DIR
+        value: /tmp/logs
+      # Remote print mode: the store's print bridge drains the job queue via
+      # /api/bridge using the generated token below. Transport stays null as
+      # a safety net (nothing ever prints from the cloud box itself).
+      - key: STL_PRINT_MODE
+        value: remote
+      - key: STL_BRIDGE_TOKEN
+        generateValue: true
+      - key: STL_PRINT_TRANSPORT
+        value: "null"
+      - key: STL_ENABLE_SCHEDULER
+        value: "false"
+      - key: STL_SECRET_KEY
+        generateValue: true

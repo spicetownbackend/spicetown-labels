@@ -1,0 +1,54 @@
+{
+  "products": [
+    {
+      "barcode": "041196910184",
+      "product_name": "McCormick Ground Cumin",
+      "retail_price": 4.99,
+      "sku": "SPC-1001",
+      "category": "Spices",
+      "size": "1.5 oz",
+      "uom": "each"
+    },
+    {
+      "barcode": "074333302100",
+      "product_name": "Spice Town Smoked Paprika",
+      "retail_price": 6.49,
+      "sku": "SPC-1002",
+      "category": "Spices",
+      "size": "2.0 oz",
+      "uom": "each",
+      "promo_price": 4.99,
+      "is_sale": true
+    },
+    {
+      "barcode": "00041220576395",
+      "product_name": "Himalayan Pink Salt Grinder",
+      "retail_price": 3.99,
+      "sku": "SPC-1004",
+      "category": "Spices",
+      "size": "5.0 oz",
+      "uom": "each"
+    },
+    {
+      "barcode": "711535509127",
+      "product_name": "Saffron Threads Premium Grade A",
+      "retail_price": 18.99,
+      "sku": "SPC-1005",
+      "category": "Spices",
+      "size": "1.0 g",
+      "uom": "each",
+      "promo_price": 14.99,
+      "is_sale": true
+    },
+    {
+      "barcode": "041303001899",
+      "product_name": "Garam Masala Blend, Authentic North Indian Style",
+      "retail_price": 8.99,
+      "sku": "SPC-1007",
+      "category": "Spices",
+      "size": "3.0 oz",
+      "uom": "each",
+      "is_clearance": true
+    }
+  ]
+}

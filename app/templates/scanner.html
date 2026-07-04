@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" content="#b00000">
+  <title>{{ store_name }} — Label Scanner</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <span class="logo">🌶️ {{ store_name }}</span>
+    <span class="status-dots">
+      <span id="provider-badge" class="badge" title="data provider">{{ provider }}</span>
+      <span id="printer-badge" class="badge" title="printer">{{ printer or 'no printer' }}</span>
+    </span>
+  </header>
+
+  <main>
+    <!-- ── Scanner ─────────────────────────────────────────────── -->
+    <section id="scanner-card" class="card">
+      <div class="scanner-wrap">
+        <div id="viewport"></div>
+        <div class="scan-line"></div>
+      </div>
+      <div class="controls">
+        <button id="btn-start" class="btn btn-primary">▶ Start camera</button>
+        <button id="btn-stop" class="btn" hidden>⏹ Stop</button>
+      </div>
+      <form id="manual-form" class="manual">
+        <input id="manual-input" inputmode="text" autocomplete="off"
+               placeholder="Type a UPC or product name…">
+        <button class="btn" type="submit">Search</button>
+      </form>
+      <p id="scan-hint" class="hint">Point the camera at a barcode, or type above.</p>
+    </section>
+
+    <!-- ── Result / product ────────────────────────────────────── -->
+    <section id="result-card" class="card" hidden>
+      <button id="btn-back" class="btn btn-link">← Scan another</button>
+      <div id="product-info"></div>
+
+      <div class="preview-wrap">
+        <img id="label-preview" alt="label preview" />
+      </div>
+
+      <div class="print-row">
+        <label class="field">
+          Variant
+          <select id="variant-select">
+            <option value="">Auto (from price)</option>
+            <option value="standard">Standard</option>
+            <option value="sale">Sale</option>
+            <option value="clearance">Clearance</option>
+          </select>
+        </label>
+        <label class="field">
+          Copies
+          <input id="copies-input" type="number" min="1" max="50" value="1">
+        </label>
+      </div>
+
+      <button id="btn-print" class="btn btn-primary btn-lg">🖨️ Print label</button>
+      <p id="print-status" class="print-status"></p>
+    </section>
+
+    <!-- ── Suggestions / search results ────────────────────────── -->
+    <section id="suggest-card" class="card" hidden>
+      <button id="btn-back2" class="btn btn-link">← Back</button>
+      <h2 id="suggest-title">No exact match</h2>
+      <div id="suggest-list" class="suggest-list"></div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <!-- QuaggaJS (maintained quagga2 fork) via CDN. Vendor locally for offline. -->
+  <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2@1.8.4/dist/quagga.min.js"></script>
+  <script src="{{ url_for('static', filename='js/scanner.js') }}"></script>
+</body>
+</html>

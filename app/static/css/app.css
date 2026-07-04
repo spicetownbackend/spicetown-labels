@@ -1,0 +1,82 @@
+:root {
+  --red: #b00000;
+  --ink: #1d1d1f;
+  --muted: #6b6b70;
+  --line: #e3e3e6;
+  --bg: #f6f6f7;
+  --ok: #1a7f37;
+  --warn: #9a6700;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; }
+
+.topbar { display: flex; align-items: center; justify-content: space-between;
+  background: var(--red); color: #fff; padding: .7rem 1rem; position: sticky; top: 0; z-index: 5; }
+.logo { font-weight: 700; }
+.status-dots { display: flex; gap: .4rem; }
+.badge { background: rgba(255,255,255,.18); border-radius: 999px;
+  padding: .15rem .55rem; font-size: .72rem; text-transform: uppercase; letter-spacing: .03em; }
+
+main { max-width: 560px; margin: 0 auto; padding: 1rem; }
+.card { background: #fff; border: 1px solid var(--line); border-radius: 16px;
+  padding: 1rem; margin-bottom: 1rem; box-shadow: 0 1px 4px rgba(0,0,0,.05); }
+
+.scanner-wrap { position: relative; background: #000; border-radius: 12px;
+  overflow: hidden; aspect-ratio: 4/3; }
+#viewport { width: 100%; height: 100%; }
+#viewport video, #viewport canvas { width: 100% !important; height: 100% !important;
+  object-fit: cover; display: block; }
+.scan-line { position: absolute; left: 6%; right: 6%; top: 50%; height: 2px;
+  background: rgba(255,0,0,.7); box-shadow: 0 0 8px rgba(255,0,0,.8); animation: scan 2s ease-in-out infinite; }
+@keyframes scan { 0%,100% { top: 25%; } 50% { top: 75%; } }
+
+.controls { display: flex; gap: .5rem; margin-top: .75rem; }
+.manual { display: flex; gap: .5rem; margin-top: .75rem; }
+.manual input { flex: 1; }
+
+input, select, .btn { font-size: 1rem; padding: .6rem .8rem; border-radius: 10px;
+  border: 1px solid var(--line); background: #fff; color: var(--ink); }
+input:focus, select:focus { outline: 2px solid var(--red); outline-offset: 0; }
+
+.btn { cursor: pointer; font-weight: 600; }
+.btn:active { transform: translateY(1px); }
+.btn-primary { background: var(--red); color: #fff; border-color: var(--red); }
+.btn-lg { width: 100%; padding: .9rem; font-size: 1.1rem; margin-top: .5rem; }
+.btn-link { background: none; border: none; color: var(--red); padding: .2rem 0; font-weight: 600; }
+
+.hint { color: var(--muted); font-size: .85rem; margin: .6rem 0 0; }
+
+#product-info h2 { margin: .4rem 0 .1rem; font-size: 1.4rem; }
+#product-info .price { font-size: 2rem; font-weight: 800; }
+#product-info .was { color: var(--muted); text-decoration: line-through; margin-left: .4rem; font-size: 1.1rem; }
+#product-info .meta { color: var(--muted); font-size: .9rem; }
+.variant-tag { display: inline-block; font-size: .72rem; font-weight: 700;
+  text-transform: uppercase; padding: .12rem .5rem; border-radius: 999px; margin-left: .4rem; vertical-align: middle; }
+.variant-sale { background: var(--red); color: #fff; }
+.variant-clearance { background: #000; color: #fff; }
+.variant-standard { background: #eee; color: #555; }
+
+.preview-wrap { margin: .8rem 0; text-align: center; }
+#label-preview { max-width: 100%; border: 1px solid var(--line); border-radius: 8px; }
+
+.print-row { display: flex; gap: .8rem; }
+.field { display: flex; flex-direction: column; gap: .25rem; font-size: .8rem;
+  color: var(--muted); flex: 1; }
+.field select, .field input { color: var(--ink); }
+
+.print-status { margin: .6rem 0 0; font-weight: 600; min-height: 1.2em; }
+.print-status.ok { color: var(--ok); }
+.print-status.err { color: var(--red); }
+.print-status.pending { color: var(--warn); }
+
+.suggest-list { display: flex; flex-direction: column; gap: .5rem; margin-top: .6rem; }
+.suggest-item { text-align: left; padding: .7rem .8rem; border: 1px solid var(--line);
+  border-radius: 10px; background: #fff; cursor: pointer; }
+.suggest-item:active { background: #faf0f0; }
+.suggest-item .s-name { font-weight: 600; }
+.suggest-item .s-meta { color: var(--muted); font-size: .8rem; }
+
+.toast { position: fixed; left: 50%; bottom: 1.2rem; transform: translateX(-50%);
+  background: #222; color: #fff; padding: .7rem 1rem; border-radius: 10px;
+  font-size: .9rem; box-shadow: 0 4px 14px rgba(0,0,0,.25); z-index: 20; max-width: 90%; }

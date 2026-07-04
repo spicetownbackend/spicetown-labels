@@ -1,0 +1,32 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Spice Town Labels — docker compose
+#
+#   docker compose up --build
+#   open http://localhost:8080
+#
+# Default: 'file' printing (writes label PNGs to ./data/spool) so it runs with
+# NO printer. To print on a real networked CUPS server, see the commented
+# environment below and DEPLOY.md.
+# ─────────────────────────────────────────────────────────────────────────────
+services:
+  labels:
+    build: .
+    image: spicetown-labels
+    container_name: spicetown-labels
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/data            # products.csv, sqlite db, logs, spooled labels
+    environment:
+      STL_ENV: production
+      STL_DATA_PROVIDER: file
+      STL_PRODUCTS_FILE: /data/products.csv
+      STL_PRINT_TRANSPORT: file       # 'cups' to print to a networked CUPS
+      STL_PRINT_SPOOL_DIR: /data/spool
+      # ── Print to a real CUPS server on your LAN (Brother QL-810W) ──────────
+      # STL_PRINT_TRANSPORT: cups
+      # STL_CUPS_PRINTER_NAME: Brother_QL_810W
+      # CUPS_SERVER: host.docker.internal:631   # the machine running CUPS
+      # STL_LABEL_SIZE: "29x62"
+      # STL_CUPS_LP_OPTIONS: media=29x62mm,landscape,scaling=123
+    restart: unless-stopped

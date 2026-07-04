@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+
+# Env / secrets
+.env
+
+# Runtime artifacts
+*.db
+*.db-wal
+*.db-shm
+logs/*.log
+logs/*.log.*
+spool/
+data/products_*.csv
+
+# OS
+.DS_Store

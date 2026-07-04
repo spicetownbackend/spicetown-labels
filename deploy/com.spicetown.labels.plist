@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  launchd auto-start for the Spice Town label server on the Mac Mini.
+
+  EDIT the two paths below (PROJECT_DIR) to match where you unzipped the
+  project, then install:
+
+    # 1) copy this file, substituting your real path
+    cp deploy/com.spicetown.labels.plist ~/Library/LaunchAgents/
+
+    # 2) load it (starts now + on every login/reboot)
+    launchctl load -w ~/Library/LaunchAgents/com.spicetown.labels.plist
+
+    # stop / start / status
+    launchctl unload ~/Library/LaunchAgents/com.spicetown.labels.plist
+    launchctl list | grep spicetown
+
+  Logs go to <PROJECT_DIR>/logs/launchd.{out,err}.log
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.spicetown.labels</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/rk_macmini/projects/spicetown-labels/scripts/run_gunicorn.sh</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/rk_macmini/projects/spicetown-labels</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>STL_ENV</key>
+        <string>production</string>
+        <key>STL_PORT</key>
+        <string>8080</string>
+        <!-- Printer: uncomment + set for the 29x62 landscape DK-1209 setup
+        <key>STL_LABEL_SIZE</key>
+        <string>29x62</string>
+        <key>STL_CUPS_LP_OPTIONS</key>
+        <string>media=29x62mm,landscape,scaling=123</string>
+        -->
+    </dict>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>/Users/rk_macmini/projects/spicetown-labels/logs/launchd.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/rk_macmini/projects/spicetown-labels/logs/launchd.err.log</string>
+</dict>
+</plist>

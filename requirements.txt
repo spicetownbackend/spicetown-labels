@@ -1,0 +1,41 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Spice Town Grocery — Label Printing System
+# requirements.txt  (Python 3.11+, Mac Mini M1 / macOS)
+# Pinned to ranges that are known-good for arm64 (Apple Silicon).
+# ─────────────────────────────────────────────────────────────────────────────
+
+# --- Web framework -----------------------------------------------------------
+Flask==3.0.3                  # HTTP server / app factory / blueprints
+Werkzeug==3.0.4               # WSGI utils (pulled by Flask, pinned for safety)
+Jinja2==3.1.4                 # templating for the scanner UI
+gunicorn==22.0.0              # production WSGI server (launchd-managed)
+
+# --- Persistence -------------------------------------------------------------
+Flask-SQLAlchemy==3.1.1       # ORM integration
+SQLAlchemy==2.0.34            # core ORM (SQLite primary lookup layer)
+
+# --- Scheduling (nightly bulk refresh) --------------------------------------
+APScheduler==3.10.4           # background cron for nightly product refresh
+
+# --- Rate limiting -----------------------------------------------------------
+ratelimit==2.2.1              # decorator-based limiter (token bucket impl is in-repo)
+
+# --- Label rendering / printing ---------------------------------------------
+Pillow==10.4.0                # PIL fork — label image generation
+brother_ql==0.9.4             # Brother QL-810W raster command generation
+qrcode==7.4.2                 # optional QR variant on labels
+python-barcode==0.15.1        # Code128/UPC barcode rendering onto labels
+
+# --- AI / fuzzy features -----------------------------------------------------
+rapidfuzz==3.9.7              # fuzzy search for unrecognized barcodes
+
+# --- HTTP client (Toast / external data sources) -----------------------------
+requests==2.32.3              # external API calls (wrapped by rate limiter)
+urllib3==2.2.2                # retry/backoff transport (pulled by requests)
+
+# --- Config / environment ----------------------------------------------------
+python-dotenv==1.0.1          # load .env into config
+
+# --- Dev / test (optional, safe to install) ---------------------------------
+pytest==8.3.2
+pytest-flask==1.3.0
