@@ -349,3 +349,54 @@ def test_cups_cmd_fit_to_page_disabled():
     t = CupsTransport("Brother_QL_810W", fit_to_page=False)
     cmd = t._build_lp_cmd("/tmp/x.png", 1)
     assert "fit-to-page" not in cmd
+
+
+# ── Name fitting: shrink + two-line wrap before any truncation ────────────────
+def test_render_full_name_preferred_over_short_name():
+    # Full name fits at a smaller font -> must be used verbatim (no "…"),
+    # even though the pre-computed short_name was truncated.
+    from app.services.label import _fit_single, _wrap_two_lines, _load_font
+    from PIL import ImageDraw, Image as PILImage
+
+    p = {**SAMPLE, "name": "Shan Biryani Masala B1G1",
+         "short_name": "Shan Biryani Masala…"}
+    img = render_label(p, _spec())
+    assert img.size == (696, 390)
+
+    draw = ImageDraw.Draw(PILImage.new("RGB", (10, 10)))
+    spec = _spec()
+    inner = spec.width_px - 2 * (spec.margin + spec.border_width)
+    # The full name fits single-line within the shrink range -> no wrap needed.
+    assert _fit_single(draw, p["name"], None, True, inner, 58, 28) is not None
+
+
+def test_render_very_long_name_wraps_two_lines_keeps_barcode():
+    from app.services.label import _fit_single, _fit_two_lines
+    from PIL import ImageDraw, Image as PILImage
+
+    long_name = "Laxmi Freshly Ground Organic Coriander Cumin Powder Blend 400g"
+    img = render_label({**SAMPLE, "name": long_name, "short_name": None}, _spec())
+    assert img.size == (696, 390)
+
+    draw = ImageDraw.Draw(PILImage.new("RGB", (10, 10)))
+    spec = _spec()
+    inner = spec.width_px - 2 * (spec.margin + spec.border_width)
+    # Single-line can't fit even at the minimum -> two-line fitter must succeed.
+    assert _fit_single(draw, long_name, None, True, inner, 58, 28) is None
+    two = _fit_two_lines(draw, long_name, None, True, inner, 40, 22)
+    assert two is not None
+    _font, l1, l2 = two
+    assert (l1 + " " + l2) == long_name  # nothing dropped
+
+
+def test_wrap_two_lines_balances_split():
+    from app.services.label import _wrap_two_lines, _load_font
+    from PIL import ImageDraw, Image as PILImage
+
+    draw = ImageDraw.Draw(PILImage.new("RGB", (10, 10)))
+    font = _load_font(None, 30, True)
+    lines = _wrap_two_lines(draw, "Shan Biryani Masala B1G1 Special", font, 350)
+    assert lines is not None
+    assert lines[0] and lines[1]
+    # single word can never wrap
+    assert _wrap_two_lines(draw, "Turmeric", font, 350) is None

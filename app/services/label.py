@@ -181,6 +181,68 @@ def _fit_font(
     return _load_font(font_path, min_size, bold)
 
 
+def _fit_single(
+    draw: ImageDraw.ImageDraw,
+    text: str,
+    font_path: str | None,
+    bold: bool,
+    max_width: int,
+    start_size: int,
+    min_size: int,
+) -> ImageFont.FreeTypeFont | None:
+    """Like _fit_font, but returns None when the text can't fit at min_size."""
+    size = start_size
+    while size >= min_size:
+        font = _load_font(font_path, size, bold)
+        if _text_size(draw, text, font)[0] <= max_width:
+            return font
+        size -= 2
+    return None
+
+
+def _wrap_two_lines(
+    draw: ImageDraw.ImageDraw, text: str, font, max_width: int
+) -> tuple[str, str] | None:
+    """Split `text` into two lines that both fit `max_width`, or None.
+
+    Picks the most balanced feasible split so neither line looks orphaned
+    (e.g. "Shan Biryani Masala" / "B1G1" beats cramming three words up top).
+    """
+    words = text.split(" ")
+    if len(words) < 2:
+        return None
+    best: tuple[int, tuple[str, str]] | None = None
+    for i in range(1, len(words)):
+        l1, l2 = " ".join(words[:i]), " ".join(words[i:])
+        w1 = _text_size(draw, l1, font)[0]
+        w2 = _text_size(draw, l2, font)[0]
+        if w1 <= max_width and w2 <= max_width:
+            widest = max(w1, w2)
+            if best is None or widest < best[0]:
+                best = (widest, (l1, l2))
+    return best[1] if best else None
+
+
+def _fit_two_lines(
+    draw: ImageDraw.ImageDraw,
+    text: str,
+    font_path: str | None,
+    bold: bool,
+    max_width: int,
+    start_size: int,
+    min_size: int,
+) -> tuple[ImageFont.FreeTypeFont, str, str] | None:
+    """Find the largest font at which `text` wraps onto two fitting lines."""
+    size = start_size
+    while size >= min_size:
+        font = _load_font(font_path, size, bold)
+        lines = _wrap_two_lines(draw, text, font, max_width)
+        if lines is not None:
+            return font, lines[0], lines[1]
+        size -= 2
+    return None
+
+
 def _truncate_to_width(
     draw: ImageDraw.ImageDraw, text: str, font, max_width: int
 ) -> str:
@@ -302,23 +364,51 @@ def render_label(product: dict, spec: LabelSpec, *, variant: str | None = None) 
     else:
         y += 38
 
-    # ── Product name (prefer AI short_name; auto-fit; abbreviate before shrink)
-    name = product.get("short_name") or product.get("name") or ""
-    name_font = _fit_font(
-        draw, name, spec.font_path_bold, True, inner_w, start_size=58, min_size=24
+    # ── Product name — NEVER truncate if avoidable. Cascade:
+    #   1. full name, one line, shrinking 58 -> 28
+    #   2. full name, TWO lines, shrinking 40 -> 22 (tall labels only)
+    #   3. AI short_name, one line, 58 -> 24
+    #   4. abbreviated full name (AI shortener), one line
+    #   5. last resort: min-size + ellipsis
+    full_name = product.get("name") or ""
+    short_name = product.get("short_name") or full_name
+    # Two-line mode needs vertical room (compact die-cut labels don't have it).
+    allow_two_lines = not spec.compact and spec.height_px >= 340
+
+    name_lines: list[str] = []
+    name_font = _fit_single(
+        draw, full_name, spec.font_path_bold, True, inner_w, 58, 28
     )
-    # If it still overflows at the minimum size, abbreviate (AI shortener) and
-    # refit before falling back to an ellipsis — keeps the name legible.
-    if _text_size(draw, name, name_font)[0] > inner_w:
-        abbreviated = shorten_name(name, max_chars=24)
-        if abbreviated and abbreviated != name:
-            name = abbreviated
-            name_font = _fit_font(
-                draw, name, spec.font_path_bold, True, inner_w, start_size=58, min_size=24
-            )
-    name = _truncate_to_width(draw, name, name_font, inner_w)
-    draw.text((m, y), name, font=name_font, fill="black")
-    y += _text_size(draw, name, name_font)[1] + 14
+    if name_font is not None:
+        name_lines = [full_name]
+    elif allow_two_lines:
+        two = _fit_two_lines(
+            draw, full_name, spec.font_path_bold, True, inner_w, 40, 22
+        )
+        if two is not None:
+            name_font, l1, l2 = two
+            name_lines = [l1, l2]
+    if not name_lines:
+        name_font = _fit_single(
+            draw, short_name, spec.font_path_bold, True, inner_w, 58, 24
+        )
+        if name_font is not None:
+            name_lines = [short_name]
+    if not name_lines:
+        abbreviated = shorten_name(full_name, max_chars=24)
+        name_font = _fit_single(
+            draw, abbreviated, spec.font_path_bold, True, inner_w, 58, 24
+        )
+        if name_font is not None:
+            name_lines = [abbreviated]
+    if not name_lines:
+        name_font = _load_font(spec.font_path_bold, 24, True)
+        name_lines = [_truncate_to_width(draw, short_name, name_font, inner_w)]
+
+    for line in name_lines:
+        draw.text((m, y), line, font=name_font, fill="black")
+        y += _text_size(draw, line, name_font)[1] + 6
+    y += 8
 
     # ── Size / unit line (skipped in compact mode) ────────────────────────────
     sub_bits = [b for b in [product.get("size"), product.get("unit")] if b]
