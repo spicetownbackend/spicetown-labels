@@ -1,22 +1,49 @@
 # 🌶️ Spice Town Grocery — Label Printing System
 
-Production-ready retail label printing for Spice Town Grocery.
+Retail label printing for Spice Town Grocery: staff scan a product barcode on
+any phone, pick copies/variant, and a price label prints on the store's
+Brother QL-810W — fully automated, $0/month hosting.
 
-- **Backend:** Flask + SQLAlchemy (SQLite) on a Mac Mini M1 (macOS)
-- **Printing:** `brother_ql` → Brother **QL-810W** via CUPS (later stage)
-- **Scanning:** QuaggaJS mobile camera (later stage)
-- **Labels:** PIL/Pillow image generation (later stage)
-- **Auto-start:** `launchd` on reboot (later stage)
+## 🚀 The production system (live)
 
-> **This document covers all 6 stages.** The system is feature-complete:
-> scan → lookup → label → print, with a mobile UI and turnkey deployment.
-> See **DEPLOY.md** for hosting options, and **docs/ENGINEERING_HANDOFF.md**
-> for the engineering/hosting guide (AWS, GitHub Actions CI/CD, printer bridge).
->
-> **Cloud hosting + real printing:** the app also supports **remote print
-> mode** (`STL_PRINT_MODE=remote`) — host it free in the cloud while a
-> one-file, stdlib-only bridge agent (`scripts/print_bridge.py`) on any device
-> at the store drives the Brother QL-810W. Setup guide: **docs/BRIDGE.md**.
+```
+ Toast POS ──nightly sync──▶ GitHub (products.csv, versioned)
+                                │  push → auto-deploy
+                                ▼
+ staff phone ──scan/search──▶ Render free tier (Flask app, remote print mode)
+                                │  /api/print → job queued
+                                ▼
+ Samsung tablet (Termux print bridge) ──raster over WiFi:9100──▶ Brother QL-810W
+```
+
+| Piece | Where | Notes |
+|-------|-------|-------|
+| Web app + API | https://spicetown-labels.onrender.com | Render free tier, auto-deploys from `main` |
+| Catalog | `data/products.csv` in this repo | Synced from Toast nightly (~3:30 AM ET) by the **Toast catalog sync** GitHub Action; hand-edited `sale_price`/`clearance` survive syncs |
+| Print bridge | Samsung tablet at the store (Termux) | `scripts/print_bridge.py`, stdlib-only; auto-starts on boot; see **docs/BRIDGE.md** |
+| Printer | Brother QL-810W on store WiFi | Receives server-converted raster on port 9100 |
+| Secrets | GitHub Actions Secrets (Toast creds) + Render env (`STL_BRIDGE_TOKEN`) | Never in the repo |
+
+Key behaviours: **shared barcodes** are supported (same UPC on "XYZ" and
+"XYZ B1G1" → staff pick from a list); label names **never truncate** when
+shrinking or two-line wrapping can fit them; jobs queue in the cloud when the
+tablet is offline and print on reconnect; stuck jobs auto-requeue.
+
+**Operations / testing / troubleshooting:** see the runbook (kept by the
+owner) and **docs/BRIDGE.md** (bridge + tablet), **docs/TOAST.md** (inventory
+sync), **DEPLOY.md** (hosting options).
+
+---
+
+> **The sections below document the original 6-stage build** (all complete)
+> and remain accurate for local development. The original target was a Mac
+> Mini M1 (`local` print mode); production now runs the cloud + bridge
+> architecture above (`STL_PRINT_MODE=remote`).
+
+- **Backend:** Flask + SQLAlchemy (SQLite)
+- **Printing:** transports for CUPS / `brother_ql` / file / null + remote bridge
+- **Scanning:** QuaggaJS mobile camera + fuzzy name/UPC search
+- **Labels:** PIL/Pillow image generation (variants, barcode, auto-fit names)
 
 ---
 
