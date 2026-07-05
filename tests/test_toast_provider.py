@@ -29,8 +29,9 @@ MENUS_DOC = {
                     "name": "Spices",
                     "menuItems": [
                         {"guid": "g1", "name": "Ground Cumin", "sku": "041196910184", "price": 4.99},
-                        {"guid": "g2", "name": "No Barcode Item", "sku": "", "price": 3.99},
+                        {"guid": "a1b2c3d4-e5f6-7890-abcd-ef0123456789", "name": "No Barcode Item", "sku": "", "price": 3.99},
                         {"guid": "g3", "name": "Open Priced", "sku": "111", "price": 0},
+                        {"guid": "g5", "name": "Bulk Basmati Rice", "sku": "", "plu": "4011", "price": 2.50},
                     ],
                     "menuGroups": [
                         {
@@ -136,8 +137,8 @@ def test_missing_credentials_fail_health(fake):
 # ── Catalog mapping ───────────────────────────────────────────────────────────
 def test_fetch_all_maps_and_skips(fake):
     recs = {r.upc: r for r in _provider().fetch_all()}
-    # 2 valid items; blank-sku and zero-price items skipped.
-    assert set(recs) == {"041196910184", "085239014288"}
+    # sku items + plu fallback + guid fallback; only the zero-price item skips.
+    assert set(recs) == {"041196910184", "085239014288", "4011", "TG-A1B2C3D4E5F6"}
     cumin = recs["041196910184"]
     assert cumin.name == "Ground Cumin"
     assert cumin.price == 4.99
@@ -145,6 +146,9 @@ def test_fetch_all_maps_and_skips(fake):
     assert cumin.sku == "041196910184"
     # Nested group inherits its own (deepest) group name as department.
     assert recs["085239014288"].department == "Organic Spices"
+    # No-barcode items stay findable by name; their key is stable run-to-run.
+    assert recs["TG-A1B2C3D4E5F6"].name == "No Barcode Item"
+    assert recs["4011"].name == "Bulk Basmati Rice"
 
 
 def test_fetch_by_upc_hit_miss_and_doc_reuse(fake):
@@ -160,7 +164,7 @@ def test_fetch_by_upc_hit_miss_and_doc_reuse(fake):
 def test_retries_on_429_then_succeeds(fake):
     fake.scripted["/menus/v2/menus"] = [FakeResponse(429), FakeResponse(200, MENUS_DOC)]
     recs = list(_provider().fetch_all())
-    assert len(recs) == 2
+    assert len(recs) == 4
     assert fake.count("/menus/v2/menus") == 2
 
 

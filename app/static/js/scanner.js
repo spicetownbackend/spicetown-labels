@@ -251,7 +251,12 @@
   // health badges
   getJSON("/api/health").then(({ body }) => {
     if (!body) return;
-    if (!body.print_worker_alive)
+    if (body.print_mode === "remote") {
+      // Cloud hosting: the store's print bridge drains the queue; the local
+      // transport name ("null") is irrelevant — don't scare the user with it.
+      $("printer-badge").textContent = "print bridge";
+    } else if (!body.print_worker_alive) {
       $("printer-badge").textContent = (body.printer || "printer") + " (worker off)";
+    }
   });
 })();

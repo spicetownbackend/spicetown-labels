@@ -6,9 +6,12 @@ the nightly sync** (3:00 AM ET) — no more editing `products.csv`.
 
 How it maps: each Toast menu item's **`sku` field is the barcode/UPC**, `name`
 and `price` come across as-is, and the item's menu-group name becomes the
-label's department line. Items with no sku or no positive price are skipped
-(they can't be scanned anyway); the skip count appears in the logs after each
-sync.
+label's department line. Items **without a barcode are still included**: the
+key falls back to the item's PLU, then to a stable `TG-…` code from the Toast
+GUID — staff find them via **name search** in the scanner UI, and the printed
+label carries that code as a scannable Code128 (so the shelf label itself
+scans from then on). Only items with no positive price are skipped; the skip
+count appears in the logs after each sync.
 
 There are **two ways to run the sync** — pick one:
 

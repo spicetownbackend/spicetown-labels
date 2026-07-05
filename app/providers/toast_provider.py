@@ -219,9 +219,6 @@ class ToastDataProvider(DataProvider):
 
     def _to_record(self, item: dict, department: str) -> ProductRecord | None:
         """Map one Toast menu item to a ProductRecord (None -> skip + reason)."""
-        sku = (str(item.get("sku") or "")).strip()
-        if not sku:
-            return None  # no barcode — unscannable, skip
         name = (item.get("name") or "").strip()
         if not name:
             return None
@@ -232,11 +229,23 @@ class ToastDataProvider(DataProvider):
         if price <= 0:
             return None  # open-priced / unpriced items can't be labelled
 
+        # Barcode key: sku (the store keeps the UPC there), else PLU, else a
+        # stable code derived from the Toast GUID. Items without a real
+        # barcode are still loadable — staff find them by NAME SEARCH in the
+        # scanner UI, and the printed label carries the internal code as a
+        # scannable Code128, so the label itself scans from then on.
+        sku = (str(item.get("sku") or "")).strip()
+        plu = (str(item.get("plu") or "")).strip()
+        guid = (str(item.get("guid") or "")).strip()
+        upc = sku or plu or (f"TG-{guid.replace('-', '')[:12].upper()}" if guid else "")
+        if not upc:
+            return None  # nothing stable to key on
+
         return ProductRecord(
-            upc=sku,
+            upc=upc,
             name=name,
             price=price,
-            sku=sku,
+            sku=sku or None,
             department=department or None,
             extra={"toast_guid": item.get("guid")},
         )
@@ -267,7 +276,7 @@ class ToastDataProvider(DataProvider):
             seen += 1
             yield rec
         logger.info(
-            "toast fetch_all: yielded=%d skipped=%d (no sku/name/price)",
+            "toast fetch_all: yielded=%d skipped=%d (no name/price/key)",
             seen,
             skipped,
         )
