@@ -200,12 +200,20 @@
         inputStream: {
           type: "LiveStream",
           target: viewport,
-          constraints: { facingMode: "environment" },
+          constraints: {
+            facingMode: "environment",
+            // Higher resolution dramatically improves decode accuracy on
+            // small/curved grocery barcodes.
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+          },
         },
+        locator: { patchSize: "medium", halfSample: true },
         decoder: {
           readers: ["upc_reader", "upc_e_reader", "ean_reader", "ean_8_reader", "code_128_reader"],
         },
         locate: true,
+        frequency: 10,
       },
       (err) => {
         if (err) {
@@ -224,12 +232,57 @@
     Quagga.onDetected(onDetected);
   }
 
+  // ── scan validation ──────────────────────────────────────────────────────
+  // A single video frame routinely mis-decodes (wrong digits, phantom codes).
+  // Accept a code only when: (1) the decoder's own error score is low,
+  // (2) the SAME code is read in several frames within a short window, and
+  // (3) numeric UPC/EAN codes pass their checksum digit.
+  const MAX_DECODE_ERROR = 0.16; // mean per-digit error; >0.16 is unreliable
+  const CONFIRMATIONS_NEEDED = 3; // identical reads required
+  const CONFIRM_WINDOW_MS = 1800; // ...within this window
+  let readVotes = {}; // code -> [timestamps]
+
+  function decodeQualityOk(res) {
+    const codes = res.codeResult && res.codeResult.decodedCodes;
+    if (!codes || !codes.length) return true; // no scores available → let votes decide
+    let sum = 0, n = 0;
+    for (const d of codes) {
+      if (d.error !== undefined) { sum += d.error; n++; }
+    }
+    return n === 0 || sum / n < MAX_DECODE_ERROR;
+  }
+
+  function gtinChecksumOk(code) {
+    // Validate UPC-A / EAN-8 / EAN-13 / GTIN-14 check digit. Non-numeric or
+    // other-length codes (our Code128 TG-… labels) skip this test.
+    if (!/^\d+$/.test(code)) return true;
+    if (![8, 12, 13, 14].includes(code.length)) return true;
+    const digits = code.split("").map(Number);
+    const check = digits.pop();
+    let sum = 0;
+    // From the rightmost payload digit leftwards: weights 3,1,3,1,…
+    digits.reverse().forEach((d, i) => { sum += d * (i % 2 === 0 ? 3 : 1); });
+    return (10 - (sum % 10)) % 10 === check;
+  }
+
   function onDetected(res) {
     const code = res && res.codeResult && res.codeResult.code;
     if (!code) return;
     const now = Date.now();
-    // debounce duplicate reads
+    // debounce a code we already accepted moments ago
     if (code === lastCode && now - lastAt < 2500) return;
+
+    if (!decodeQualityOk(res)) return; // noisy frame → ignore
+    if (!gtinChecksumOk(code)) return; // impossible UPC/EAN → ignore
+
+    // Vote: require the same code in several frames before trusting it.
+    const votes = (readVotes[code] = (readVotes[code] || []).filter(
+      (t) => now - t < CONFIRM_WINDOW_MS
+    ));
+    votes.push(now);
+    if (votes.length < CONFIRMATIONS_NEEDED) return;
+
+    readVotes = {};
     lastCode = code;
     lastAt = now;
     if (navigator.vibrate) navigator.vibrate(60);
