@@ -10,7 +10,40 @@ label's department line. Items with no sku or no positive price are skipped
 (they can't be scanned anyway); the skip count appears in the logs after each
 sync.
 
-## Activate it (config only — no code changes)
+There are **two ways to run the sync** — pick one:
+
+## Option A (recommended): GitHub Actions nightly sync
+
+Credentials live in **GitHub Actions Secrets** (encrypted; never in repo
+files). A scheduled workflow (`.github/workflows/toast-sync.yml`) runs nightly
+at ~3 AM ET on GitHub's servers, pulls the catalog from Toast, and commits an
+updated `data/products.csv` — Render auto-deploys it minutes later. The app
+stays on the simple `file` provider and never holds Toast credentials.
+
+Bonuses: the catalog is **version-controlled** (every night's prices are a
+commit you can inspect or revert), and **hand-edited `sale_price` /
+`clearance` values in the CSV survive the sync** — so SALE labels still work
+even though Toast has no sale-price concept.
+
+Setup:
+
+1. **Get credentials from Toast** (standard API access): client ID, client
+   secret, restaurant GUID.
+2. On GitHub: repo → **Settings → Secrets and variables → Actions →
+   New repository secret**, add the three:
+   `TOAST_CLIENT_ID`, `TOAST_CLIENT_SECRET`, `TOAST_RESTAURANT_GUID`.
+3. Test it immediately: **Actions tab → "Toast catalog sync" → Run
+   workflow**. Watch the run; on success the new `products.csv` is committed
+   and Render redeploys with your real catalog.
+
+That's it — it repeats nightly by itself. (GitHub pauses schedules in repos
+with no activity for 60 days, but the sync's own nightly commits count as
+activity, so this doesn't bite in practice.)
+
+## Option B: live provider on Render
+
+The app itself talks to Toast at runtime (startup load, nightly in-app
+refresh, per-scan miss lookups).
 
 1. **Get credentials from Toast** (standard API access): a client ID, client
    secret, and your restaurant GUID.

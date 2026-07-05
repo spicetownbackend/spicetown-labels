@@ -1,0 +1,59 @@
+# Nightly Toast POS -> products.csv sync.
+#
+# Pulls the catalog from Toast using credentials stored in GitHub Actions
+# SECRETS (Settings -> Secrets and variables -> Actions):
+#   TOAST_CLIENT_ID, TOAST_CLIENT_SECRET, TOAST_RESTAURANT_GUID
+#
+# If the catalog changed, the workflow commits data/products.csv — that push
+# triggers Render's auto-deploy, so the label app reloads the new catalog a
+# couple of minutes later. Hand-edited sale_price/clearance values in the CSV
+# are preserved across syncs (see scripts/toast_sync.py).
+#
+# Run it on demand: Actions tab -> "Toast catalog sync" -> Run workflow.
+
+name: Toast catalog sync
+
+on:
+  schedule:
+    - cron: "30 7 * * *"   # 07:30 UTC ≈ 2:30/3:30 AM ET year-round
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: toast-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Sync catalog from Toast
+        env:
+          TOAST_CLIENT_ID: ${{ secrets.TOAST_CLIENT_ID }}
+          TOAST_CLIENT_SECRET: ${{ secrets.TOAST_CLIENT_SECRET }}
+          TOAST_RESTAURANT_GUID: ${{ secrets.TOAST_RESTAURANT_GUID }}
+        run: python scripts/toast_sync.py
+
+      - name: Commit updated catalog (if changed)
+        run: |
+          if git diff --quiet data/products.csv; then
+            echo "catalog unchanged — nothing to commit"
+            exit 0
+          fi
+          git config user.name "toast-sync-bot"
+          git config user.email "actions@github.com"
+          git add data/products.csv
+          git commit -m "Nightly Toast catalog sync ($(date -u +%F))"
+          git push
