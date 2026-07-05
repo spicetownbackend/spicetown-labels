@@ -1,26 +1,36 @@
 """
-app/providers/toast_provider.py — ToastDataProvider (STUB).
+app/providers/toast_provider.py — ToastDataProvider (Toast standard API).
 
-This is a fully-wired *skeleton* for the Toast POS integration. The control
-flow, rate limiting, and exponential backoff are real and correct; only the
-actual HTTP/OAuth2 calls are stubbed and marked with TODO.
+Pulls the product catalog from Toast's Menus API so the label system syncs
+straight from the POS (startup bulk load + nightly refresh — no CSV edits).
 
-To activate Toast in production:
-    1. Obtain OAuth2 client credentials from Toast (Integrations console).
-    2. Set STL_TOAST_CLIENT_ID / STL_TOAST_CLIENT_SECRET / STL_TOAST_RESTAURANT_GUID.
-    3. Set STL_DATA_PROVIDER=toast.
-    4. Implement the TODO blocks below.
+Mapping (per the store's Toast setup):
+  * ProductRecord.upc   <- menu item `sku` (the store keeps the barcode there)
+  * ProductRecord.name  <- item `name`
+  * ProductRecord.price <- item `price` (fixed-price items)
+  * department          <- the menu group's name (falls back to the menu name)
+Items without a scannable sku or a positive price are skipped (logged once per
+sync) — they can't be looked up by barcode anyway.
+
+Activation (config only):
+    1. Set STL_TOAST_CLIENT_ID / STL_TOAST_CLIENT_SECRET /
+       STL_TOAST_RESTAURANT_GUID (Render: Environment tab — never in git).
+    2. Set STL_DATA_PROVIDER=toast.
+    3. Verify: `python manage.py provider-check` -> provider=toast healthy=True
 
 Every outbound call is gated by the shared token bucket (10 req/s, burst 20)
-and retried with exponential backoff + jitter on 429 / 5xx. This guarantees we
-never overrun Toast's limits regardless of how many scans arrive.
+and retried with exponential backoff + jitter on 429 / 5xx. An expired OAuth
+token (401 mid-flight) is refreshed transparently and the call retried.
 """
 
 from __future__ import annotations
 
 import logging
+import threading
 import time
-from typing import Iterator
+from typing import Any, Iterator
+
+import requests
 
 from ..services.ratelimit import (
     RetryableError,
@@ -33,13 +43,20 @@ from .base import DataProvider, ProductRecord
 
 logger = logging.getLogger("spicetown.provider.toast")
 
+# Refresh the OAuth token this many seconds before Toast says it expires.
+_TOKEN_SAFETY_MARGIN = 60.0
+# fetch_by_upc reuses the last menus document for this long (the cache-miss
+# path is rare; this avoids re-downloading the catalog for burst misses).
+_MENUS_DOC_TTL = 60.0
+_HTTP_TIMEOUT = 30.0
+
+
+class ToastAuthError(Exception):
+    """Raised when Toast rejects the client credentials."""
+
 
 class ToastDataProvider(DataProvider):
-    """OAuth2-backed Toast POS provider — STUB implementation.
-
-    The public methods mirror FileDataProvider so the rest of the system is
-    agnostic to which provider is active.
-    """
+    """OAuth2-backed Toast POS provider (Menus API)."""
 
     name = "toast"
 
@@ -67,65 +84,68 @@ class ToastDataProvider(DataProvider):
         self._backoff_cap = backoff_cap
         self._backoff_max_retries = backoff_max_retries
 
-        # OAuth2 token cache.
+        # OAuth2 token cache (lock: refresh may race between the scheduler
+        # thread and a request-handler cache miss).
+        self._token_lock = threading.Lock()
         self._access_token: str | None = None
         self._token_expires_at: float = 0.0
 
-    # ── credentials ────────────────────────────────────────────────────────
+        # Short-lived menus-document cache for the per-UPC miss path.
+        self._menus_doc: Any = None
+        self._menus_doc_at: float = 0.0
+
+    # ── credentials / OAuth2 ──────────────────────────────────────────────────
     def _credentials_present(self) -> bool:
         return bool(self.client_id and self.client_secret and self.restaurant_guid)
 
     def _ensure_token(self) -> str:
-        """Return a valid OAuth2 access token, refreshing if expired.
+        """Return a valid OAuth2 access token, refreshing if (nearly) expired."""
+        with self._token_lock:
+            if self._access_token and time.monotonic() < self._token_expires_at:
+                return self._access_token
 
-        TODO(toast-oauth): Implement the client-credentials grant:
+            if not self._credentials_present():
+                raise ToastAuthError(
+                    "Toast credentials missing: set STL_TOAST_CLIENT_ID / "
+                    "STL_TOAST_CLIENT_SECRET / STL_TOAST_RESTAURANT_GUID"
+                )
 
-            POST {api_base}/authentication/v1/authentication/login
-            body = {
-                "clientId": self.client_id,
-                "clientSecret": self.client_secret,
-                "userAccessType": "TOAST_MACHINE_CLIENT",
-            }
-        Parse `token.accessToken` and `token.expiresIn`; cache both. Wrap the
-        POST with `self._rate_limited_call(...)` so even auth respects limits.
-        """
-        now = time.monotonic()
-        if self._access_token and now < self._token_expires_at:
-            return self._access_token
-
-        if not self._credentials_present():
-            raise NotImplementedError(
-                "ToastDataProvider is a stub: set STL_TOAST_CLIENT_ID / "
-                "STL_TOAST_CLIENT_SECRET / STL_TOAST_RESTAURANT_GUID and "
-                "implement _ensure_token()."
+            payload = self._http_json(
+                "POST",
+                "/authentication/v1/authentication/login",
+                authenticated=False,
+                json={
+                    "clientId": self.client_id,
+                    "clientSecret": self.client_secret,
+                    "userAccessType": "TOAST_MACHINE_CLIENT",
+                },
             )
+            token = (payload or {}).get("token") or {}
+            access = token.get("accessToken")
+            expires_in = token.get("expiresIn") or 0
+            if not access:
+                raise ToastAuthError(f"Toast login returned no token: {payload!r}")
 
-        # TODO(toast-oauth): replace the line below with a real token request.
-        raise NotImplementedError(
-            "Toast OAuth2 client-credentials flow not yet implemented."
-        )
+            self._access_token = access
+            self._token_expires_at = (
+                time.monotonic() + max(float(expires_in) - _TOKEN_SAFETY_MARGIN, 30.0)
+            )
+            logger.info("Toast OAuth token refreshed (expires_in=%ss)", expires_in)
+            return access
+
+    def _invalidate_token(self) -> None:
+        with self._token_lock:
+            self._access_token = None
+            self._token_expires_at = 0.0
 
     # ── transport ────────────────────────────────────────────────────────────
-    def _rate_limited_call(self, method: str, path: str, **kwargs):
+    def _http_json(self, method: str, path: str, *, authenticated: bool = True, **kwargs):
         """Single choke point for ALL Toast HTTP traffic.
 
-        Acquires a token from the shared bucket (blocking up to a short timeout)
-        and performs the request inside the backoff-retry wrapper. Non-2xx
-        responses in RETRYABLE_STATUS raise RetryableError to trigger backoff.
-
-        TODO(toast-http): Implement the actual `requests` call:
-
-            import requests
-            url = f"{self.api_base}{path}"
-            headers = {
-                "Authorization": f"Bearer {self._ensure_token()}",
-                "Toast-Restaurant-External-ID": self.restaurant_guid,
-            }
-            resp = requests.request(method, url, headers=headers, timeout=10, **kwargs)
-            if resp.status_code in RETRYABLE_STATUS:
-                raise RetryableError(f"toast {resp.status_code}", status=resp.status_code)
-            resp.raise_for_status()
-            return resp.json()
+        Acquires a token from the shared bucket and performs the request inside
+        the backoff-retry wrapper. 429/5xx raise RetryableError -> backoff with
+        jitter. A 401 on an authenticated call invalidates the cached OAuth
+        token and retries (fresh login) via the same backoff path.
         """
 
         @backoff_retry(
@@ -141,51 +161,130 @@ class ToastDataProvider(DataProvider):
                 # Treat starvation as retryable so backoff smooths the spike.
                 raise RetryableError("rate-limiter timeout", status=429)
 
-            # TODO(toast-http): perform the real request here and return JSON.
-            raise NotImplementedError(
-                f"Toast HTTP transport not implemented ({method} {path})."
-            )
+            headers = {"Toast-Restaurant-External-ID": self.restaurant_guid}
+            if authenticated:
+                headers["Authorization"] = f"Bearer {self._ensure_token()}"
+
+            url = f"{self.api_base}{path}"
+            try:
+                resp = requests.request(
+                    method, url, headers=headers, timeout=_HTTP_TIMEOUT, **kwargs
+                )
+            except requests.RequestException as exc:
+                # Network blips are retryable; DNS/refused resolve on retry too.
+                raise RetryableError(f"toast network error: {exc}", status=503) from exc
+
+            if resp.status_code in RETRYABLE_STATUS:
+                raise RetryableError(
+                    f"toast {resp.status_code} on {path}", status=resp.status_code
+                )
+            if authenticated and resp.status_code == 401:
+                # Token expired server-side — drop it and retry with a new one.
+                self._invalidate_token()
+                raise RetryableError("toast 401 (token expired)", status=401)
+            resp.raise_for_status()
+            return resp.json() if resp.content else None
 
         return _do()
 
+    # ── Menus document → ProductRecords ───────────────────────────────────────
+    def _get_menus_document(self, *, max_age: float = 0.0) -> Any:
+        """Fetch the published menus (optionally reusing a recent copy)."""
+        if (
+            max_age > 0
+            and self._menus_doc is not None
+            and (time.monotonic() - self._menus_doc_at) < max_age
+        ):
+            return self._menus_doc
+        doc = self._http_json("GET", "/menus/v2/menus")
+        self._menus_doc = doc
+        self._menus_doc_at = time.monotonic()
+        return doc
+
+    def _iter_items(self, doc: Any) -> Iterator[tuple[dict, str]]:
+        """Yield (menu_item, department) walking menus -> groups (recursively)."""
+
+        def walk_group(group: dict, department: str) -> Iterator[tuple[dict, str]]:
+            dept = (group.get("name") or department or "").strip() or department
+            for item in group.get("menuItems") or []:
+                yield item, dept
+            for sub in group.get("menuGroups") or []:
+                yield from walk_group(sub, dept)
+
+        menus = (doc or {}).get("menus") or []
+        for menu in menus:
+            menu_name = (menu.get("name") or "").strip()
+            for group in menu.get("menuGroups") or []:
+                yield from walk_group(group, menu_name)
+
+    def _to_record(self, item: dict, department: str) -> ProductRecord | None:
+        """Map one Toast menu item to a ProductRecord (None -> skip + reason)."""
+        sku = (str(item.get("sku") or "")).strip()
+        if not sku:
+            return None  # no barcode — unscannable, skip
+        name = (item.get("name") or "").strip()
+        if not name:
+            return None
+        try:
+            price = float(item.get("price") or 0.0)
+        except (TypeError, ValueError):
+            price = 0.0
+        if price <= 0:
+            return None  # open-priced / unpriced items can't be labelled
+
+        return ProductRecord(
+            upc=sku,
+            name=name,
+            price=price,
+            sku=sku,
+            department=department or None,
+            extra={"toast_guid": item.get("guid")},
+        )
+
     # ── DataProvider interface ────────────────────────────────────────────────
     def health_check(self) -> bool:
-        """Cheap reachability probe.
-
-        TODO(toast-health): GET {api_base}/.../config and return resp.ok.
-        For the stub we simply report whether credentials are configured.
-        """
+        """Authenticated probe against the lightweight menus metadata endpoint."""
         if not self._credentials_present():
-            logger.warning("Toast credentials not configured; provider is a stub.")
+            logger.warning("Toast credentials not configured.")
             return False
-        # TODO(toast-health): perform a lightweight authenticated GET.
-        return False
+        try:
+            self._http_json("GET", "/menus/v2/metadata")
+            return True
+        except Exception as exc:
+            logger.error("Toast health check failed: %s", exc)
+            return False
 
     def fetch_all(self) -> Iterator[ProductRecord]:
-        """Stream every menu item for the nightly bulk refresh.
-
-        TODO(toast-menu): Page through the Toast Menus API:
-            GET {api_base}/menus/v2/menus  (or config/v2/menuItems)
-        Map each item -> ProductRecord(upc=..., name=..., price=..., ...).
-        Yield records as pages arrive (do NOT build one giant list) so 10k+
-        items stream with bounded memory. Each page fetch must go through
-        self._rate_limited_call(...).
-        """
-        raise NotImplementedError(
-            "ToastDataProvider.fetch_all() is a stub — implement Toast Menus paging."
+        """Stream every sellable item for the startup load / nightly refresh."""
+        doc = self._get_menus_document()
+        seen = 0
+        skipped = 0
+        for item, department in self._iter_items(doc):
+            rec = self._to_record(item, department)
+            if rec is None:
+                skipped += 1
+                continue
+            seen += 1
+            yield rec
+        logger.info(
+            "toast fetch_all: yielded=%d skipped=%d (no sku/name/price)",
+            seen,
+            skipped,
         )
-        # Unreachable, but documents intended shape for implementers:
-        # yield ProductRecord(upc="...", name="...", price=0.0)
 
     def fetch_by_upc(self, upc: str) -> ProductRecord | None:
         """Look up one product by UPC (cache-miss fallback).
 
-        TODO(toast-lookup): Query the Toast item endpoint filtered by UPC/SKU,
-        e.g. GET {api_base}/config/v2/menuItems?upc={upc}. Return the mapped
-        ProductRecord or None if not found. The call already flows through the
-        rate limiter + backoff via _rate_limited_call.
+        Toast's standard API has no sku-filter endpoint, so this scans the
+        menus document (reusing a copy fetched within the last minute — the
+        miss path is rare and bursts shouldn't re-download the catalog).
         """
-        _ = self._rate_limited_call  # referenced so implementers see the path
-        raise NotImplementedError(
-            "ToastDataProvider.fetch_by_upc() is a stub — implement Toast item lookup."
-        )
+        upc = (upc or "").strip()
+        if not upc:
+            return None
+        doc = self._get_menus_document(max_age=_MENUS_DOC_TTL)
+        for item, department in self._iter_items(doc):
+            rec = self._to_record(item, department)
+            if rec is not None and rec.upc == upc:
+                return rec
+        return None

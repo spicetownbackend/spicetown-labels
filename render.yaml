@@ -46,7 +46,10 @@ services:
         generateValue: true
       - key: STL_PRINT_TRANSPORT
         value: "null"
+      # Nightly catalog refresh at 3:00 AM ET (the print bridge's polling keeps
+      # the free instance awake, so the scheduler actually fires). Essential
+      # once STL_DATA_PROVIDER=toast so price changes sync overnight.
       - key: STL_ENABLE_SCHEDULER
-        value: "false"
+        value: "true"
       - key: STL_SECRET_KEY
         generateValue: true
