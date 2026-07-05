@@ -178,14 +178,15 @@ def test_lookup_found_and_missing(app, client):
     assert missing.get_json()["found"] is False
 
 
-def test_indexed_upc_is_unique(app):
+def test_indexed_upc_allows_shared_barcodes(app):
+    # The store sells variants sharing a barcode (e.g. "XYZ" / "XYZ B1G1"),
+    # so upc is indexed but intentionally NOT unique.
     with app.app_context():
         db.session.add(Product(upc="dup-123", name="One", price=1.0))
         db.session.commit()
         db.session.add(Product(upc="dup-123", name="Two", price=2.0))
-        with pytest.raises(Exception):
-            db.session.commit()
-        db.session.rollback()
+        db.session.commit()
+        assert db.session.query(Product).filter_by(upc="dup-123").count() == 2
 
 
 def test_stage_stubs_return_501(client):

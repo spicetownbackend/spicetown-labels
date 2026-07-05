@@ -113,11 +113,16 @@ def lookup(upc: str):
             404,
         )
 
+    products = result.products or [result.product]
     return jsonify(
         {
             "found": True,
             "outcome": result.outcome,  # hit | refreshed | stale
             "product": result.product.to_dict(),
+            # Shared barcodes (e.g. "XYZ" vs "XYZ B1G1") return every match;
+            # the UI shows a picker when there is more than one.
+            "products": [p.to_dict() for p in products],
+            "multiple": len(products) > 1,
         }
     )
 
@@ -211,21 +216,33 @@ def enqueue_print():
     """
     body = request.get_json(silent=True) or {}
     upc = str(body.get("upc", "")).strip()
-    if not upc:
+    product_id = body.get("product_id")
+    if not upc and not product_id:
         return jsonify({"error": "bad_request", "message": "upc is required"}), 400
 
     copies = body.get("copies", 1)
     variant = body.get("variant")
     wait = bool(body.get("wait", False))
 
-    # The product must be in the catalog (scan path already looked it up).
-    cache = current_app.extensions["cache"]
-    result = cache.get(upc, allow_remote=True)
-    if not result.found:
-        return (
-            jsonify({"error": "not_found", "upc": upc, "message": "UPC not in catalog"}),
-            404,
-        )
+    # Resolve the exact product: by id when given (disambiguates shared
+    # barcodes), else the first catalog match for the UPC.
+    if product_id is not None:
+        product = db.session.get(Product, int(product_id))
+        if product is None:
+            return (
+                jsonify({"error": "not_found", "product_id": product_id}),
+                404,
+            )
+        upc = product.upc
+    else:
+        cache = current_app.extensions["cache"]
+        result = cache.get(upc, allow_remote=True)
+        if not result.found:
+            return (
+                jsonify({"error": "not_found", "upc": upc, "message": "UPC not in catalog"}),
+                404,
+            )
+        product = result.product
 
     pq = current_app.extensions["print_queue"]
     remote_mode = current_app.config.get("PRINT_MODE", "local") == "remote"
@@ -236,8 +253,14 @@ def enqueue_print():
         # drives the printer. Reuse the row-creation half of enqueue only.
         copies_n = max(1, min(int(copies), 50))
         if variant is None:
-            variant = result.product.label_variant()
-        job = PrintJob(upc=upc, variant=variant, copies=copies_n, status="queued")
+            variant = product.label_variant()
+        job = PrintJob(
+            upc=upc,
+            product_id=product.id,
+            variant=variant,
+            copies=copies_n,
+            status="queued",
+        )
         db.session.add(job)
         db.session.commit()
         enq = SimpleNamespace(
@@ -253,7 +276,9 @@ def enqueue_print():
                 503,
             )
         try:
-            enq = pq.enqueue(upc, variant=variant, copies=copies)
+            enq = pq.enqueue(
+                upc, variant=variant, copies=copies, product_id=product.id
+            )
         except QueueFull:
             return jsonify({"error": "busy", "message": "print queue full"}), 503
 
@@ -270,7 +295,7 @@ def enqueue_print():
                 "status": "queued",
                 "job_id": enq.job_id,
                 "queue_depth": enq.queue_depth,
-                "product": result.product.to_dict(),
+                "product": product.to_dict(),
             }
         ),
         202,
@@ -294,14 +319,22 @@ def preview_label(upc: str):
     `variant=` overrides the computed variant.
     """
     upc = (upc or "").strip()
-    cache = current_app.extensions["cache"]
-    result = cache.get(upc, allow_remote=True)
-    if not result.found:
-        return jsonify({"error": "not_found", "upc": upc}), 404
+    # `id` pins the exact product when several share the barcode.
+    product_id = request.args.get("id", type=int)
+    if product_id is not None:
+        product = db.session.get(Product, product_id)
+        if product is None:
+            return jsonify({"error": "not_found", "product_id": product_id}), 404
+    else:
+        cache = current_app.extensions["cache"]
+        result = cache.get(upc, allow_remote=True)
+        if not result.found:
+            return jsonify({"error": "not_found", "upc": upc}), 404
+        product = result.product
 
     spec = current_app.extensions["label_spec"]
     variant = request.args.get("variant")
-    png = render_to_png_bytes(result.product.to_dict(), spec, variant=variant)
+    png = render_to_png_bytes(product.to_dict(), spec, variant=variant)
     return Response(png, mimetype="image/png")
 
 

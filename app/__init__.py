@@ -176,17 +176,40 @@ def create_app(
 
 
 def _apply_micro_migrations(app: Flask) -> None:
-    """Additive column migrations create_all() can't do on existing tables."""
+    """Schema fixes create_all() can't do on existing tables."""
     from sqlalchemy import inspect, text
 
     try:
-        cols = {c["name"] for c in inspect(db.engine).get_columns("print_jobs")}
-        if "claimed_at" not in cols:
-            db.session.execute(
-                text("ALTER TABLE print_jobs ADD COLUMN claimed_at DATETIME")
-            )
+        insp = inspect(db.engine)
+        cols = {c["name"] for c in insp.get_columns("print_jobs")}
+        for col, ddl in (
+            ("claimed_at", "ALTER TABLE print_jobs ADD COLUMN claimed_at DATETIME"),
+            ("product_id", "ALTER TABLE print_jobs ADD COLUMN product_id INTEGER"),
+        ):
+            if col not in cols:
+                db.session.execute(text(ddl))
+                db.session.commit()
+                app.logger.info("migrated: print_jobs.%s added", col)
+
+        # Legacy DBs enforced UNIQUE(upc); shared barcodes are now allowed.
+        # Products are cache data (rebuilt from the provider at startup), so
+        # the safe migration is: drop + recreate the cache tables.
+        upc_unique = any(
+            ix.get("unique") and ix.get("column_names") == ["upc"]
+            for ix in insp.get_indexes("products")
+        ) or any(
+            uc.get("column_names") == ["upc"]
+            for uc in insp.get_unique_constraints("products")
+        )
+        if upc_unique:
+            db.session.execute(text("DROP TABLE IF EXISTS price_history"))
+            db.session.execute(text("DROP TABLE IF EXISTS products"))
             db.session.commit()
-            app.logger.info("migrated: print_jobs.claimed_at added")
+            db.create_all()
+            app.logger.warning(
+                "migrated: products rebuilt without UNIQUE(upc) "
+                "(catalog reloads from the provider)"
+            )
     except Exception:  # pragma: no cover - defensive
         app.logger.exception("micro-migration check failed")
 

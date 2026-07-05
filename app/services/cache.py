@@ -27,7 +27,7 @@ import logging
 import threading
 import time
 from collections import deque
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Literal
 
 from ..extensions import db
@@ -42,10 +42,16 @@ LookupOutcome = Literal["hit", "refreshed", "stale", "miss"]
 
 @dataclass
 class CacheResult:
-    """Return value of CacheService.get()."""
+    """Return value of CacheService.get().
+
+    `product` is the first match (back-compat); `products` holds every row
+    sharing the scanned barcode (variants like "XYZ" / "XYZ B1G1"). Callers
+    that care about ambiguity check len(products) > 1 and let the user pick.
+    """
 
     product: Product | None
     outcome: LookupOutcome
+    products: list[Product] = field(default_factory=list)
 
     @property
     def found(self) -> bool:
@@ -161,27 +167,46 @@ class CacheService:
 
     # ── lookup ────────────────────────────────────────────────────────────────
     def get(self, upc: str, *, allow_remote: bool = True) -> CacheResult:
-        """Look up a product by UPC. See module docstring for the policy."""
+        """Look up product(s) by UPC. See module docstring for the policy.
+
+        A barcode may match multiple rows (shared-barcode variants); the
+        result carries all of them, freshest-logic applied to the set.
+        """
         upc = (upc or "").strip()
-        product = db.session.query(Product).filter_by(upc=upc).one_or_none()
+        rows = (
+            db.session.query(Product).filter_by(upc=upc).order_by(Product.id).all()
+        )
 
-        # Fresh hit — never contact the data source.
-        if product is not None and product.is_fresh(self.standard_ttl, self.flagged_ttl):
+        # Fresh hit — never contact the data source (all matches must be fresh).
+        if rows and all(
+            p.is_fresh(self.standard_ttl, self.flagged_ttl) for p in rows
+        ):
             self.monitor.record(is_hit=True)
-            return CacheResult(product, "hit")
+            return CacheResult(rows[0], "hit", rows)
 
-        # Miss: either absent or stale.
+        # Miss: either absent or (partially) stale.
         self.monitor.record(is_hit=False)
 
         if not allow_remote:
-            return CacheResult(product, "stale" if product is not None else "miss")
+            return CacheResult(
+                rows[0] if rows else None, "stale" if rows else "miss", rows
+            )
 
         refreshed = self._refresh_one(upc)
         if refreshed is not None:
-            return CacheResult(refreshed, "refreshed")
+            # Re-read the set: the refresh may have updated one of the rows.
+            rows = (
+                db.session.query(Product)
+                .filter_by(upc=upc)
+                .order_by(Product.id)
+                .all()
+            )
+            return CacheResult(rows[0] if rows else refreshed, "refreshed", rows)
 
-        # Upstream had nothing: return the stale copy if we have one.
-        return CacheResult(product, "stale" if product is not None else "miss")
+        # Upstream had nothing: return the stale copies if we have them.
+        return CacheResult(
+            rows[0] if rows else None, "stale" if rows else "miss", rows
+        )
 
     def _refresh_one(self, upc: str) -> Product | None:
         """Fetch a single UPC from the provider and upsert it.

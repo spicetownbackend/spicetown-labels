@@ -112,7 +112,13 @@ def upsert_record(
     The caller is responsible for committing the session (callers batch commits).
     """
     if existing is None:
-        existing = db.session.query(Product).filter_by(upc=rec.upc).one_or_none()
+        # Logical identity is (upc, name): the store sells variants sharing a
+        # barcode (e.g. "XYZ" and "XYZ B1G1"), which live as separate rows.
+        existing = (
+            db.session.query(Product)
+            .filter_by(upc=rec.upc, name=rec.name)
+            .first()
+        )
 
     now = utcnow()
     short = shorten_name(rec.name, max_chars=shorten_max_chars)
@@ -232,9 +238,10 @@ def bulk_load(
     started = time.monotonic()
     source = source or provider.name
 
-    # Pre-load existing products keyed by UPC (single query).
-    existing_map: dict[str, Product] = {
-        p.upc: p for p in db.session.query(Product).all()
+    # Pre-load existing products keyed by (upc, name) — shared barcodes are
+    # allowed, so UPC alone is not an identity (single query).
+    existing_map: dict[tuple[str, str], Product] = {
+        (p.upc, p.name): p for p in db.session.query(Product).all()
     }
     logger.info(
         "bulk_load start: provider=%s existing_rows=%d batch_size=%d",
@@ -243,7 +250,7 @@ def bulk_load(
         batch_size,
     )
 
-    seen: set[str] = set()
+    seen: set[tuple[str, str]] = set()
     pending = 0
 
     try:
@@ -255,18 +262,21 @@ def bulk_load(
                 stats.skipped_invalid += 1
                 continue
 
-            # Duplicate UPC within the incoming feed → data error.
-            if rec.upc in seen:
+            # Exact duplicate (same UPC *and* name) within the feed → data
+            # error, keep the first. Same UPC with a different name is a real
+            # shared-barcode variant (e.g. B1G1) and loads as its own row.
+            key = (rec.upc, rec.name)
+            if key in seen:
                 stats.duplicates += 1
                 if len(stats.duplicate_upcs) < 1000:
                     stats.duplicate_upcs.append(rec.upc)
                 logger.warning(
-                    "duplicate UPC in feed: %s ('%s') — keeping first, skipping dup",
+                    "exact duplicate in feed: %s ('%s') — keeping first, skipping dup",
                     rec.upc,
                     rec.name,
                 )
                 continue
-            seen.add(rec.upc)
+            seen.add(key)
 
             try:
                 upsert_record(
@@ -274,7 +284,7 @@ def bulk_load(
                     source=source,
                     price_change_threshold=price_change_threshold,
                     shorten_max_chars=shorten_max_chars,
-                    existing=existing_map.get(rec.upc),
+                    existing=existing_map.get(key),
                     stats=stats,
                 )
             except Exception:  # pragma: no cover - per-record resilience

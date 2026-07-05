@@ -124,19 +124,26 @@ def test_loader_sets_short_name_on_insert(ctx):
     assert len(p.short_name) <= 22
 
 
-def test_loader_updates_short_name_on_name_change(ctx):
+def test_loader_short_name_and_shared_barcode_rows(ctx):
     upsert_record(rec("222", "Cumin"), source="file")
     db.session.commit()
-    assert db.session.query(Product).filter_by(upc="222").one().short_name == "Cumin"
+    assert (
+        db.session.query(Product).filter_by(upc="222", name="Cumin").one().short_name
+        == "Cumin"
+    )
+    # Identity is (upc, name): a different name on the same barcode is a
+    # separate product row (shared-barcode variant), with its own short_name.
     upsert_record(
         rec("222", "Organic Ground Cumin Premium Authentic Style Jar"),
         source="file",
         shorten_max_chars=22,
     )
     db.session.commit()
-    p = db.session.query(Product).filter_by(upc="222").one()
-    assert len(p.short_name) <= 22
-    assert p.short_name != "Cumin"
+    rows = db.session.query(Product).filter_by(upc="222").all()
+    assert len(rows) == 2
+    long_row = next(r for r in rows if r.name != "Cumin")
+    assert len(long_row.short_name) <= 22
+    assert long_row.short_name != "Cumin"
 
 
 # ── SearchService ─────────────────────────────────────────────────────────────

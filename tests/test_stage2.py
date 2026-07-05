@@ -149,17 +149,22 @@ def test_bulk_load_inserts_and_dedupes(ctx):
     provider = FakeProvider([
         rec("a1", "One", 1.0),
         rec("a2", "Two", 2.0),
-        rec("a1", "One-dup", 9.0),  # duplicate UPC in feed
+        rec("a1", "One", 9.0),       # exact duplicate (same upc+name) in feed
+        rec("a1", "One B1G1", 0.5),  # shared barcode, different product → allowed
         rec("", "NoUPC", 3.0),       # invalid
     ])
     stats = bulk_load(provider, batch_size=2)
-    assert stats.inserted == 2
+    assert stats.inserted == 3
     assert stats.duplicates == 1
     assert "a1" in stats.duplicate_upcs
     assert stats.skipped_invalid == 1
-    assert db.session.query(Product).count() == 2
-    # first occurrence kept (price 1.0, not 9.0)
-    assert db.session.query(Product).filter_by(upc="a1").one().price == 1.0
+    assert db.session.query(Product).count() == 3
+    # exact dup: first occurrence kept (price 1.0, not 9.0)
+    assert (
+        db.session.query(Product).filter_by(upc="a1", name="One").one().price == 1.0
+    )
+    # shared barcode: both variants live under the same UPC
+    assert db.session.query(Product).filter_by(upc="a1").count() == 2
 
 
 def test_bulk_load_updates_existing(ctx):

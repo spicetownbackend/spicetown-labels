@@ -46,18 +46,23 @@ FIELDS = [
 MIN_EXPECTED_ITEMS = 1
 
 
-def load_existing_overrides(path: Path) -> dict[str, dict]:
-    """Read sale_price/clearance the store hand-set in the current CSV."""
-    overrides: dict[str, dict] = {}
+def load_existing_overrides(path: Path) -> dict[tuple[str, str], dict]:
+    """Read sale_price/clearance the store hand-set in the current CSV.
+
+    Keyed by (upc, name): shared barcodes are allowed (e.g. "XYZ" and
+    "XYZ B1G1"), so an override must target the exact variant row.
+    """
+    overrides: dict[tuple[str, str], dict] = {}
     if not path.exists():
         return overrides
     with path.open(newline="") as fh:
         for row in csv.DictReader(fh):
             upc = (row.get("upc") or "").strip()
+            name = (row.get("name") or "").strip()
             sale = (row.get("sale_price") or "").strip()
             clearance = (row.get("clearance") or "").strip()
             if upc and (sale or clearance):
-                overrides[upc] = {"sale_price": sale, "clearance": clearance}
+                overrides[(upc, name)] = {"sale_price": sale, "clearance": clearance}
     return overrides
 
 
@@ -108,11 +113,11 @@ def main() -> int:
             "sale_price": "",
             "clearance": "",
         }
-        if rec.upc in overrides:
-            row.update(overrides[rec.upc])
+        if (rec.upc, rec.name) in overrides:
+            row.update(overrides[(rec.upc, rec.name)])
             kept_overrides += 1
         rows.append(row)
-    rows.sort(key=lambda r: r["upc"])
+    rows.sort(key=lambda r: (r["upc"], r["name"]))
 
     print(f"toast sync: {len(rows)} items, {kept_overrides} sale/clearance override(s) preserved")
     if args.dry_run:

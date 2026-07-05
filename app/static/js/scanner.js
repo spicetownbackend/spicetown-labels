@@ -12,6 +12,7 @@
   let lastCode = null;
   let lastAt = 0;
   let currentUpc = null;
+  let currentProductId = null; // pins the exact product on shared barcodes
 
   // ── helpers ────────────────────────────────────────────────────────────
   function toast(msg, ms = 2200) {
@@ -37,6 +38,7 @@
   // ── product view ───────────────────────────────────────────────────────
   function renderProduct(p) {
     currentUpc = p.upc;
+    currentProductId = p.id != null ? p.id : null;
     const variant = p.label_variant || "standard";
     const wasPrice =
       (p.on_sale || p.clearance) && p.sale_price != null
@@ -56,11 +58,12 @@
 
   function refreshPreview() {
     const v = $("variant-select").value;
-    const url =
-      `/api/preview/${encodeURIComponent(currentUpc)}.png` +
-      (v ? `?variant=${encodeURIComponent(v)}` : "") +
-      `${v ? "&" : "?"}t=${Date.now()}`;
-    $("label-preview").src = url;
+    const params = new URLSearchParams();
+    if (currentProductId != null) params.set("id", currentProductId);
+    if (v) params.set("variant", v);
+    params.set("t", Date.now());
+    $("label-preview").src =
+      `/api/preview/${encodeURIComponent(currentUpc)}.png?` + params.toString();
   }
 
   // ── lookup flow ────────────────────────────────────────────────────────
@@ -72,6 +75,16 @@
       `/api/lookup/${encodeURIComponent(code)}`
     );
     if (ok && body && body.found) {
+      if (body.multiple && body.products && body.products.length > 1) {
+        // Shared barcode (e.g. "XYZ" vs "XYZ B1G1") → let staff pick.
+        renderSuggestions(
+          code,
+          body.products.map((p) => ({ product: p })),
+          200,
+          `${body.products.length} products share this barcode`
+        );
+        return;
+      }
       renderProduct(body.product);
       return;
     }
@@ -80,9 +93,9 @@
     renderSuggestions(code, suggestions, status);
   }
 
-  function renderSuggestions(query, suggestions, status) {
+  function renderSuggestions(query, suggestions, status, title) {
     $("suggest-title").textContent =
-      status === 404 ? `No match for “${query}”` : "Pick a product";
+      title || (status === 404 ? `No match for “${query}”` : "Pick a product");
     const list = $("suggest-list");
     list.innerHTML = "";
     if (!suggestions.length) {
@@ -92,10 +105,11 @@
       const p = s.product;
       const div = document.createElement("button");
       div.className = "suggest-item";
+      const match = s.score != null ? ` · match ${Math.round(s.score)}%` : "";
       div.innerHTML = `<div class="s-name">${escapeHtml(p.name)}</div>
         <div class="s-meta">${money(p.effective_price ?? p.price)} · UPC ${escapeHtml(
         p.upc
-      )} · match ${Math.round(s.score)}%</div>`;
+      )}${match}</div>`;
       div.onclick = () => renderProduct(p);
       list.appendChild(div);
     }
@@ -123,7 +137,13 @@
     const { ok, status, body } = await getJSON("/api/print", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ upc: currentUpc, copies, variant, wait: true }),
+      body: JSON.stringify({
+        upc: currentUpc,
+        product_id: currentProductId,
+        copies,
+        variant,
+        wait: true,
+      }),
     });
     $("btn-print").disabled = false;
 

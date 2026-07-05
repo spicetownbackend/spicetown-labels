@@ -51,9 +51,11 @@ class Product(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
 
     # ── Identity ──────────────────────────────────────────────────────────────
-    # UPC is the hot path: UNIQUE + INDEXED. Stored as TEXT to preserve leading
-    # zeros and support EAN-13 / Code128 payloads.
-    upc: Mapped[str] = mapped_column(String(32), nullable=False, unique=True)
+    # UPC is the hot path: INDEXED (non-unique — the store sells variants that
+    # share a barcode, e.g. "XYZ" and "XYZ B1G1"; a scan of a shared barcode
+    # surfaces a picker in the UI). Stored as TEXT to preserve leading zeros
+    # and support EAN-13 / Code128 payloads. Logical identity is (upc, name).
+    upc: Mapped[str] = mapped_column(String(32), nullable=False)
 
     sku: Mapped[str | None] = mapped_column(String(64), nullable=True)
 
@@ -95,8 +97,9 @@ class Product(db.Model):
     )
 
     __table_args__ = (
-        # Explicit named index on the hot lookup column.
-        Index("ix_products_upc", "upc", unique=True),
+        # Explicit named index on the hot lookup column (non-unique: shared
+        # barcodes are allowed; duplicates resolve via a UI picker).
+        Index("ix_products_upc", "upc"),
         # Secondary indexes that help nightly refresh + sale/clearance queries.
         Index("ix_products_synced_at", "synced_at"),
         Index("ix_products_flags", "on_sale", "clearance"),
@@ -178,6 +181,9 @@ class PrintJob(db.Model):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     upc: Mapped[str] = mapped_column(String(32), nullable=False)
+    # Specific product to print (required to disambiguate shared barcodes).
+    # Nullable for legacy rows; resolution falls back to the first UPC match.
+    product_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
     variant: Mapped[str] = mapped_column(String(20), default="standard")
     copies: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
     # queued | printing | done | error
@@ -200,6 +206,7 @@ class PrintJob(db.Model):
         return {
             "id": self.id,
             "upc": self.upc,
+            "product_id": self.product_id,
             "variant": self.variant,
             "copies": self.copies,
             "status": self.status,

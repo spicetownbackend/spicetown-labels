@@ -141,9 +141,24 @@ def _job_or_404(job_id: int) -> tuple[PrintJob | None, Response | None]:
     return job, None
 
 
+def _job_product(job: PrintJob) -> Product | None:
+    """Product for a job: pinned id first, else first UPC match (shared
+    barcodes make UPC alone ambiguous)."""
+    if job.product_id is not None:
+        product = db.session.get(Product, job.product_id)
+        if product is not None:
+            return product
+    return (
+        db.session.query(Product)
+        .filter_by(upc=job.upc)
+        .order_by(Product.id)
+        .first()
+    )
+
+
 def _render_job_image(job: PrintJob):
-    """Render the label image for a job (or None if the UPC vanished)."""
-    product = db.session.query(Product).filter_by(upc=job.upc).one_or_none()
+    """Render the label image for a job (or None if the product vanished)."""
+    product = _job_product(job)
     if product is None:
         return None
     spec = current_app.extensions["label_spec"]
@@ -156,7 +171,7 @@ def job_label_png(job_id: int):
     job, err = _job_or_404(job_id)
     if err:
         return err
-    product = db.session.query(Product).filter_by(upc=job.upc).one_or_none()
+    product = _job_product(job)
     if product is None:
         return jsonify({"error": "not_found", "upc": job.upc}), 404
     spec = current_app.extensions["label_spec"]

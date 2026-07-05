@@ -36,6 +36,21 @@ logger = logging.getLogger("spicetown.printq")
 _STOP = object()
 
 
+def _resolve_product(product_id: int | None, upc: str) -> Product | None:
+    """Product for a job: by pinned id first, else first UPC match (shared
+    barcodes mean UPC alone may be ambiguous). Must run in an app context."""
+    if product_id is not None:
+        product = db.session.get(Product, product_id)
+        if product is not None:
+            return product
+    return (
+        db.session.query(Product)
+        .filter_by(upc=upc)
+        .order_by(Product.id)
+        .first()
+    )
+
+
 @dataclass
 class EnqueueResult:
     job_id: int
@@ -111,10 +126,18 @@ class PrintQueue:
         return self._worker is not None and self._worker.is_alive()
 
     # ── enqueue ───────────────────────────────────────────────────────────────
-    def enqueue(self, upc: str, *, variant: str | None = None, copies: int = 1) -> EnqueueResult:
+    def enqueue(
+        self,
+        upc: str,
+        *,
+        variant: str | None = None,
+        copies: int = 1,
+        product_id: int | None = None,
+    ) -> EnqueueResult:
         """Create a PrintJob row (status=queued) and enqueue its id.
 
         Must be called within an app context (the request handler provides one).
+        `product_id` pins the exact product when several share the barcode.
         If `variant` is None it is resolved from the product's computed variant
         (sale/clearance/standard) so labels reflect current pricing. Raises
         QueueFull if the bounded queue is saturated.
@@ -122,10 +145,16 @@ class PrintQueue:
         copies = max(1, min(int(copies), 50))  # clamp absurd values
 
         if variant is None:
-            product = db.session.query(Product).filter_by(upc=upc).one_or_none()
+            product = _resolve_product(product_id, upc)
             variant = product.label_variant() if product is not None else "standard"
 
-        job = PrintJob(upc=upc, variant=variant, copies=copies, status="queued")
+        job = PrintJob(
+            upc=upc,
+            product_id=product_id,
+            variant=variant,
+            copies=copies,
+            status="queued",
+        )
         db.session.add(job)
         db.session.commit()
 
@@ -168,7 +197,7 @@ class PrintQueue:
         job.status = "printing"
         db.session.commit()
 
-        product = db.session.query(Product).filter_by(upc=job.upc).one_or_none()
+        product = _resolve_product(job.product_id, job.upc)
         if product is None:
             job.status = "error"
             job.error = f"UPC {job.upc} not in catalog at print time"
