@@ -339,22 +339,19 @@ def _render_shelf(product: dict, spec: LabelSpec) -> Image.Image:
     head_font = _load_font(spec.font_path_regular, 24, bold=False)
     dept = (product.get("department") or spec.store_name).upper()
     dept = _truncate_to_width(draw, dept, head_font, inner_w)
-    draw.text((m, y), dept, font=head_font, fill=(60, 60, 60))
+    dw = _text_size(draw, dept, head_font)[0]
+    draw.text((m + (inner_w - dw) // 2, y), dept, font=head_font, fill=(60, 60, 60))
     y += _text_size(draw, dept, head_font)[1] + 10
 
-    # Price anchored to the bottom; the name gets whatever band is left.
+    # Reserve room at the bottom for the price; the name gets the band between.
     eff = product.get("effective_price", product.get("price", 0.0))
     price_str = _money(eff)
     price_font = _fit_font(
         draw, price_str, spec.font_path_bold, True, inner_w, 84, min_size=48
     )
-    ph = _text_size(draw, price_str, price_font)[1]
-    price_y = H - m - ph - 4
-    draw.text((m, price_y), price_str, font=price_font, fill="black")
+    pw, ph = _text_size(draw, price_str, price_font)
 
-    # Product name — same never-truncate cascade as the full label, scaled to
-    # the band between the header and the price.
-    name_band = price_y - y - 8
+    name_band = (H - m - ph - 4) - y - 8
     full_name = product.get("name") or ""
     short_name = product.get("short_name") or full_name
 
@@ -389,8 +386,14 @@ def _render_shelf(product: dict, spec: LabelSpec) -> Image.Image:
         name_lines = [_truncate_to_width(draw, short_name, name_font, inner_w)]
 
     for line in name_lines:
-        draw.text((m, y), line, font=name_font, fill="black")
+        lw = _text_size(draw, line, name_font)[0]
+        draw.text((m + (inner_w - lw) // 2, y), line, font=name_font, fill="black")
         y += _text_size(draw, line, name_font)[1] + 4
+
+    # Price directly under the name, centered in the remaining space.
+    price_y = y + max(6, ((H - m) - y - ph) // 2)
+    draw.text((m + (inner_w - pw) // 2, price_y), price_str,
+              font=price_font, fill="black")
 
     return img
 
