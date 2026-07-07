@@ -77,7 +77,13 @@ VARIANT_STYLE: dict[str, dict[str, Any]] = {
         "banner": "CLEARANCE",
         "banner_bg": (0, 0, 0),
     },
+    # "shelf" is a barcode-free 62x29mm tag (department + name + price only);
+    # it uses a dedicated layout in _render_shelf(), not this style table.
+    "shelf": {"border": (0, 0, 0), "banner": None, "banner_bg": None},
 }
+
+# Physical length of the shelf-tag variant on continuous tape, in millimetres.
+SHELF_LENGTH_MM = 29
 
 
 # ── Font resolution (portable: macOS + Linux) ─────────────────────────────────
@@ -309,6 +315,86 @@ def _money(v: float | None) -> str:
     return "" if v is None else f"${v:,.2f}"
 
 
+def _render_shelf(product: dict, spec: LabelSpec) -> Image.Image:
+    """Barcode-free shelf tag: department, name, price. 62mm x 29mm.
+
+    Width follows the configured tape (696 px on 62mm media); the length is
+    fixed at ~29mm regardless of the app-wide label length, so the same
+    continuous roll yields a short tag.
+    """
+    W = spec.width_px
+    H = int(round(SHELF_LENGTH_MM / 25.4 * spec.dpi))
+    img = Image.new("RGB", (W, H), "white")
+    draw = ImageDraw.Draw(img)
+
+    bw = min(spec.border_width, 4)  # thin border; the tag is short
+    for i in range(bw):
+        draw.rectangle([i, i, W - 1 - i, H - 1 - i], outline=(0, 0, 0))
+
+    m = spec.margin + bw
+    inner_w = W - 2 * m
+    y = m
+
+    # Department (category) header.
+    head_font = _load_font(spec.font_path_regular, 24, bold=False)
+    dept = (product.get("department") or spec.store_name).upper()
+    dept = _truncate_to_width(draw, dept, head_font, inner_w)
+    draw.text((m, y), dept, font=head_font, fill=(60, 60, 60))
+    y += _text_size(draw, dept, head_font)[1] + 10
+
+    # Price anchored to the bottom; the name gets whatever band is left.
+    eff = product.get("effective_price", product.get("price", 0.0))
+    price_str = _money(eff)
+    price_font = _fit_font(
+        draw, price_str, spec.font_path_bold, True, inner_w, 84, min_size=48
+    )
+    ph = _text_size(draw, price_str, price_font)[1]
+    price_y = H - m - ph - 4
+    draw.text((m, price_y), price_str, font=price_font, fill="black")
+
+    # Product name — same never-truncate cascade as the full label, scaled to
+    # the band between the header and the price.
+    name_band = price_y - y - 8
+    full_name = product.get("name") or ""
+    short_name = product.get("short_name") or full_name
+
+    name_lines: list[str] = []
+    name_font = _fit_single(
+        draw, full_name, spec.font_path_bold, True, inner_w, 46, 26
+    )
+    if name_font is not None:
+        name_lines = [full_name]
+    elif name_band >= 90:
+        two = _fit_two_lines(
+            draw, full_name, spec.font_path_bold, True, inner_w, 32, 20
+        )
+        if two is not None:
+            name_font, l1, l2 = two
+            name_lines = [l1, l2]
+    if not name_lines:
+        name_font = _fit_single(
+            draw, short_name, spec.font_path_bold, True, inner_w, 46, 22
+        )
+        if name_font is not None:
+            name_lines = [short_name]
+    if not name_lines:
+        abbreviated = shorten_name(full_name, max_chars=24)
+        name_font = _fit_single(
+            draw, abbreviated, spec.font_path_bold, True, inner_w, 46, 22
+        )
+        if name_font is not None:
+            name_lines = [abbreviated]
+    if not name_lines:
+        name_font = _load_font(spec.font_path_bold, 22, True)
+        name_lines = [_truncate_to_width(draw, short_name, name_font, inner_w)]
+
+    for line in name_lines:
+        draw.text((m, y), line, font=name_font, fill="black")
+        y += _text_size(draw, line, name_font)[1] + 4
+
+    return img
+
+
 def render_label(product: dict, spec: LabelSpec, *, variant: str | None = None) -> Image.Image:
     """Render a label for `product` (a Product.to_dict()) and return a PIL image.
 
@@ -323,6 +409,8 @@ def render_label(product: dict, spec: LabelSpec, *, variant: str | None = None) 
         Override the variant; defaults to product["label_variant"].
     """
     variant = variant or product.get("label_variant", "standard")
+    if variant == "shelf":
+        return _render_shelf(product, spec)
     style = VARIANT_STYLE.get(variant, VARIANT_STYLE["standard"])
 
     W, H = spec.width_px, spec.height_px

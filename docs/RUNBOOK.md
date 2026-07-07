@@ -89,7 +89,9 @@ Preview rendering only (no print): open
 
     https://spicetown-labels.onrender.com/api/preview/<any-UPC>.png
 
-You should see the label image. Add `?variant=sale` to see the red SALE style.
+You should see the label image. Add `?variant=sale` to see the red SALE style,
+or `?variant=shelf` for the barcode-free 62×29 mm shelf tag (category, name,
+price only — also available in the Variant dropdown on the scanner page).
 
 ### 3.3 Test the shared-barcode picker
 
