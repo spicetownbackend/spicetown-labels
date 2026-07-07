@@ -339,8 +339,7 @@ def _render_shelf(product: dict, spec: LabelSpec) -> Image.Image:
     head_font = _load_font(spec.font_path_regular, 24, bold=False)
     dept = (product.get("department") or spec.store_name).upper()
     dept = _truncate_to_width(draw, dept, head_font, inner_w)
-    dw = _text_size(draw, dept, head_font)[0]
-    draw.text((m + (inner_w - dw) // 2, y), dept, font=head_font, fill=(60, 60, 60))
+    draw.text((m, y), dept, font=head_font, fill=(60, 60, 60))
     y += _text_size(draw, dept, head_font)[1] + 10
 
     # Reserve room at the bottom for the price; the name gets the band between.
