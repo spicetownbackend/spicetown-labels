@@ -15,7 +15,7 @@ name: Toast catalog sync
 
 on:
   schedule:
-    - cron: "*/30 7 * * *"   # 07:30 UTC ≈ 2:30/3:30 AM ET year-round
+    - cron: "*/30 * * * *"   # 07:30 UTC ≈ 2:30/3:30 AM ET year-round
   workflow_dispatch: {}
 
 permissions:
