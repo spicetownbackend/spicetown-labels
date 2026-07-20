@@ -26,7 +26,7 @@ from dataclasses import dataclass
 
 from ..extensions import db
 from ..models import PrintJob, Product, utcnow
-from .label import LabelSpec, render_label
+from .label import LabelSpec, parse_fields, render_label
 from .printer import PrinterError, PrinterTransport
 from .ratelimit import compute_backoff
 
@@ -133,6 +133,7 @@ class PrintQueue:
         variant: str | None = None,
         copies: int = 1,
         product_id: int | None = None,
+        fields: str | None = None,
     ) -> EnqueueResult:
         """Create a PrintJob row (status=queued) and enqueue its id.
 
@@ -153,6 +154,7 @@ class PrintQueue:
             product_id=product_id,
             variant=variant,
             copies=copies,
+            fields=fields,
             status="queued",
         )
         db.session.add(job)
@@ -213,7 +215,12 @@ class PrintQueue:
         last_err: Exception | None = None
         for attempt in range(self.max_retries + 1):
             try:
-                image = render_label(product.to_dict(), self._spec, variant=variant)
+                image = render_label(
+                    product.to_dict(),
+                    self._spec,
+                    variant=variant,
+                    fields=parse_fields(job.fields),
+                )
                 result = self._printer.send(image, copies=job.copies, job_id=job.id)
                 job.status = "done"
                 job.error = None

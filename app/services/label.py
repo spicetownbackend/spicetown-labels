@@ -85,6 +85,27 @@ VARIANT_STYLE: dict[str, dict[str, Any]] = {
 # Physical length of the shelf-tag variant on continuous tape, in millimetres.
 SHELF_LENGTH_MM = 29
 
+# Label content blocks staff can toggle per print (default: all included).
+ALL_LABEL_FIELDS: tuple[str, ...] = ("department", "name", "size", "price", "barcode")
+
+
+def parse_fields(value) -> frozenset[str] | None:
+    """Normalize a field selection (list or comma-separated string).
+
+    Returns None for "all fields" (empty/absent input, or nothing valid left
+    after filtering unknown names) so callers can treat None as the default.
+    """
+    if not value:
+        return None
+    items = value.split(",") if isinstance(value, str) else list(value)
+    sel = frozenset(
+        f.strip().lower() for f in items if isinstance(f, str) and f.strip()
+    )
+    sel = frozenset(f for f in sel if f in ALL_LABEL_FIELDS)
+    if not sel or sel == frozenset(ALL_LABEL_FIELDS):
+        return None
+    return sel
+
 
 # ── Font resolution (portable: macOS + Linux) ─────────────────────────────────
 _FONT_CANDIDATES_REGULAR = [
@@ -315,13 +336,18 @@ def _money(v: float | None) -> str:
     return "" if v is None else f"${v:,.2f}"
 
 
-def _render_shelf(product: dict, spec: LabelSpec) -> Image.Image:
+def _render_shelf(
+    product: dict, spec: LabelSpec, *, fields: frozenset[str] | None = None
+) -> Image.Image:
     """Barcode-free shelf tag: department, name, price. 62mm x 29mm.
 
     Width follows the configured tape (696 px on 62mm media); the length is
     fixed at ~29mm regardless of the app-wide label length, so the same
     continuous roll yields a short tag.
     """
+    def _has(f: str) -> bool:
+        return fields is None or f in fields
+
     W = spec.width_px
     H = int(round(SHELF_LENGTH_MM / 25.4 * spec.dpi))
     img = Image.new("RGB", (W, H), "white")
@@ -336,51 +362,59 @@ def _render_shelf(product: dict, spec: LabelSpec) -> Image.Image:
     y = m
 
     # Department (category) header.
-    head_font = _load_font(spec.font_path_regular, 24, bold=False)
-    dept = (product.get("department") or spec.store_name).upper()
-    dept = _truncate_to_width(draw, dept, head_font, inner_w)
-    draw.text((m, y), dept, font=head_font, fill=(60, 60, 60))
-    y += _text_size(draw, dept, head_font)[1] + 10
+    if _has("department"):
+        head_font = _load_font(spec.font_path_regular, 24, bold=False)
+        dept = (product.get("department") or spec.store_name).upper()
+        dept = _truncate_to_width(draw, dept, head_font, inner_w)
+        draw.text((m, y), dept, font=head_font, fill=(60, 60, 60))
+        y += _text_size(draw, dept, head_font)[1] + 10
 
     # Reserve room at the bottom for the price; the name gets the band between.
+    # Zero/open-priced items (or a deselected price field) render no price.
     eff = product.get("effective_price", product.get("price", 0.0))
-    price_str = _money(eff)
-    price_font = _fit_font(
-        draw, price_str, spec.font_path_bold, True, inner_w, 84, min_size=48
-    )
-    pw, ph = _text_size(draw, price_str, price_font)
+    show_price = _has("price") and eff is not None and eff > 0
+    price_str = _money(eff) if show_price else ""
+    if show_price:
+        price_font = _fit_font(
+            draw, price_str, spec.font_path_bold, True, inner_w, 84, min_size=48
+        )
+        pw, ph = _text_size(draw, price_str, price_font)
+    else:
+        price_font, pw, ph = None, 0, 0
 
     name_band = (H - m - ph - 4) - y - 8
-    full_name = product.get("name") or ""
+    full_name = (product.get("name") or "") if _has("name") else ""
     short_name = product.get("short_name") or full_name
 
     name_lines: list[str] = []
-    name_font = _fit_single(
-        draw, full_name, spec.font_path_bold, True, inner_w, 46, 26
-    )
+    name_font = None
+    if full_name:
+        name_font = _fit_single(
+            draw, full_name, spec.font_path_bold, True, inner_w, 46, 26
+        )
     if name_font is not None:
         name_lines = [full_name]
-    elif name_band >= 90:
+    elif full_name and name_band >= 90:
         two = _fit_two_lines(
             draw, full_name, spec.font_path_bold, True, inner_w, 32, 20
         )
         if two is not None:
             name_font, l1, l2 = two
             name_lines = [l1, l2]
-    if not name_lines:
+    if full_name and not name_lines:
         name_font = _fit_single(
             draw, short_name, spec.font_path_bold, True, inner_w, 46, 22
         )
         if name_font is not None:
             name_lines = [short_name]
-    if not name_lines:
+    if full_name and not name_lines:
         abbreviated = shorten_name(full_name, max_chars=24)
         name_font = _fit_single(
             draw, abbreviated, spec.font_path_bold, True, inner_w, 46, 22
         )
         if name_font is not None:
             name_lines = [abbreviated]
-    if not name_lines:
+    if full_name and not name_lines:
         name_font = _load_font(spec.font_path_bold, 22, True)
         name_lines = [_truncate_to_width(draw, short_name, name_font, inner_w)]
 
@@ -390,14 +424,21 @@ def _render_shelf(product: dict, spec: LabelSpec) -> Image.Image:
         y += _text_size(draw, line, name_font)[1] + 4
 
     # Price directly under the name, centered in the remaining space.
-    price_y = y + max(6, ((H - m) - y - ph) // 2)
-    draw.text((m + (inner_w - pw) // 2, price_y), price_str,
-              font=price_font, fill="black")
+    if show_price:
+        price_y = y + max(6, ((H - m) - y - ph) // 2)
+        draw.text((m + (inner_w - pw) // 2, price_y), price_str,
+                  font=price_font, fill="black")
 
     return img
 
 
-def render_label(product: dict, spec: LabelSpec, *, variant: str | None = None) -> Image.Image:
+def render_label(
+    product: dict,
+    spec: LabelSpec,
+    *,
+    variant: str | None = None,
+    fields: frozenset[str] | None = None,
+) -> Image.Image:
     """Render a label for `product` (a Product.to_dict()) and return a PIL image.
 
     Parameters
@@ -409,10 +450,15 @@ def render_label(product: dict, spec: LabelSpec, *, variant: str | None = None) 
         LabelSpec describing geometry + fonts.
     variant:
         Override the variant; defaults to product["label_variant"].
+    fields:
+        Subset of ALL_LABEL_FIELDS to include (see parse_fields); None = all.
     """
+    def _has(f: str) -> bool:
+        return fields is None or f in fields
+
     variant = variant or product.get("label_variant", "standard")
     if variant == "shelf":
-        return _render_shelf(product, spec)
+        return _render_shelf(product, spec, fields=fields)
     style = VARIANT_STYLE.get(variant, VARIANT_STYLE["standard"])
 
     W, H = spec.width_px, spec.height_px
@@ -432,7 +478,7 @@ def render_label(product: dict, spec: LabelSpec, *, variant: str | None = None) 
     # Compact labels (short die-cut) skip the department text to save height,
     # but still show the sale/clearance banner.
     head_font = _load_font(spec.font_path_regular, 26, bold=False)
-    if not spec.compact:
+    if not spec.compact and _has("department"):
         dept = (product.get("department") or spec.store_name).upper()
         dept = _truncate_to_width(draw, dept, head_font, int(inner_w * 0.62))
         draw.text((m, y), dept, font=head_font, fill=(60, 60, 60))
@@ -460,38 +506,40 @@ def render_label(product: dict, spec: LabelSpec, *, variant: str | None = None) 
     #   3. AI short_name, one line, 58 -> 24
     #   4. abbreviated full name (AI shortener), one line
     #   5. last resort: min-size + ellipsis
-    full_name = product.get("name") or ""
+    full_name = (product.get("name") or "") if _has("name") else ""
     short_name = product.get("short_name") or full_name
     # Two-line mode needs vertical room (compact die-cut labels don't have it).
     allow_two_lines = not spec.compact and spec.height_px >= 340
 
     name_lines: list[str] = []
-    name_font = _fit_single(
-        draw, full_name, spec.font_path_bold, True, inner_w, 58, 28
-    )
+    name_font = None
+    if full_name:
+        name_font = _fit_single(
+            draw, full_name, spec.font_path_bold, True, inner_w, 58, 28
+        )
     if name_font is not None:
         name_lines = [full_name]
-    elif allow_two_lines:
+    elif full_name and allow_two_lines:
         two = _fit_two_lines(
             draw, full_name, spec.font_path_bold, True, inner_w, 40, 22
         )
         if two is not None:
             name_font, l1, l2 = two
             name_lines = [l1, l2]
-    if not name_lines:
+    if full_name and not name_lines:
         name_font = _fit_single(
             draw, short_name, spec.font_path_bold, True, inner_w, 58, 24
         )
         if name_font is not None:
             name_lines = [short_name]
-    if not name_lines:
+    if full_name and not name_lines:
         abbreviated = shorten_name(full_name, max_chars=24)
         name_font = _fit_single(
             draw, abbreviated, spec.font_path_bold, True, inner_w, 58, 24
         )
         if name_font is not None:
             name_lines = [abbreviated]
-    if not name_lines:
+    if full_name and not name_lines:
         name_font = _load_font(spec.font_path_bold, 24, True)
         name_lines = [_truncate_to_width(draw, short_name, name_font, inner_w)]
 
@@ -502,32 +550,34 @@ def render_label(product: dict, spec: LabelSpec, *, variant: str | None = None) 
 
     # ── Size / unit line (skipped in compact mode) ────────────────────────────
     sub_bits = [b for b in [product.get("size"), product.get("unit")] if b]
-    if sub_bits and not spec.compact:
+    if sub_bits and not spec.compact and _has("size"):
         sub_font = _load_font(spec.font_path_regular, 28, bold=False)
         draw.text((m, y), " · ".join(sub_bits), font=sub_font, fill=(80, 80, 80))
         y += _text_size(draw, sub_bits[0], sub_font)[1] + 12
 
     # ── Price line (sale strikethrough of original) ───────────────────────────
+    # Zero/open-priced items (or a deselected price field) render no price.
     eff = product.get("effective_price", product.get("price", 0.0))
-    price_font = _load_font(spec.font_path_bold, 72, bold=True)
-    price_str = _money(eff)
-    draw.text((m, y), price_str, font=price_font, fill="black")
-    pw, ph = _text_size(draw, price_str, price_font)
+    if _has("price") and eff is not None and eff > 0:
+        price_font = _load_font(spec.font_path_bold, 72, bold=True)
+        price_str = _money(eff)
+        draw.text((m, y), price_str, font=price_font, fill="black")
+        pw, ph = _text_size(draw, price_str, price_font)
 
-    if variant in ("sale", "clearance") and product.get("sale_price") is not None:
-        was_font = _load_font(spec.font_path_regular, 30, bold=False)
-        was_str = _money(product.get("price"))
-        wx = m + pw + 18
-        wy = y + (ph - _text_size(draw, was_str, was_font)[1])
-        draw.text((wx, wy), was_str, font=was_font, fill=(120, 120, 120))
-        ww, wh = _text_size(draw, was_str, was_font)
-        # strike-through the original price
-        draw.line([wx, wy + wh // 2, wx + ww, wy + wh // 2], fill=(120, 120, 120), width=3)
-    y += ph + 16
+        if variant in ("sale", "clearance") and product.get("sale_price") is not None:
+            was_font = _load_font(spec.font_path_regular, 30, bold=False)
+            was_str = _money(product.get("price"))
+            wx = m + pw + 18
+            wy = y + (ph - _text_size(draw, was_str, was_font)[1])
+            draw.text((wx, wy), was_str, font=was_font, fill=(120, 120, 120))
+            ww, wh = _text_size(draw, was_str, was_font)
+            # strike-through the original price
+            draw.line([wx, wy + wh // 2, wx + ww, wy + wh // 2], fill=(120, 120, 120), width=3)
+        y += ph + 16
 
     # ── Barcode + human-readable UPC, bottom-aligned ──────────────────────────
     upc = str(product.get("upc", ""))
-    if spec.draw_barcode and upc:
+    if spec.draw_barcode and upc and _has("barcode"):
         upc_font = _load_font(spec.font_path_regular, 24, bold=False)
         upc_text_h = _text_size(draw, upc, upc_font)[1]
         # Reserve a band at the bottom for the barcode + its digits.
@@ -552,9 +602,15 @@ def render_label(product: dict, spec: LabelSpec, *, variant: str | None = None) 
     return img
 
 
-def render_to_png_bytes(product: dict, spec: LabelSpec, *, variant: str | None = None) -> bytes:
+def render_to_png_bytes(
+    product: dict,
+    spec: LabelSpec,
+    *,
+    variant: str | None = None,
+    fields: frozenset[str] | None = None,
+) -> bytes:
     """Render and return PNG bytes (used by the preview endpoint)."""
-    img = render_label(product, spec, variant=variant)
+    img = render_label(product, spec, variant=variant, fields=fields)
     bio = io.BytesIO()
     img.save(bio, format="PNG", dpi=(spec.dpi, spec.dpi))
     return bio.getvalue()

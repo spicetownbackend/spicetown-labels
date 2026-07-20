@@ -21,7 +21,7 @@ from flask import Blueprint, Response, current_app, jsonify, request
 
 from ..extensions import db
 from ..models import PrintJob, Product
-from ..services.label import render_to_png_bytes
+from ..services.label import parse_fields, render_to_png_bytes
 from ..services.loader import (
     RefreshInProgress,
     bulk_load_guarded,
@@ -205,10 +205,12 @@ def manual_refresh():
 def enqueue_print():
     """Enqueue a label print job and return immediately (decoupled worker).
 
-    Body (JSON): {"upc": "...", "copies": 1, "variant": "sale"?, "wait": false?}
+    Body (JSON): {"upc": "...", "copies": 1, "variant": "sale"?, "wait": false?,
+                  "fields": ["name", "price", ...]?}
       - upc      : required; must resolve via the cache (404 if unknown).
       - copies   : optional, default 1 (clamped 1..50).
       - variant  : optional override of the product's computed variant.
+      - fields   : optional label-field subset (default: all fields).
       - wait     : optional; if true, block briefly for the terminal status.
 
     Returns 202 with the job id (or 200 with the final status when wait=true).
@@ -223,6 +225,9 @@ def enqueue_print():
     copies = body.get("copies", 1)
     variant = body.get("variant")
     wait = bool(body.get("wait", False))
+    # Normalize the field selection to a stored CSV (None = all fields).
+    fields_sel = parse_fields(body.get("fields"))
+    fields_csv = ",".join(sorted(fields_sel)) if fields_sel else None
 
     # Resolve the exact product: by id when given (disambiguates shared
     # barcodes), else the first catalog match for the UPC.
@@ -259,6 +264,7 @@ def enqueue_print():
             product_id=product.id,
             variant=variant,
             copies=copies_n,
+            fields=fields_csv,
             status="queued",
         )
         db.session.add(job)
@@ -277,7 +283,11 @@ def enqueue_print():
             )
         try:
             enq = pq.enqueue(
-                upc, variant=variant, copies=copies, product_id=product.id
+                upc,
+                variant=variant,
+                copies=copies,
+                product_id=product.id,
+                fields=fields_csv,
             )
         except QueueFull:
             return jsonify({"error": "busy", "message": "print queue full"}), 503
@@ -316,7 +326,8 @@ def preview_label(upc: str):
     """Render and return the label PNG for `upc` WITHOUT printing.
 
     Powers the scanner UI's on-screen preview (Stage 5). Query param
-    `variant=` overrides the computed variant.
+    `variant=` overrides the computed variant; `fields=` (comma-separated)
+    limits which label blocks are drawn (default: all).
     """
     upc = (upc or "").strip()
     # `id` pins the exact product when several share the barcode.
@@ -334,7 +345,8 @@ def preview_label(upc: str):
 
     spec = current_app.extensions["label_spec"]
     variant = request.args.get("variant")
-    png = render_to_png_bytes(product.to_dict(), spec, variant=variant)
+    fields = parse_fields(request.args.get("fields"))
+    png = render_to_png_bytes(product.to_dict(), spec, variant=variant, fields=fields)
     return Response(png, mimetype="image/png")
 
 

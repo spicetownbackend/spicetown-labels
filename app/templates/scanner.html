@@ -32,6 +32,7 @@
                placeholder="Type a UPC or product name…">
         <button class="btn" type="submit">Search</button>
       </form>
+      <div id="live-results" class="suggest-list live-results" hidden></div>
       <p id="scan-hint" class="hint">Point the camera at a barcode, or search by name/UPC above.</p>
     </section>
 
@@ -60,6 +61,15 @@
           <input id="copies-input" type="number" min="1" max="50" value="1">
         </label>
       </div>
+
+      <fieldset id="field-toggles" class="field-toggles">
+        <legend>Include on label</legend>
+        <label><input type="checkbox" data-field="name" checked> Name</label>
+        <label><input type="checkbox" data-field="price" checked> Price</label>
+        <label><input type="checkbox" data-field="barcode" checked> Barcode</label>
+        <label><input type="checkbox" data-field="size" checked> Size</label>
+        <label><input type="checkbox" data-field="department" checked> Department</label>
+      </fieldset>
 
       <button id="btn-print" class="btn btn-primary btn-lg">🖨️ Print label</button>
       <p id="print-status" class="print-status"></p>

@@ -65,12 +65,19 @@ input:focus, select:focus { outline: 2px solid var(--red); outline-offset: 0; }
   color: var(--muted); flex: 1; }
 .field select, .field input { color: var(--ink); }
 
+.field-toggles { display: flex; flex-wrap: wrap; gap: .4rem .9rem; margin: .6rem 0;
+  padding: .5rem .7rem; border: 1px solid var(--line); border-radius: 10px; }
+.field-toggles legend { font-size: .8rem; color: var(--muted); padding: 0 .3rem; }
+.field-toggles label { display: inline-flex; align-items: center; gap: .35rem;
+  font-size: .85rem; }
+
 .print-status { margin: .6rem 0 0; font-weight: 600; min-height: 1.2em; }
 .print-status.ok { color: var(--ok); }
 .print-status.err { color: var(--red); }
 .print-status.pending { color: var(--warn); }
 
 .suggest-list { display: flex; flex-direction: column; gap: .5rem; margin-top: .6rem; }
+.live-results { max-height: 46vh; overflow-y: auto; }
 .suggest-item { text-align: left; padding: .7rem .8rem; border: 1px solid var(--line);
   border-radius: 10px; background: #fff; cursor: pointer; }
 .suggest-item:active { background: #faf0f0; }

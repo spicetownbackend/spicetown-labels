@@ -186,6 +186,9 @@ class PrintJob(db.Model):
     product_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
     variant: Mapped[str] = mapped_column(String(20), default="standard")
     copies: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
+    # Comma-separated label fields to include (see label.ALL_LABEL_FIELDS);
+    # NULL means "all fields" (the default).
+    fields: Mapped[str | None] = mapped_column(String(120), nullable=True)
     # queued | printing | done | error
     status: Mapped[str] = mapped_column(String(20), default="queued", nullable=False)
     error: Mapped[str | None] = mapped_column(Text, nullable=True)
@@ -209,6 +212,7 @@ class PrintJob(db.Model):
             "product_id": self.product_id,
             "variant": self.variant,
             "copies": self.copies,
+            "fields": self.fields,
             "status": self.status,
             "error": self.error,
             "created_at": self.created_at.isoformat() if self.created_at else None,

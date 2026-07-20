@@ -56,11 +56,21 @@
     show(resultCard);
   }
 
+  // Selected label fields; null when everything is checked (= server default).
+  function selectedFields() {
+    const boxes = document.querySelectorAll("#field-toggles input[type=checkbox]");
+    const picked = [];
+    for (const b of boxes) if (b.checked) picked.push(b.dataset.field);
+    return picked.length === boxes.length ? null : picked;
+  }
+
   function refreshPreview() {
     const v = $("variant-select").value;
     const params = new URLSearchParams();
     if (currentProductId != null) params.set("id", currentProductId);
     if (v) params.set("variant", v);
+    const fields = selectedFields();
+    if (fields) params.set("fields", fields.join(","));
     params.set("t", Date.now());
     $("label-preview").src =
       `/api/preview/${encodeURIComponent(currentUpc)}.png?` + params.toString();
@@ -124,6 +134,58 @@
     renderSuggestions(query, results, 200);
   }
 
+  // ── live (as-you-type) search ──────────────────────────────────────────
+  // Debounced fuzzy search under the input; picking a result opens it.
+  let liveTimer = null;
+  let liveSeq = 0; // drop out-of-order responses
+
+  function hideLiveResults() {
+    const box = $("live-results");
+    box.hidden = true;
+    box.innerHTML = "";
+  }
+
+  async function liveSearch(query) {
+    const seq = ++liveSeq;
+    const { body } = await getJSON(`/api/search?q=${encodeURIComponent(query)}`);
+    if (seq !== liveSeq) return; // a newer keystroke superseded this response
+    if ($("manual-input").value.trim() !== query) return;
+    const results = (body && body.results) || [];
+    const box = $("live-results");
+    box.innerHTML = "";
+    if (!results.length) {
+      box.innerHTML = `<p class="hint">No matches yet — keep typing…</p>`;
+      box.hidden = false;
+      return;
+    }
+    for (const s of results.slice(0, 8)) {
+      const p = s.product;
+      const div = document.createElement("button");
+      div.type = "button";
+      div.className = "suggest-item";
+      div.innerHTML = `<div class="s-name">${escapeHtml(p.name)}</div>
+        <div class="s-meta">${money(p.effective_price ?? p.price)} · UPC ${escapeHtml(p.upc)}</div>`;
+      div.onclick = () => {
+        hideLiveResults();
+        $("manual-input").value = "";
+        renderProduct(p);
+      };
+      box.appendChild(div);
+    }
+    box.hidden = false;
+  }
+
+  function onManualInput() {
+    const q = $("manual-input").value.trim();
+    clearTimeout(liveTimer);
+    // Short/empty text or a barcode being typed/scanned in: wait for submit.
+    if (q.length < 2 || /^\d+$/.test(q)) {
+      hideLiveResults();
+      return;
+    }
+    liveTimer = setTimeout(() => liveSearch(q), 250);
+  }
+
   // ── printing ───────────────────────────────────────────────────────────
   async function doPrint() {
     if (!currentUpc) return;
@@ -142,6 +204,7 @@
         product_id: currentProductId,
         copies,
         variant,
+        fields: selectedFields() || undefined,
         wait: true,
       }),
     });
@@ -310,12 +373,18 @@
   $("btn-stop").onclick = stopScanner;
   $("btn-print").onclick = doPrint;
   $("variant-select").onchange = refreshPreview;
+  for (const b of document.querySelectorAll("#field-toggles input[type=checkbox]")) {
+    b.onchange = refreshPreview;
+  }
   $("btn-back").onclick = () => show(scannerCard);
   $("btn-back2").onclick = () => show(scannerCard);
+  $("manual-input").oninput = onManualInput;
   $("manual-form").onsubmit = (e) => {
     e.preventDefault();
     const q = $("manual-input").value.trim();
     if (!q) return;
+    clearTimeout(liveTimer);
+    hideLiveResults();
     // digits → treat as a UPC lookup; text → name search
     if (/^\d{6,}$/.test(q)) lookup(q);
     else search(q);

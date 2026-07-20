@@ -9,8 +9,8 @@ Mapping (per the store's Toast setup):
   * ProductRecord.name  <- item `name`
   * ProductRecord.price <- item `price` (fixed-price items)
   * department          <- the menu group's name (falls back to the menu name)
-Items without a scannable sku or a positive price are skipped (logged once per
-sync) — they can't be looked up by barcode anyway.
+Items without a name or any stable key (sku/PLU/GUID) are skipped (logged once
+per sync). Zero/open-priced items ARE kept — their labels omit the price area.
 
 Activation (config only):
     1. Set STL_TOAST_CLIENT_ID / STL_TOAST_CLIENT_SECRET /
@@ -226,8 +226,8 @@ class ToastDataProvider(DataProvider):
             price = float(item.get("price") or 0.0)
         except (TypeError, ValueError):
             price = 0.0
-        if price <= 0:
-            return None  # open-priced / unpriced items can't be labelled
+        # Open-priced / unpriced items (price 0) are kept: their labels simply
+        # omit the price area, so staff can still print name+barcode tags.
 
         # Barcode key: sku (the store keeps the UPC there), else PLU, else a
         # stable code derived from the Toast GUID. Items without a real
@@ -276,7 +276,7 @@ class ToastDataProvider(DataProvider):
             seen += 1
             yield rec
         logger.info(
-            "toast fetch_all: yielded=%d skipped=%d (no name/price/key)",
+            "toast fetch_all: yielded=%d skipped=%d (no name/key)",
             seen,
             skipped,
         )

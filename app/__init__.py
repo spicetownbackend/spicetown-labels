@@ -185,6 +185,7 @@ def _apply_micro_migrations(app: Flask) -> None:
         for col, ddl in (
             ("claimed_at", "ALTER TABLE print_jobs ADD COLUMN claimed_at DATETIME"),
             ("product_id", "ALTER TABLE print_jobs ADD COLUMN product_id INTEGER"),
+            ("fields", "ALTER TABLE print_jobs ADD COLUMN fields VARCHAR(120)"),
         ):
             if col not in cols:
                 db.session.execute(text(ddl))

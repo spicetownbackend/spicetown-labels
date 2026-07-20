@@ -137,8 +137,13 @@ def test_missing_credentials_fail_health(fake):
 # ── Catalog mapping ───────────────────────────────────────────────────────────
 def test_fetch_all_maps_and_skips(fake):
     recs = {r.upc: r for r in _provider().fetch_all()}
-    # sku items + plu fallback + guid fallback; only the zero-price item skips.
-    assert set(recs) == {"041196910184", "085239014288", "4011", "TG-A1B2C3D4E5F6"}
+    # sku items + plu fallback + guid fallback; zero-price items are kept
+    # (their labels simply omit the price area).
+    assert set(recs) == {
+        "041196910184", "085239014288", "4011", "TG-A1B2C3D4E5F6", "111",
+    }
+    assert recs["111"].name == "Open Priced"
+    assert recs["111"].price == 0.0
     cumin = recs["041196910184"]
     assert cumin.name == "Ground Cumin"
     assert cumin.price == 4.99
@@ -164,7 +169,7 @@ def test_fetch_by_upc_hit_miss_and_doc_reuse(fake):
 def test_retries_on_429_then_succeeds(fake):
     fake.scripted["/menus/v2/menus"] = [FakeResponse(429), FakeResponse(200, MENUS_DOC)]
     recs = list(_provider().fetch_all())
-    assert len(recs) == 4
+    assert len(recs) == 5
     assert fake.count("/menus/v2/menus") == 2
 
 

@@ -33,7 +33,7 @@ from flask import Blueprint, Response, current_app, jsonify, request
 
 from ..extensions import db
 from ..models import PrintJob, Product, utcnow
-from ..services.label import render_label, render_to_png_bytes
+from ..services.label import parse_fields, render_label, render_to_png_bytes
 
 bp = Blueprint("bridge", __name__, url_prefix="/api/bridge")
 
@@ -162,7 +162,9 @@ def _render_job_image(job: PrintJob):
     if product is None:
         return None
     spec = current_app.extensions["label_spec"]
-    return render_label(product.to_dict(), spec, variant=job.variant)
+    return render_label(
+        product.to_dict(), spec, variant=job.variant, fields=parse_fields(job.fields)
+    )
 
 
 @bp.get("/jobs/<int:job_id>/label.png")
@@ -175,7 +177,9 @@ def job_label_png(job_id: int):
     if product is None:
         return jsonify({"error": "not_found", "upc": job.upc}), 404
     spec = current_app.extensions["label_spec"]
-    png = render_to_png_bytes(product.to_dict(), spec, variant=job.variant)
+    png = render_to_png_bytes(
+        product.to_dict(), spec, variant=job.variant, fields=parse_fields(job.fields)
+    )
     return Response(png, mimetype="image/png")
 
 
