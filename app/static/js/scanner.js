@@ -6,6 +6,7 @@
   const scannerCard = $("scanner-card");
   const resultCard = $("result-card");
   const suggestCard = $("suggest-card");
+  const customCard = $("custom-card");
   const viewport = $("viewport");
 
   let scanning = false;
@@ -23,7 +24,8 @@
     toast._t = setTimeout(() => (t.hidden = true), ms);
   }
   function show(card) {
-    for (const c of [scannerCard, resultCard, suggestCard]) c.hidden = c !== card;
+    for (const c of [scannerCard, resultCard, suggestCard, customCard])
+      c.hidden = c !== card;
   }
   function money(v) {
     return v == null ? "" : "$" + Number(v).toFixed(2);
@@ -251,6 +253,35 @@
     st.textContent = "Still printing… check the printer.";
   }
 
+  // ── custom label ───────────────────────────────────────────────────────
+  async function createCustom(e) {
+    e.preventDefault();
+    const st = $("custom-status");
+    const name = $("c-name").value.trim();
+    if (!name) return;
+    st.className = "print-status pending";
+    st.textContent = "Saving…";
+    const { ok, body } = await getJSON("/api/products/custom", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name,
+        price: $("c-price").value || 0,
+        size: $("c-size").value.trim(),
+        department: $("c-dept").value.trim(),
+        upc: $("c-upc").value.trim(),
+      }),
+    });
+    if (!ok || !body || !body.product) {
+      st.className = "print-status err";
+      st.textContent = "✗ " + ((body && body.message) || "Could not save.");
+      return;
+    }
+    st.textContent = "";
+    $("custom-form").reset();
+    renderProduct(body.product);
+  }
+
   // ── camera (QuaggaJS) ──────────────────────────────────────────────────
   function startScanner() {
     if (scanning) return;
@@ -378,6 +409,12 @@
   }
   $("btn-back").onclick = () => show(scannerCard);
   $("btn-back2").onclick = () => show(scannerCard);
+  $("btn-back3").onclick = () => show(scannerCard);
+  $("btn-custom").onclick = () => {
+    show(customCard);
+    $("c-name").focus();
+  };
+  $("custom-form").onsubmit = createCustom;
   $("manual-input").oninput = onManualInput;
   $("manual-form").onsubmit = (e) => {
     e.preventDefault();

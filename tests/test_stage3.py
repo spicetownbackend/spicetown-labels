@@ -400,3 +400,48 @@ def test_wrap_two_lines_balances_split():
     assert lines[0] and lines[1]
     # single word can never wrap
     assert _wrap_two_lines(draw, "Turmeric", font, 350) is None
+
+
+# ── Custom products (hand-entered labels) ─────────────────────────────────────
+def test_api_custom_product_create_and_print(app, client):
+    r = client.post(
+        "/api/products/custom",
+        json={"name": "Fresh Curry Leaves", "price": 1.49, "department": "Produce"},
+    )
+    assert r.status_code == 201
+    p = r.get_json()["product"]
+    assert p["upc"].startswith("CU-")
+    assert p["price"] == 1.49
+    assert p["source"] == "custom"
+
+    # Re-posting the same upc+name updates instead of duplicating.
+    r2 = client.post(
+        "/api/products/custom",
+        json={"name": "Fresh Curry Leaves", "upc": p["upc"], "price": 1.99},
+    )
+    assert r2.status_code == 200
+    assert r2.get_json()["product"]["id"] == p["id"]
+    assert r2.get_json()["product"]["price"] == 1.99
+
+    # It previews and prints like any catalog product.
+    assert client.get(f"/api/preview/{p['upc']}.png").status_code == 200
+
+
+def test_api_custom_product_requires_name(client):
+    assert client.post("/api/products/custom", json={}).status_code == 400
+    assert (
+        client.post("/api/products/custom", json={"name": "X", "price": "abc"}).status_code
+        == 400
+    )
+    assert (
+        client.post("/api/products/custom", json={"name": "X", "price": -1}).status_code
+        == 400
+    )
+
+
+def test_api_custom_product_zero_price_label(client):
+    r = client.post("/api/products/custom", json={"name": "Open Priced Veg"})
+    assert r.status_code == 201
+    p = r.get_json()["product"]
+    assert p["price"] == 0.0
+    assert client.get(f"/api/preview/{p['upc']}.png").status_code == 200

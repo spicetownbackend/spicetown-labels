@@ -34,6 +34,37 @@
       </form>
       <div id="live-results" class="suggest-list live-results" hidden></div>
       <p id="scan-hint" class="hint">Point the camera at a barcode, or search by name/UPC above.</p>
+      <button id="btn-custom" class="btn">✏️ Create custom label</button>
+    </section>
+
+    <!-- ── Custom label form ───────────────────────────────────── -->
+    <section id="custom-card" class="card" hidden>
+      <button id="btn-back3" class="btn btn-link">← Back</button>
+      <h2>Create a custom label</h2>
+      <form id="custom-form" class="custom-form">
+        <label class="field">Name *
+          <input id="c-name" required autocomplete="off" placeholder="e.g. Fresh Curry Leaves">
+        </label>
+        <div class="print-row">
+          <label class="field">Price ($)
+            <input id="c-price" type="number" step="0.01" min="0" inputmode="decimal"
+                   placeholder="blank = no price">
+          </label>
+          <label class="field">Size
+            <input id="c-size" autocomplete="off" placeholder="e.g. 1 bunch">
+          </label>
+        </div>
+        <div class="print-row">
+          <label class="field">Department
+            <input id="c-dept" autocomplete="off" placeholder="e.g. Produce">
+          </label>
+          <label class="field">Barcode / UPC
+            <input id="c-upc" autocomplete="off" placeholder="blank = auto">
+          </label>
+        </div>
+        <button class="btn btn-primary btn-lg" type="submit">Create &amp; preview</button>
+        <p id="custom-status" class="print-status"></p>
+      </form>
     </section>
 
     <!-- ── Result / product ────────────────────────────────────── -->

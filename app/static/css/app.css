@@ -78,6 +78,9 @@ input:focus, select:focus { outline: 2px solid var(--red); outline-offset: 0; }
 
 .suggest-list { display: flex; flex-direction: column; gap: .5rem; margin-top: .6rem; }
 .live-results { max-height: 46vh; overflow-y: auto; }
+
+#btn-custom { margin-top: .75rem; width: 100%; }
+.custom-form { display: flex; flex-direction: column; gap: .8rem; margin-top: .6rem; }
 .suggest-item { text-align: left; padding: .7rem .8rem; border: 1px solid var(--line);
   border-radius: 10px; background: #fff; cursor: pointer; }
 .suggest-item:active { background: #faf0f0; }

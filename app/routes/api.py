@@ -15,6 +15,7 @@ Implemented (Stage 1-4):
 from __future__ import annotations
 
 import threading
+import uuid
 from types import SimpleNamespace
 
 from flask import Blueprint, Response, current_app, jsonify, request
@@ -198,6 +199,59 @@ def manual_refresh():
         return jsonify({"status": "busy", "message": "refresh already running"}), 409
 
     return jsonify({"status": "ok", "stats": stats.as_dict()})
+
+
+@bp.post("/products/custom")
+def create_custom_product():
+    """Create (or update) a hand-entered product so it can be labelled.
+
+    Body (JSON): {"name": "...", "price"?: 4.99, "size"?, "unit"?,
+                  "department"?, "upc"?}
+      - name  : required.
+      - price : optional; 0/absent = open-priced (label omits the price area).
+      - upc   : optional; auto-generated ("CU-…") when blank, so the printed
+                Code128 barcode scans back to this product from then on.
+
+    Rows are stored with source="custom"; the catalog sync only upserts
+    provider rows, so custom products survive refreshes. Re-posting the same
+    upc+name updates the row instead of duplicating it.
+    """
+    body = request.get_json(silent=True) or {}
+    name = str(body.get("name", "")).strip()
+    if not name:
+        return jsonify({"error": "bad_request", "message": "name is required"}), 400
+    try:
+        price = float(body.get("price") or 0.0)
+    except (TypeError, ValueError):
+        return jsonify({"error": "bad_request", "message": "price must be a number"}), 400
+    if price < 0:
+        return jsonify({"error": "bad_request", "message": "price must be >= 0"}), 400
+
+    upc = str(body.get("upc", "")).strip()
+    if not upc:
+        upc = "CU-" + uuid.uuid4().hex[:10].upper()
+    size = str(body.get("size", "")).strip() or None
+    unit = str(body.get("unit", "")).strip() or None
+    department = str(body.get("department", "")).strip() or None
+
+    product = db.session.query(Product).filter_by(upc=upc, name=name).first()
+    created = product is None
+    if created:
+        product = Product(upc=upc, name=name, source="custom")
+        db.session.add(product)
+    product.price = price
+    product.size = size
+    product.unit = unit
+    product.department = department
+    db.session.commit()
+
+    current_app.logger.info(
+        "custom product %s: %r upc=%s price=%.2f",
+        "created" if created else "updated", name, upc, price,
+    )
+    return jsonify({"product": product.to_dict(), "created": created}), (
+        201 if created else 200
+    )
 
 
 # ── Printing (Stage 3) ────────────────────────────────────────────────────────
