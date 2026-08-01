@@ -106,8 +106,14 @@ _PRICE_EPSILON = 0.005
 # GROUP name — e.g. "Street Snacks" — and near-never equals the menu name
 # itself) that never get labeled — made-to-order hot food, no shelf tag.
 # Excluded entirely: never synced into products.csv, never printed, never
-# shows up as a price change to review.
-EXCLUDED_MENUS = {"street kitchen"}
+# shows up as a price change to review. Substring match (case-insensitive) so
+# Toast naming variants like "Street Kitchen (GH)" are caught too.
+EXCLUDED_MENUS = {"street kitchen", "catering"}
+
+
+def _menu_excluded(menu: str) -> bool:
+    menu = (menu or "").strip().lower()
+    return any(ex in menu for ex in EXCLUDED_MENUS)
 
 
 def compute_price_diffs(
@@ -138,6 +144,13 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Sync Toast catalog to CSV")
     parser.add_argument("--out", default=str(REPO_ROOT / "data" / "products.csv"))
     parser.add_argument("--dry-run", action="store_true", help="print stats, write nothing")
+    parser.add_argument(
+        "--list-menus",
+        action="store_true",
+        help="print each distinct top-level Toast menu name + item count, then exit "
+        "(no CSV/diff written) — use this to audit exact menu names before adding "
+        "them to EXCLUDED_MENUS",
+    )
     args = parser.parse_args()
     out_path = Path(args.out)
 
@@ -166,6 +179,16 @@ def main() -> int:
         print(f"safety stop: Toast returned only {len(records)} item(s); not overwriting CSV")
         return 2
 
+    if args.list_menus:
+        counts: dict[str, int] = {}
+        for rec in records:
+            menu = ((rec.extra or {}).get("menu") or "(no menu)").strip()
+            counts[menu] = counts.get(menu, 0) + 1
+        for menu, n in sorted(counts.items(), key=lambda kv: -kv[1]):
+            flag = " [EXCLUDED]" if _menu_excluded(menu) else ""
+            print(f"{n:5d}  {menu}{flag}")
+        return 0
+
     overrides = load_existing_overrides(out_path)
     old_prices = load_existing_prices(out_path)
     kept_overrides = 0
@@ -174,8 +197,8 @@ def main() -> int:
     dupes = 0
     excluded = 0
     for rec in records:
-        menu = ((rec.extra or {}).get("menu") or "").strip().lower()
-        if menu in EXCLUDED_MENUS:
+        menu = (rec.extra or {}).get("menu") or ""
+        if _menu_excluded(menu):
             excluded += 1
             continue
 

@@ -16,7 +16,12 @@ name: Toast catalog sync
 on:
   schedule:
     - cron: "*/30 * * * *"   # 07:30 UTC ≈ 2:30/3:30 AM ET year-round
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      list_menus:
+        description: "Audit only: print every Toast menu name + item count (no commit)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -40,13 +45,23 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Sync catalog from Toast
+        if: ${{ github.event.inputs.list_menus != 'true' }}
         env:
           TOAST_CLIENT_ID: ${{ secrets.TOAST_CLIENT_ID }}
           TOAST_CLIENT_SECRET: ${{ secrets.TOAST_CLIENT_SECRET }}
           TOAST_RESTAURANT_GUID: ${{ secrets.TOAST_RESTAURANT_GUID }}
         run: python scripts/toast_sync.py
 
+      - name: List Toast menu names (audit only, no commit)
+        if: ${{ github.event.inputs.list_menus == 'true' }}
+        env:
+          TOAST_CLIENT_ID: ${{ secrets.TOAST_CLIENT_ID }}
+          TOAST_CLIENT_SECRET: ${{ secrets.TOAST_CLIENT_SECRET }}
+          TOAST_RESTAURANT_GUID: ${{ secrets.TOAST_RESTAURANT_GUID }}
+        run: python scripts/toast_sync.py --list-menus
+
       - name: Commit updated catalog (if changed)
+        if: ${{ github.event.inputs.list_menus != 'true' }}
         run: |
           if git diff --quiet data/products.csv; then
             echo "catalog unchanged — nothing to commit"
