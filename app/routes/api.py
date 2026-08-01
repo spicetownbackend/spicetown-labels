@@ -10,6 +10,9 @@ Implemented (Stage 1-4):
   GET  /api/print/<job_id>     -> poll print job status
   GET  /api/preview/<upc>.png  -> render label PNG (no print) for the scanner UI
   GET  /api/search?q=...       -> fuzzy search (rapidfuzz) for bad barcodes
+  GET  /api/price-changes      -> unreviewed price changes needing a fresh label
+  POST /api/price-changes/print   -> print labels for selected changes, mark reviewed
+  POST /api/price-changes/dismiss -> mark selected changes reviewed without printing
 """
 
 from __future__ import annotations
@@ -21,7 +24,7 @@ from types import SimpleNamespace
 from flask import Blueprint, Response, current_app, jsonify, request
 
 from ..extensions import db
-from ..models import PrintJob, Product
+from ..models import PriceHistory, PrintJob, Product, utcnow
 from ..services.label import parse_fields, render_to_png_bytes
 from ..services.loader import (
     RefreshInProgress,
@@ -254,6 +257,47 @@ def create_custom_product():
     )
 
 
+def _enqueue_for_product(
+    product: Product, *, variant: str | None = None, copies: int = 1, fields_csv: str | None = None
+):
+    """Queue a print job for `product`. Shared by /api/print and the
+    price-change review/print flow.
+
+    Returns a SimpleNamespace(job_id, status, queue_depth). Raises QueueFull
+    (bounded local queue) or RuntimeError (local worker not running).
+    """
+    pq = current_app.extensions["print_queue"]
+    remote_mode = current_app.config.get("PRINT_MODE", "local") == "remote"
+
+    if remote_mode:
+        copies_n = max(1, min(int(copies), 50))
+        job = PrintJob(
+            upc=product.upc,
+            product_id=product.id,
+            variant=variant or product.label_variant(),
+            copies=copies_n,
+            fields=fields_csv,
+            status="queued",
+        )
+        db.session.add(job)
+        db.session.commit()
+        return SimpleNamespace(
+            job_id=job.id,
+            status="queued",
+            queue_depth=db.session.query(PrintJob).filter_by(status="queued").count(),
+        )
+
+    if not pq.is_alive():
+        raise RuntimeError("print worker not running")
+    return pq.enqueue(
+        product.upc,
+        variant=variant,
+        copies=copies,
+        product_id=product.id,
+        fields=fields_csv,
+    )
+
+
 # ── Printing (Stage 3) ────────────────────────────────────────────────────────
 @bp.post("/print")
 def enqueue_print():
@@ -304,47 +348,18 @@ def enqueue_print():
         product = result.product
 
     pq = current_app.extensions["print_queue"]
-    remote_mode = current_app.config.get("PRINT_MODE", "local") == "remote"
-
-    if remote_mode:
-        # Cloud hosting: leave the job `queued` in SQLite; the store's print
-        # bridge (scripts/print_bridge.py) claims it via /api/bridge and
-        # drives the printer. Reuse the row-creation half of enqueue only.
-        copies_n = max(1, min(int(copies), 50))
-        if variant is None:
-            variant = product.label_variant()
-        job = PrintJob(
-            upc=upc,
-            product_id=product.id,
-            variant=variant,
-            copies=copies_n,
-            fields=fields_csv,
-            status="queued",
+    try:
+        enq = _enqueue_for_product(
+            product, variant=variant, copies=copies, fields_csv=fields_csv
         )
-        db.session.add(job)
-        db.session.commit()
-        enq = SimpleNamespace(
-            job_id=job.id,
-            status="queued",
-            queue_depth=db.session.query(PrintJob).filter_by(status="queued").count(),
+    except RuntimeError:
+        # Worker disabled/not started — fail loudly rather than silently drop.
+        return (
+            jsonify({"error": "unavailable", "message": "print worker not running"}),
+            503,
         )
-    else:
-        if not pq.is_alive():
-            # Worker disabled/not started — fail loudly rather than silently drop.
-            return (
-                jsonify({"error": "unavailable", "message": "print worker not running"}),
-                503,
-            )
-        try:
-            enq = pq.enqueue(
-                upc,
-                variant=variant,
-                copies=copies,
-                product_id=product.id,
-                fields=fields_csv,
-            )
-        except QueueFull:
-            return jsonify({"error": "busy", "message": "print queue full"}), 503
+    except QueueFull:
+        return jsonify({"error": "busy", "message": "print queue full"}), 503
 
     if wait:
         timeout = float(current_app.config.get("PRINT_JOB_TIMEOUT_SECONDS", 20.0))
@@ -373,6 +388,96 @@ def print_status(job_id: int):
     if job is None:
         return jsonify({"error": "not_found", "job_id": job_id}), 404
     return jsonify({"job": job.to_dict()})
+
+
+# ── Price-change review (Stage 6) ───────────────────────────────────────────
+# Every Toast sync / refresh upserts through loader.upsert_record, which
+# already appends a PriceHistory row whenever a price actually moves. These
+# endpoints surface the unreviewed ones so staff can print fresh labels for
+# exactly what changed instead of silently auto-printing or re-scanning the
+# whole store.
+@bp.get("/price-changes")
+def list_price_changes():
+    """Unreviewed price changes, most recent first.
+
+    Query params: limit (default 200, max 500).
+    """
+    limit = min(request.args.get("limit", 200, type=int) or 200, 500)
+    rows = (
+        db.session.query(PriceHistory)
+        .filter(PriceHistory.reviewed_at.is_(None))
+        .order_by(PriceHistory.recorded_at.desc())
+        .limit(limit)
+        .all()
+    )
+    return jsonify({"count": len(rows), "changes": [r.to_dict() for r in rows]})
+
+
+def _resolve_price_change_ids() -> tuple[list[int], dict | None]:
+    body = request.get_json(silent=True) or {}
+    ids = body.get("ids")
+    if not isinstance(ids, list) or not ids:
+        return [], {"error": "bad_request", "message": "ids (non-empty list) is required"}
+    try:
+        return [int(i) for i in ids], None
+    except (TypeError, ValueError):
+        return [], {"error": "bad_request", "message": "ids must be integers"}
+
+
+@bp.post("/price-changes/print")
+def print_price_changes():
+    """Print a fresh label for each selected price change, then mark reviewed.
+
+    Body (JSON): {"ids": [<price_history id>, ...]}
+    Returns per-id results; partial failures don't block the rest.
+    """
+    ids, err = _resolve_price_change_ids()
+    if err:
+        return jsonify(err), 400
+
+    results = []
+    for pid in ids:
+        row = db.session.get(PriceHistory, pid)
+        if row is None or row.reviewed_at is not None:
+            results.append({"id": pid, "ok": False, "error": "not_found"})
+            continue
+        product = db.session.get(Product, row.product_id) if row.product_id else None
+        if product is None:
+            results.append({"id": pid, "ok": False, "error": "product_missing"})
+            continue
+        try:
+            enq = _enqueue_for_product(product, variant=product.label_variant())
+        except RuntimeError:
+            results.append({"id": pid, "ok": False, "error": "unavailable"})
+            continue
+        except QueueFull:
+            results.append({"id": pid, "ok": False, "error": "busy"})
+            continue
+        row.reviewed_at = utcnow()
+        row.label_printed = True
+        db.session.commit()
+        results.append({"id": pid, "ok": True, "job_id": enq.job_id})
+
+    return jsonify({"results": results})
+
+
+@bp.post("/price-changes/dismiss")
+def dismiss_price_changes():
+    """Mark selected price changes reviewed without printing a label.
+
+    Body (JSON): {"ids": [<price_history id>, ...]}
+    """
+    ids, err = _resolve_price_change_ids()
+    if err:
+        return jsonify(err), 400
+
+    n = (
+        db.session.query(PriceHistory)
+        .filter(PriceHistory.id.in_(ids), PriceHistory.reviewed_at.is_(None))
+        .update({"reviewed_at": utcnow()}, synchronize_session=False)
+    )
+    db.session.commit()
+    return jsonify({"dismissed": n})
 
 
 @bp.get("/preview/<upc>.png")

@@ -7,6 +7,7 @@
   const resultCard = $("result-card");
   const suggestCard = $("suggest-card");
   const customCard = $("custom-card");
+  const priceChangesCard = $("price-changes-card");
   const viewport = $("viewport");
 
   let scanning = false;
@@ -24,7 +25,7 @@
     toast._t = setTimeout(() => (t.hidden = true), ms);
   }
   function show(card) {
-    for (const c of [scannerCard, resultCard, suggestCard, customCard])
+    for (const c of [scannerCard, resultCard, suggestCard, customCard, priceChangesCard])
       c.hidden = c !== card;
   }
   function money(v) {
@@ -282,6 +283,104 @@
     renderProduct(body.product);
   }
 
+  // ── price-change review ───────────────────────────────────────────────
+  // Every Toast sync appends a PriceHistory row for anything that actually
+  // moved; this panel surfaces the unreviewed ones so staff print/dismiss
+  // instead of the app silently printing labels on its own.
+  async function refreshPriceChangesBanner() {
+    const { body } = await getJSON("/api/price-changes");
+    const changes = (body && body.changes) || [];
+    const btn = $("btn-price-changes");
+    if (!changes.length) {
+      btn.hidden = true;
+      return;
+    }
+    $("price-changes-count").textContent = changes.length;
+    btn.hidden = false;
+  }
+
+  function pcRow(c) {
+    const up = c.new_price > c.old_price;
+    const dir = c.old_price == null ? "" : up ? "up" : "down";
+    const was = c.old_price != null
+      ? `<span class="was">${money(c.old_price)}</span> → `
+      : "";
+    const div = document.createElement("label");
+    div.className = "pc-row";
+    div.innerHTML = `
+      <input type="checkbox" class="pc-check" data-id="${c.id}" checked>
+      <span class="pc-info">
+        <span class="pc-name">${escapeHtml(c.name || c.upc)}</span>
+        <span class="pc-meta">UPC ${escapeHtml(c.upc || "")} · ${was}<span class="pc-new ${dir}">${money(c.new_price)}</span></span>
+      </span>`;
+    return div;
+  }
+
+  async function openPriceChanges() {
+    show(priceChangesCard);
+    $("pc-status").textContent = "";
+    const list = $("price-changes-list");
+    list.innerHTML = `<p class="hint">Loading…</p>`;
+    const { body } = await getJSON("/api/price-changes");
+    const changes = (body && body.changes) || [];
+    list.innerHTML = "";
+    if (!changes.length) {
+      list.innerHTML = `<p class="hint">Nothing pending — you're all caught up.</p>`;
+      return;
+    }
+    for (const c of changes) list.appendChild(pcRow(c));
+    $("pc-select-all").checked = true;
+  }
+
+  function selectedPriceChangeIds() {
+    const boxes = document.querySelectorAll("#price-changes-list .pc-check:checked");
+    return Array.from(boxes).map((b) => parseInt(b.dataset.id, 10));
+  }
+
+  async function printSelectedPriceChanges() {
+    const ids = selectedPriceChangeIds();
+    const st = $("pc-status");
+    if (!ids.length) {
+      st.className = "print-status err";
+      st.textContent = "Select at least one item.";
+      return;
+    }
+    st.className = "print-status pending";
+    st.textContent = `Printing ${ids.length} label(s)…`;
+    const { body } = await getJSON("/api/price-changes/print", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids }),
+    });
+    const results = (body && body.results) || [];
+    const failed = results.filter((r) => !r.ok);
+    st.className = failed.length ? "print-status err" : "print-status ok";
+    st.textContent = failed.length
+      ? `✓ ${results.length - failed.length} printed, ✗ ${failed.length} failed.`
+      : `✓ Printed ${results.length} label(s).`;
+    await openPriceChanges();
+    await refreshPriceChangesBanner();
+  }
+
+  async function dismissSelectedPriceChanges() {
+    const ids = selectedPriceChangeIds();
+    const st = $("pc-status");
+    if (!ids.length) {
+      st.className = "print-status err";
+      st.textContent = "Select at least one item.";
+      return;
+    }
+    await getJSON("/api/price-changes/dismiss", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids }),
+    });
+    st.className = "print-status ok";
+    st.textContent = `Dismissed ${ids.length} item(s).`;
+    await openPriceChanges();
+    await refreshPriceChangesBanner();
+  }
+
   // ── camera (QuaggaJS) ──────────────────────────────────────────────────
   function startScanner() {
     if (scanning) return;
@@ -410,9 +509,17 @@
   $("btn-back").onclick = () => show(scannerCard);
   $("btn-back2").onclick = () => show(scannerCard);
   $("btn-back3").onclick = () => show(scannerCard);
+  $("btn-back4").onclick = () => show(scannerCard);
   $("btn-custom").onclick = () => {
     show(customCard);
     $("c-name").focus();
+  };
+  $("btn-price-changes").onclick = openPriceChanges;
+  $("btn-pc-print").onclick = printSelectedPriceChanges;
+  $("btn-pc-dismiss").onclick = dismissSelectedPriceChanges;
+  $("pc-select-all").onchange = (e) => {
+    for (const b of document.querySelectorAll("#price-changes-list .pc-check"))
+      b.checked = e.target.checked;
   };
   $("custom-form").onsubmit = createCustom;
   $("manual-input").oninput = onManualInput;
@@ -438,4 +545,9 @@
       $("printer-badge").textContent = (body.printer || "printer") + " (worker off)";
     }
   });
+
+  // price-change banner: check on load and every 2 minutes (syncs land ~every
+  // 30 min, so this is just cheap enough to catch one soon after it lands).
+  refreshPriceChangesBanner();
+  setInterval(refreshPriceChangesBanner, 120000);
 })();

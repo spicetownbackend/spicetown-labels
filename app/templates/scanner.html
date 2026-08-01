@@ -17,6 +17,11 @@
   </header>
 
   <main>
+    <!-- ── Price-change review banner ──────────────────────────── -->
+    <button id="btn-price-changes" class="price-changes-banner" hidden>
+      <span id="price-changes-count">0</span> price change(s) need new labels — Review
+    </button>
+
     <!-- ── Scanner ─────────────────────────────────────────────── -->
     <section id="scanner-card" class="card">
       <div class="scanner-wrap">
@@ -111,6 +116,20 @@
       <button id="btn-back2" class="btn btn-link">← Back</button>
       <h2 id="suggest-title">No exact match</h2>
       <div id="suggest-list" class="suggest-list"></div>
+    </section>
+
+    <!-- ── Price-change review ─────────────────────────────────── -->
+    <section id="price-changes-card" class="card" hidden>
+      <button id="btn-back4" class="btn btn-link">← Back</button>
+      <h2>Price changes needing new labels</h2>
+      <p class="hint">Prices Toast synced since the last review. Print a fresh label for the ones you want, or dismiss the rest.</p>
+      <div class="price-changes-actions">
+        <label class="select-all"><input type="checkbox" id="pc-select-all" checked> Select all</label>
+        <button id="btn-pc-print" class="btn btn-primary">🖨️ Print selected</button>
+        <button id="btn-pc-dismiss" class="btn">Dismiss selected</button>
+      </div>
+      <div id="price-changes-list" class="price-changes-list"></div>
+      <p id="pc-status" class="print-status"></p>
     </section>
   </main>
 

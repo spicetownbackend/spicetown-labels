@@ -192,6 +192,19 @@ def _apply_micro_migrations(app: Flask) -> None:
                 db.session.commit()
                 app.logger.info("migrated: print_jobs.%s added", col)
 
+        ph_cols = {c["name"] for c in insp.get_columns("price_history")}
+        for col, ddl in (
+            ("reviewed_at", "ALTER TABLE price_history ADD COLUMN reviewed_at DATETIME"),
+            (
+                "label_printed",
+                "ALTER TABLE price_history ADD COLUMN label_printed BOOLEAN DEFAULT 0",
+            ),
+        ):
+            if col not in ph_cols:
+                db.session.execute(text(ddl))
+                db.session.commit()
+                app.logger.info("migrated: price_history.%s added", col)
+
         # Legacy DBs enforced UNIQUE(upc); shared barcodes are now allowed.
         # Products are cache data (rebuilt from the provider at startup), so
         # the safe migration is: drop + recreate the cache tables.

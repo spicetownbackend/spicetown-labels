@@ -168,10 +168,35 @@ class PriceHistory(db.Model):
     recorded_at: Mapped[datetime] = mapped_column(
         DateTime, default=utcnow, nullable=False
     )
+    # Review workflow (Stage 6): a price change starts unreviewed; staff either
+    # print a fresh label for it or dismiss it, which sets reviewed_at.
+    reviewed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    label_printed: Mapped[bool] = mapped_column(
+        Boolean, default=False, nullable=False
+    )
 
     product: Mapped["Product"] = relationship(back_populates="price_history")
 
-    __table_args__ = (Index("ix_price_history_product", "product_id"),)
+    __table_args__ = (
+        Index("ix_price_history_product", "product_id"),
+        Index("ix_price_history_reviewed", "reviewed_at"),
+    )
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "product_id": self.product_id,
+            "upc": self.product.upc if self.product else None,
+            "name": self.product.name if self.product else None,
+            "old_price": self.old_price,
+            "new_price": self.new_price,
+            "delta_ratio": self.delta_ratio,
+            "flagged": self.flagged,
+            "source": self.source,
+            "recorded_at": self.recorded_at.isoformat() if self.recorded_at else None,
+            "reviewed_at": self.reviewed_at.isoformat() if self.reviewed_at else None,
+            "label_printed": self.label_printed,
+        }
 
 
 class PrintJob(db.Model):
