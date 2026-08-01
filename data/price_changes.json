@@ -1,1 +1,9 @@
-[]
+[
+  {
+    "upc": "018625167909",
+    "name": "Cilantro Bunch",
+    "old_price": 0.99,
+    "new_price": 1.0,
+    "recorded_at": "2026-08-01T03:00:35.784967+00:00"
+  }
+]
