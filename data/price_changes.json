@@ -1,513 +1,499 @@
 [
   {
-    "upc": "053600164344",
-    "name": "WHOLE MILK YOGURT 4LB",
-    "old_price": 6.99,
-    "new_price": 7.0,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
-  },
-  {
     "upc": "163241433522",
     "name": "Gazar Halwa",
     "old_price": 9.95,
     "new_price": 6.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "163241433522",
     "name": "Gazar Halwa",
     "old_price": 9.95,
     "new_price": 7.95,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "407672259505",
     "name": "Burger - Chicken Shami Kabab (Loaded)",
     "old_price": 10.95,
     "new_price": 8.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "408418525434",
     "name": "Chicken Butter Masala (Boneless)",
     "old_price": 10.95,
     "new_price": 10.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "409807454700",
     "name": "Burger - Chicken Zinger",
     "old_price": 9.95,
     "new_price": 7.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "410543554432",
     "name": "Shami Kabab Protein Bowl",
     "old_price": 12.95,
     "new_price": 9.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "412952281893",
     "name": "Achari Chana Roll",
     "old_price": 5.95,
     "new_price": 4.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "413574421858",
     "name": "Dahi Vada (2pc)",
     "old_price": 5.95,
     "new_price": 4.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "414451530908",
     "name": "Vegetable Fried Rice",
     "old_price": 12.95,
     "new_price": 8.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "415724775231",
     "name": "Chicken Samosa Each",
     "old_price": 2.95,
     "new_price": 2.49,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "415732590994",
     "name": "Pani Puri (6ct)",
     "old_price": 5.95,
     "new_price": 4.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "417847612639",
     "name": "Custom Combo",
     "old_price": 12.95,
     "new_price": 9.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "421254217318",
     "name": "Poori with Chana Masala",
     "old_price": 11.95,
     "new_price": 9.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "421254217318",
     "name": "Poori with Chana Masala",
     "old_price": 11.95,
     "new_price": 9.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "421490273956",
     "name": "Burger - Veggie (Loaded)",
     "old_price": 9.95,
     "new_price": 7.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "421948579135",
     "name": "Chicken Shami Kebab Each",
     "old_price": 3.95,
     "new_price": 2.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "424875431408",
     "name": "Sandwich - Chicken Breast Patty",
     "old_price": 9.95,
     "new_price": 7.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "425016071262",
     "name": "Fish & Chips",
     "old_price": 11.95,
     "new_price": 9.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "425877441662",
     "name": "Bhel Chaat",
     "old_price": 5.95,
     "new_price": 4.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "426623981074",
     "name": "Crispy Fish Hakka Noodles",
     "old_price": 18.95,
     "new_price": 12.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "428082804215",
     "name": "Paneer Hakka Noodles",
     "old_price": 18.95,
     "new_price": 11.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "428099123248",
     "name": "Crispy Finger Fish Pita Wrap",
     "old_price": 12.95,
     "new_price": 10.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "428300631074",
     "name": "Aloo Tikki Chaat",
     "old_price": 6.95,
     "new_price": 5.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "428401409275",
     "name": "Bun - Spicy Falafel (Veg)",
     "old_price": 4.95,
     "new_price": 3.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "429723308512",
     "name": "Chicken Protein Bowl",
     "old_price": 10.95,
     "new_price": 8.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "430381982693",
     "name": "Chicken Masala Roll",
     "old_price": 5.95,
     "new_price": 4.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "431350546168",
     "name": "Lamb Shawarma Platter",
     "old_price": 13.95,
     "new_price": 11.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "433637891855",
     "name": "Fries",
     "old_price": 2.95,
     "new_price": 2.49,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "433859143916",
     "name": "Vegetable Hakka Noodles",
     "old_price": 10.95,
     "new_price": 8.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "434061876043",
     "name": "Hash Browns (2pc)",
     "old_price": 2.95,
     "new_price": 2.49,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "435251075956",
     "name": "Crispy Finger Fish Protein Bowl",
     "old_price": 12.95,
     "new_price": 10.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "438093493483",
     "name": "Egg Hakka Noodles",
     "old_price": 11.95,
     "new_price": 9.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "438890969716",
     "name": "Gulab Jamun",
     "old_price": 5.95,
     "new_price": 4.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "442091649049",
     "name": "Chicken Tikka Roll",
     "old_price": 5.95,
     "new_price": 4.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "450349642919",
     "name": "Falafel Pita Wrap (Veg)",
     "old_price": 11.95,
     "new_price": 9.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "452074949936",
     "name": "Paneer Tikka Roll",
     "old_price": 6.95,
     "new_price": 5.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "453754179643",
     "name": "Paneer Protein Bowl",
     "old_price": 11.95,
     "new_price": 9.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "454234339007",
     "name": "Crispy Finger Fish Platter",
     "old_price": 13.95,
     "new_price": 11.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "454514749984",
     "name": "Spicy Falafel Roll",
     "old_price": 5.95,
     "new_price": 4.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "457757953477",
     "name": "Burger - Chicken Chapli Kabab",
     "old_price": 12.95,
     "new_price": 8.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "458236107497",
     "name": "Veg Samosa Each",
     "old_price": 1.95,
     "new_price": 1.49,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "461106016904",
     "name": "Crispy Fish Fried Rice",
     "old_price": 18.95,
     "new_price": 12.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "461441218094",
     "name": "Spicy Finger Fish Roll",
     "old_price": 6.95,
     "new_price": 5.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "461922340863",
     "name": "Bun - Vada Pav (Veg)",
     "old_price": 4.95,
     "new_price": 3.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "462743689476",
     "name": "Chicken Dum Biryani",
     "old_price": 13.95,
     "new_price": 11.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "466266766027",
     "name": "Paneer Pita Wrap (Veg)",
     "old_price": 11.95,
     "new_price": 9.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "466267810439",
     "name": "Achari Chicken Roll",
     "old_price": 5.95,
     "new_price": 4.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "466280711300",
     "name": "Papdi Chaat",
     "old_price": 5.95,
     "new_price": 4.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "466578381499",
     "name": "Bun Kabab - Chicken",
     "old_price": 5.95,
     "new_price": 4.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "467740340788",
     "name": "Samosa Chaat",
     "old_price": 6.95,
     "new_price": 5.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "468434234109",
     "name": "Paneer Platter (Veg)",
     "old_price": 12.95,
     "new_price": 10.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "469798147999",
     "name": "Chicken Tandoori Platter",
     "old_price": 11.95,
     "new_price": 9.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "470291894259",
     "name": "Dahi Puri (6ct)",
     "old_price": 5.95,
     "new_price": 4.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "470349359983",
     "name": "Fish Sandwich",
     "old_price": 12.95,
     "new_price": 8.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "471129899934",
     "name": "Egg Fried Rice",
     "old_price": 13.95,
     "new_price": 9.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "471547034542",
     "name": "Falafel Platter (Veg)",
     "old_price": 12.95,
     "new_price": 10.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "472269822141",
     "name": "Chicken Fried Rice",
     "old_price": 16.95,
     "new_price": 11.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "472705857164",
     "name": "Lamb Shawarma Pita Wrap",
     "old_price": 12.95,
     "new_price": 10.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "478277220801",
     "name": "Paneer Masala Roll",
     "old_price": 6.95,
     "new_price": 5.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "478365436824",
     "name": "Chicken Shami Kabab Platter",
     "old_price": 13.95,
     "new_price": 9.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "479943059374",
     "name": "Lamb Hakka Noodles",
     "old_price": 18.95,
     "new_price": 12.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "480845741458",
     "name": "Lamb Shawarma Protein Bowl",
     "old_price": 12.95,
     "new_price": 10.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "485480984307",
     "name": "Lamb Fried Rice",
     "old_price": 18.95,
     "new_price": 12.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "490784344351",
     "name": "Chicken Hakka Noodles",
     "old_price": 13.95,
     "new_price": 11.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "493566293380",
     "name": "Falafel Protein Bowl",
     "old_price": 11.95,
     "new_price": 9.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "493775875544",
     "name": "Paneer Fried Rice",
     "old_price": 18.95,
     "new_price": 11.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "495849478644",
     "name": "Chicken Tandoori Pita Wrap",
     "old_price": 11.95,
     "new_price": 9.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "496074659884",
     "name": "Chicken 65",
     "old_price": 13.95,
     "new_price": 10.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "499753786840",
     "name": "Lamb Shawarma Roll",
     "old_price": 6.95,
     "new_price": 5.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
-    "upc": "620514001234",
-    "name": "National Dahi Bara Mix 160g",
-    "old_price": 2.49,
-    "new_price": 2.5,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
-  },
-  {
-    "upc": "8901262202596",
-    "name": "Amul Buffalo Dahi 2.2lb",
-    "old_price": 4.99,
-    "new_price": 5.0,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "upc": "8901262202220",
+    "name": "Amul Fat Dahi (3.3% Fat) 2.2lb",
+    "old_price": 4.49,
+    "new_price": 4.5,
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   },
   {
     "upc": "TG-4DDA6B04A29C",
     "name": "Mixed Vegetable Roll",
     "old_price": 5.95,
     "new_price": 4.99,
-    "recorded_at": "2026-08-01T02:18:00.244810+00:00"
+    "recorded_at": "2026-08-01T02:23:51.993546+00:00"
   }
 ]
