@@ -104,28 +104,19 @@ _PRICE_EPSILON = 0.005
 
 # Top-level Toast menus (NOT the item's "department", which is the leaf menu
 # GROUP name — e.g. "Street Snacks" — and near-never equals the menu name
-# itself) that never get a label review prompt — e.g. made-to-order hot food
-# with no shelf tag to reprint.
+# itself) that never get labeled — made-to-order hot food, no shelf tag.
+# Excluded entirely: never synced into products.csv, never printed, never
+# shows up as a price change to review.
 EXCLUDED_MENUS = {"street kitchen"}
 
 
 def compute_price_diffs(
-    rows: list[dict],
-    old_prices: dict[tuple[str, str], float],
-    menus: dict[tuple[str, str], str] | None = None,
+    rows: list[dict], old_prices: dict[tuple[str, str], float]
 ) -> list[dict]:
-    """Diff this run's rows against the previously-committed CSV prices.
-
-    Items under EXCLUDED_MENUS still get their price updated in the CSV as
-    normal — they're just not flagged for the label review queue.
-    """
-    menus = menus or {}
+    """Diff this run's rows against the previously-committed CSV prices."""
     now = datetime.now(timezone.utc).isoformat()
     diffs = []
     for row in rows:
-        menu = (menus.get((row["upc"], row["name"])) or "").strip().lower()
-        if menu in EXCLUDED_MENUS:
-            continue
         old = old_prices.get((row["upc"], row["name"]))
         if old is None:
             continue  # new item — nothing to compare against
@@ -179,10 +170,15 @@ def main() -> int:
     old_prices = load_existing_prices(out_path)
     kept_overrides = 0
     rows = []
-    menus: dict[tuple[str, str], str] = {}
     seen: set[tuple[str, str]] = set()
     dupes = 0
+    excluded = 0
     for rec in records:
+        menu = ((rec.extra or {}).get("menu") or "").strip().lower()
+        if menu in EXCLUDED_MENUS:
+            excluded += 1
+            continue
+
         # Same rule as the app's loader (loader.py bulk_load): an exact
         # duplicate (same UPC *and* name) within one feed is a Toast data
         # issue (e.g. the item cross-listed in two menu groups with
@@ -209,15 +205,13 @@ def main() -> int:
             row.update(overrides[key])
             kept_overrides += 1
         rows.append(row)
-        menu = (rec.extra or {}).get("menu")
-        if menu:
-            menus[key] = menu
     rows.sort(key=lambda r: (r["upc"], r["name"]))
 
-    diffs = compute_price_diffs(rows, old_prices, menus)
+    diffs = compute_price_diffs(rows, old_prices)
     print(
         f"toast sync: {len(rows)} items, {kept_overrides} sale/clearance override(s) preserved, "
-        f"{dupes} exact duplicate(s) skipped, {len(diffs)} price change(s)"
+        f"{excluded} Street Kitchen item(s) excluded, {dupes} exact duplicate(s) skipped, "
+        f"{len(diffs)} price change(s)"
     )
     if args.dry_run:
         return 0
