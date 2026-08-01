@@ -1,16 +1,1 @@
-[
-  {
-    "upc": "018625167909",
-    "name": "Cilantro Bunch",
-    "old_price": 1.0,
-    "new_price": 0.99,
-    "recorded_at": "2026-08-01T02:49:33.553383+00:00"
-  },
-  {
-    "upc": "163241433522",
-    "name": "Gazar Halwa",
-    "old_price": 9.95,
-    "new_price": 7.95,
-    "recorded_at": "2026-08-01T02:49:33.553383+00:00"
-  }
-]
+[]
