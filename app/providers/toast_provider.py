@@ -201,23 +201,30 @@ class ToastDataProvider(DataProvider):
         self._menus_doc_at = time.monotonic()
         return doc
 
-    def _iter_items(self, doc: Any) -> Iterator[tuple[dict, str]]:
-        """Yield (menu_item, department) walking menus -> groups (recursively)."""
+    def _iter_items(self, doc: Any) -> Iterator[tuple[dict, str, str]]:
+        """Yield (menu_item, department, menu_name) walking menus -> groups.
 
-        def walk_group(group: dict, department: str) -> Iterator[tuple[dict, str]]:
+        `department` is the leaf group's own name (falls back up the tree);
+        `menu_name` is the top-level Toast *menu* the item lives under (e.g.
+        "Street Kitchen") — distinct from department once items sit in a
+        named sub-group, which is the common case. Callers that need to key
+        off the whole menu (not just the immediate group) need this.
+        """
+
+        def walk_group(group: dict, department: str, menu_name: str) -> Iterator[tuple[dict, str, str]]:
             dept = (group.get("name") or department or "").strip() or department
             for item in group.get("menuItems") or []:
-                yield item, dept
+                yield item, dept, menu_name
             for sub in group.get("menuGroups") or []:
-                yield from walk_group(sub, dept)
+                yield from walk_group(sub, dept, menu_name)
 
         menus = (doc or {}).get("menus") or []
         for menu in menus:
             menu_name = (menu.get("name") or "").strip()
             for group in menu.get("menuGroups") or []:
-                yield from walk_group(group, menu_name)
+                yield from walk_group(group, menu_name, menu_name)
 
-    def _to_record(self, item: dict, department: str) -> ProductRecord | None:
+    def _to_record(self, item: dict, department: str, menu_name: str = "") -> ProductRecord | None:
         """Map one Toast menu item to a ProductRecord (None -> skip + reason)."""
         name = (item.get("name") or "").strip()
         if not name:
@@ -247,7 +254,7 @@ class ToastDataProvider(DataProvider):
             price=price,
             sku=sku or None,
             department=department or None,
-            extra={"toast_guid": item.get("guid")},
+            extra={"toast_guid": item.get("guid"), "menu": menu_name or None},
         )
 
     # ── DataProvider interface ────────────────────────────────────────────────
@@ -268,8 +275,8 @@ class ToastDataProvider(DataProvider):
         doc = self._get_menus_document()
         seen = 0
         skipped = 0
-        for item, department in self._iter_items(doc):
-            rec = self._to_record(item, department)
+        for item, department, menu_name in self._iter_items(doc):
+            rec = self._to_record(item, department, menu_name)
             if rec is None:
                 skipped += 1
                 continue
@@ -292,8 +299,8 @@ class ToastDataProvider(DataProvider):
         if not upc:
             return None
         doc = self._get_menus_document(max_age=_MENUS_DOC_TTL)
-        for item, department in self._iter_items(doc):
-            rec = self._to_record(item, department)
+        for item, department, menu_name in self._iter_items(doc):
+            rec = self._to_record(item, department, menu_name)
             if rec is not None and rec.upc == upc:
                 return rec
         return None

@@ -102,23 +102,29 @@ def load_existing_prices(path: Path) -> dict[tuple[str, str], float]:
 # Sub-cent differences are float noise, not a real price change.
 _PRICE_EPSILON = 0.005
 
-# Menu groups (Toast's "department" on the row) that never get a label review
-# prompt — e.g. made-to-order hot food with no shelf tag to reprint.
-EXCLUDED_DEPARTMENTS = {"street kitchen"}
+# Top-level Toast menus (NOT the item's "department", which is the leaf menu
+# GROUP name — e.g. "Street Snacks" — and near-never equals the menu name
+# itself) that never get a label review prompt — e.g. made-to-order hot food
+# with no shelf tag to reprint.
+EXCLUDED_MENUS = {"street kitchen"}
 
 
 def compute_price_diffs(
-    rows: list[dict], old_prices: dict[tuple[str, str], float]
+    rows: list[dict],
+    old_prices: dict[tuple[str, str], float],
+    menus: dict[tuple[str, str], str] | None = None,
 ) -> list[dict]:
     """Diff this run's rows against the previously-committed CSV prices.
 
-    Rows in EXCLUDED_DEPARTMENTS still get their price updated in the CSV as
+    Items under EXCLUDED_MENUS still get their price updated in the CSV as
     normal — they're just not flagged for the label review queue.
     """
+    menus = menus or {}
     now = datetime.now(timezone.utc).isoformat()
     diffs = []
     for row in rows:
-        if (row.get("department") or "").strip().lower() in EXCLUDED_DEPARTMENTS:
+        menu = (menus.get((row["upc"], row["name"])) or "").strip().lower()
+        if menu in EXCLUDED_MENUS:
             continue
         old = old_prices.get((row["upc"], row["name"]))
         if old is None:
@@ -173,6 +179,7 @@ def main() -> int:
     old_prices = load_existing_prices(out_path)
     kept_overrides = 0
     rows = []
+    menus: dict[tuple[str, str], str] = {}
     for rec in records:
         row = {
             "upc": rec.upc,
@@ -189,9 +196,12 @@ def main() -> int:
             row.update(overrides[(rec.upc, rec.name)])
             kept_overrides += 1
         rows.append(row)
+        menu = (rec.extra or {}).get("menu")
+        if menu:
+            menus[(rec.upc, rec.name)] = menu
     rows.sort(key=lambda r: (r["upc"], r["name"]))
 
-    diffs = compute_price_diffs(rows, old_prices)
+    diffs = compute_price_diffs(rows, old_prices, menus)
     print(
         f"toast sync: {len(rows)} items, {kept_overrides} sale/clearance override(s) preserved, "
         f"{len(diffs)} price change(s)"
