@@ -102,14 +102,24 @@ def load_existing_prices(path: Path) -> dict[tuple[str, str], float]:
 # Sub-cent differences are float noise, not a real price change.
 _PRICE_EPSILON = 0.005
 
+# Menu groups (Toast's "department" on the row) that never get a label review
+# prompt — e.g. made-to-order hot food with no shelf tag to reprint.
+EXCLUDED_DEPARTMENTS = {"street kitchen"}
+
 
 def compute_price_diffs(
     rows: list[dict], old_prices: dict[tuple[str, str], float]
 ) -> list[dict]:
-    """Diff this run's rows against the previously-committed CSV prices."""
+    """Diff this run's rows against the previously-committed CSV prices.
+
+    Rows in EXCLUDED_DEPARTMENTS still get their price updated in the CSV as
+    normal — they're just not flagged for the label review queue.
+    """
     now = datetime.now(timezone.utc).isoformat()
     diffs = []
     for row in rows:
+        if (row.get("department") or "").strip().lower() in EXCLUDED_DEPARTMENTS:
+            continue
         old = old_prices.get((row["upc"], row["name"]))
         if old is None:
             continue  # new item — nothing to compare against
