@@ -13,7 +13,9 @@ Usage:
 
 from __future__ import annotations
 
+import json
 import logging
+from pathlib import Path
 
 from flask import Flask, jsonify
 
@@ -167,6 +169,7 @@ def create_app(
         )
     if start_background:
         _startup_bulk_load(app, provider)
+        _import_price_change_diffs(app)
         init_scheduler(app)
         if cfg.ENABLE_PRINT_WORKER and not remote_mode:
             print_queue.start()
@@ -256,6 +259,71 @@ def _startup_bulk_load(app: Flask, provider) -> None:
             app.logger.error("startup bulk load skipped: %s", exc)
         except Exception:
             app.logger.exception("startup bulk load failed")
+
+
+def _import_price_change_diffs(app: Flask) -> None:
+    """Seed the review queue from data/price_changes.json (Stage 6).
+
+    On Render's free tier the DB lives on ephemeral disk and gets wiped by
+    the redeploy each Toast sync commit triggers, so a price diff computed
+    from the DB after that reload would only ever see inserts. The sync
+    script (scripts/toast_sync.py) computes the diff itself, before it's
+    lost, and commits it here. The file always holds just the latest sync's
+    changes (not an accumulating backlog), so this import is safe to re-run
+    on every boot: rows already imported are skipped via a dedupe query.
+    """
+    from .models import PriceHistory, Product, utcnow
+
+    path = Path(app.config["PRODUCTS_FILE"]).parent / "price_changes.json"
+    if not path.exists():
+        return
+    try:
+        diffs = json.loads(path.read_text())
+    except (OSError, ValueError):
+        app.logger.exception("price_changes.json import failed: unreadable")
+        return
+    if not diffs:
+        return
+
+    with app.app_context():
+        imported = 0
+        for d in diffs:
+            product = (
+                db.session.query(Product)
+                .filter_by(upc=d["upc"], name=d["name"])
+                .first()
+            )
+            if product is None:
+                continue
+            exists = (
+                db.session.query(PriceHistory)
+                .filter_by(
+                    product_id=product.id,
+                    old_price=d["old_price"],
+                    new_price=d["new_price"],
+                    source="toast_sync_file",
+                )
+                .first()
+            )
+            if exists is not None:
+                continue
+            db.session.add(
+                PriceHistory(
+                    product_id=product.id,
+                    old_price=d["old_price"],
+                    new_price=d["new_price"],
+                    source="toast_sync_file",
+                    recorded_at=utcnow(),
+                )
+            )
+            imported += 1
+        if imported:
+            db.session.commit()
+        app.logger.info(
+            "price change import: %d/%d diff(s) added to the review queue",
+            imported,
+            len(diffs),
+        )
 
 
 def _register_error_handlers(app: Flask) -> None:

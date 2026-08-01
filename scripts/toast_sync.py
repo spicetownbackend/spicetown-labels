@@ -13,6 +13,15 @@ PRESERVES any `sale_price` / `clearance` values already present in the CSV for
 UPCs that still exist in Toast. Hand-edit those columns to put an item on
 sale; the nightly sync keeps your edit while updating name/price from Toast.
 
+Price-change review queue: the app's DB lives on Render's free-tier ephemeral
+disk, so it gets wiped on every redeploy this sync's commit triggers — a diff
+computed *inside* the app after that reload would only ever see inserts, never
+an old-vs-new price to compare. So the diff is computed HERE instead, before
+the CSV is overwritten, and written to data/price_changes.json (also
+committed). That file always holds just THIS run's changes (not an
+accumulating backlog) — see app/__init__.py's `_import_price_change_diffs`
+for how the app turns it into review-queue rows on boot.
+
 Env (GitHub Actions Secrets): TOAST_CLIENT_ID, TOAST_CLIENT_SECRET,
 TOAST_RESTAURANT_GUID, optional TOAST_API_BASE.
 
@@ -27,8 +36,10 @@ from __future__ import annotations
 
 import argparse
 import csv
+import json
 import os
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -66,6 +77,56 @@ def load_existing_overrides(path: Path) -> dict[tuple[str, str], dict]:
     return overrides
 
 
+def load_existing_prices(path: Path) -> dict[tuple[str, str], float]:
+    """Read the price the CSV had *before* this run overwrites it.
+
+    Keyed by (upc, name), same logical identity as load_existing_overrides.
+    """
+    prices: dict[tuple[str, str], float] = {}
+    if not path.exists():
+        return prices
+    with path.open(newline="") as fh:
+        for row in csv.DictReader(fh):
+            upc = (row.get("upc") or "").strip()
+            name = (row.get("name") or "").strip()
+            price = (row.get("price") or "").strip()
+            if not upc or not price:
+                continue
+            try:
+                prices[(upc, name)] = float(price)
+            except ValueError:
+                continue
+    return prices
+
+
+# Sub-cent differences are float noise, not a real price change.
+_PRICE_EPSILON = 0.005
+
+
+def compute_price_diffs(
+    rows: list[dict], old_prices: dict[tuple[str, str], float]
+) -> list[dict]:
+    """Diff this run's rows against the previously-committed CSV prices."""
+    now = datetime.now(timezone.utc).isoformat()
+    diffs = []
+    for row in rows:
+        old = old_prices.get((row["upc"], row["name"]))
+        if old is None:
+            continue  # new item — nothing to compare against
+        new = float(row["price"])
+        if abs(new - old) >= _PRICE_EPSILON:
+            diffs.append(
+                {
+                    "upc": row["upc"],
+                    "name": row["name"],
+                    "old_price": old,
+                    "new_price": new,
+                    "recorded_at": now,
+                }
+            )
+    return diffs
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Sync Toast catalog to CSV")
     parser.add_argument("--out", default=str(REPO_ROOT / "data" / "products.csv"))
@@ -99,6 +160,7 @@ def main() -> int:
         return 2
 
     overrides = load_existing_overrides(out_path)
+    old_prices = load_existing_prices(out_path)
     kept_overrides = 0
     rows = []
     for rec in records:
@@ -119,11 +181,18 @@ def main() -> int:
         rows.append(row)
     rows.sort(key=lambda r: (r["upc"], r["name"]))
 
-    print(f"toast sync: {len(rows)} items, {kept_overrides} sale/clearance override(s) preserved")
+    diffs = compute_price_diffs(rows, old_prices)
+    print(
+        f"toast sync: {len(rows)} items, {kept_overrides} sale/clearance override(s) preserved, "
+        f"{len(diffs)} price change(s)"
+    )
     if args.dry_run:
         return 0
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
+    price_changes_path = out_path.parent / "price_changes.json"
+    price_changes_path.write_text(json.dumps(diffs, indent=2) + "\n")
+
     with out_path.open("w", newline="") as fh:
         writer = csv.DictWriter(fh, fieldnames=FIELDS)
         writer.writeheader()

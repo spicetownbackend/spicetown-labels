@@ -54,6 +54,9 @@ jobs:
           fi
           git config user.name "toast-sync-bot"
           git config user.email "actions@github.com"
-          git add data/products.csv
+          # price_changes.json travels with the catalog: the app's DB is wiped
+          # on the redeploy this commit triggers, so the price-change review
+          # queue is seeded from this file on boot (see app/__init__.py).
+          git add data/products.csv data/price_changes.json
           git commit -m "Nightly Toast catalog sync ($(date -u +%F))"
           git push
