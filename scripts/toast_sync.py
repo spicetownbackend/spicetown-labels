@@ -180,7 +180,20 @@ def main() -> int:
     kept_overrides = 0
     rows = []
     menus: dict[tuple[str, str], str] = {}
+    seen: set[tuple[str, str]] = set()
+    dupes = 0
     for rec in records:
+        # Same rule as the app's loader (loader.py bulk_load): an exact
+        # duplicate (same UPC *and* name) within one feed is a Toast data
+        # issue (e.g. the item cross-listed in two menu groups with
+        # inconsistent prices) — keep the first, skip the rest, rather than
+        # emitting conflicting rows/diffs for the same logical item.
+        key = (rec.upc, rec.name)
+        if key in seen:
+            dupes += 1
+            continue
+        seen.add(key)
+
         row = {
             "upc": rec.upc,
             "name": rec.name,
@@ -192,19 +205,19 @@ def main() -> int:
             "sale_price": "",
             "clearance": "",
         }
-        if (rec.upc, rec.name) in overrides:
-            row.update(overrides[(rec.upc, rec.name)])
+        if key in overrides:
+            row.update(overrides[key])
             kept_overrides += 1
         rows.append(row)
         menu = (rec.extra or {}).get("menu")
         if menu:
-            menus[(rec.upc, rec.name)] = menu
+            menus[key] = menu
     rows.sort(key=lambda r: (r["upc"], r["name"]))
 
     diffs = compute_price_diffs(rows, old_prices, menus)
     print(
         f"toast sync: {len(rows)} items, {kept_overrides} sale/clearance override(s) preserved, "
-        f"{len(diffs)} price change(s)"
+        f"{dupes} exact duplicate(s) skipped, {len(diffs)} price change(s)"
     )
     if args.dry_run:
         return 0
