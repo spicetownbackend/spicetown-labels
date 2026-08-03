@@ -1,1 +1,156 @@
-[]
+[
+  {
+    "upc": "011433112864",
+    "name": "Deep Makhan Ghee 8oz",
+    "old_price": 6.99,
+    "new_price": 5.99,
+    "recorded_at": "2026-08-03T20:43:55.920704+00:00"
+  },
+  {
+    "upc": "011433114868",
+    "name": "Deep Coriander Seeds 28oz",
+    "old_price": 6.49,
+    "new_price": 5.99,
+    "recorded_at": "2026-08-03T20:43:55.920704+00:00"
+  },
+  {
+    "upc": "011433114899",
+    "name": "Deep Cumin Seeds 28oz",
+    "old_price": 11.49,
+    "new_price": 9.99,
+    "recorded_at": "2026-08-03T20:43:55.920704+00:00"
+  },
+  {
+    "upc": "011433115575",
+    "name": "Deep Ragi Flour 2lb",
+    "old_price": 2.99,
+    "new_price": 3.29,
+    "recorded_at": "2026-08-03T20:43:55.920704+00:00"
+  },
+  {
+    "upc": "011433119757",
+    "name": "Deep Dahi Whole Milk 5lb",
+    "old_price": 7.99,
+    "new_price": 6.99,
+    "recorded_at": "2026-08-03T20:43:55.920704+00:00"
+  },
+  {
+    "upc": "011433120241",
+    "name": "Bansi Gr Moong Wadi 7 oz",
+    "old_price": 1.49,
+    "new_price": 1.29,
+    "recorded_at": "2026-08-03T20:43:55.920704+00:00"
+  },
+  {
+    "upc": "011433136136",
+    "name": "Deep Dai Mango Lassi 11fl.oz",
+    "old_price": 2.49,
+    "new_price": 1.99,
+    "recorded_at": "2026-08-03T20:43:55.920704+00:00"
+  },
+  {
+    "upc": "011433156554",
+    "name": "Deep Rice Flour 2lb",
+    "old_price": 2.49,
+    "new_price": 2.29,
+    "recorded_at": "2026-08-03T20:43:55.920704+00:00"
+  },
+  {
+    "upc": "011433159555",
+    "name": "Deep Garlic Paste 723g",
+    "old_price": 9.99,
+    "new_price": 10.99,
+    "recorded_at": "2026-08-03T20:43:55.920704+00:00"
+  },
+  {
+    "upc": "011433159562",
+    "name": "Deep Ginger Paste 25.5oz",
+    "old_price": 6.99,
+    "new_price": 5.99,
+    "recorded_at": "2026-08-03T20:43:55.920704+00:00"
+  },
+  {
+    "upc": "011433162227",
+    "name": "Deep Mint Chutney 7.7Oz",
+    "old_price": 3.99,
+    "new_price": 3.49,
+    "recorded_at": "2026-08-03T20:43:55.920704+00:00"
+  },
+  {
+    "upc": "011433165945",
+    "name": "Deep ButterChicken 2.8oz",
+    "old_price": 2.49,
+    "new_price": 1.99,
+    "recorded_at": "2026-08-03T20:43:55.920704+00:00"
+  },
+  {
+    "upc": "011433166027",
+    "name": "Deep PaneerMakhani 2.8oz",
+    "old_price": 2.49,
+    "new_price": 1.99,
+    "recorded_at": "2026-08-03T20:43:55.920704+00:00"
+  },
+  {
+    "upc": "01256808",
+    "name": "Pepsi 12oz",
+    "old_price": 1.29,
+    "new_price": 0.99,
+    "recorded_at": "2026-08-03T20:43:55.920704+00:00"
+  },
+  {
+    "upc": "04913207",
+    "name": "Sprite Can 12oz",
+    "old_price": 1.49,
+    "new_price": 0.99,
+    "recorded_at": "2026-08-03T20:43:55.920704+00:00"
+  },
+  {
+    "upc": "04963406",
+    "name": "Coke Classic Can 12oz",
+    "old_price": 1.49,
+    "new_price": 0.99,
+    "recorded_at": "2026-08-03T20:43:55.920704+00:00"
+  },
+  {
+    "upc": "04965802",
+    "name": "Diet Coke Can 12oz",
+    "old_price": 1.29,
+    "new_price": 0.99,
+    "recorded_at": "2026-08-03T20:43:55.920704+00:00"
+  },
+  {
+    "upc": "071210789627",
+    "name": "Amul Gold Whole Milk 1 gal",
+    "old_price": 6.99,
+    "new_price": 5.99,
+    "recorded_at": "2026-08-03T20:43:55.920704+00:00"
+  },
+  {
+    "upc": "855664004105",
+    "name": "Quik Tea Madras Coffee 8.5oz",
+    "old_price": 6.49,
+    "new_price": 5.99,
+    "recorded_at": "2026-08-03T20:43:55.920704+00:00"
+  },
+  {
+    "upc": "8901063151567",
+    "name": "Britannia Wheat/Suji Rusk 610g",
+    "old_price": 5.49,
+    "new_price": 5.99,
+    "recorded_at": "2026-08-03T20:43:55.920704+00:00"
+  },
+  {
+    "upc": "8901262202220",
+    "name": "Amul Fat Dahi (3.3% Fat) 2.2lb",
+    "old_price": 4.49,
+    "new_price": 3.99,
+    "recorded_at": "2026-08-03T20:43:55.920704+00:00"
+  },
+  {
+    "upc": "8901262202268",
+    "name": "Amul Fat Dahi (3.3% Fat) 4.4lb",
+    "old_price": 8.49,
+    "new_price": 7.99,
+    "recorded_at": "2026-08-03T20:43:55.920704+00:00"
+  }
+]
