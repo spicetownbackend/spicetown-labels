@@ -8,6 +8,7 @@
   const suggestCard = $("suggest-card");
   const customCard = $("custom-card");
   const priceChangesCard = $("price-changes-card");
+  const printHistoryCard = $("print-history-card");
   const viewport = $("viewport");
 
   let scanning = false;
@@ -25,7 +26,7 @@
     toast._t = setTimeout(() => (t.hidden = true), ms);
   }
   function show(card) {
-    for (const c of [scannerCard, resultCard, suggestCard, customCard, priceChangesCard])
+    for (const c of [scannerCard, resultCard, suggestCard, customCard, priceChangesCard, printHistoryCard])
       c.hidden = c !== card;
   }
   function money(v) {
@@ -381,6 +382,66 @@
     await refreshPriceChangesBanner();
   }
 
+  // ── print history ──────────────────────────────────────────────────────
+  // Every /api/print and price-change print goes through PrintJob, so this
+  // view is just a read of that table (no separate log to keep in sync).
+  const STATUS_ICON = { queued: "⏳", printing: "🖨️", done: "✓", error: "✗" };
+
+  function phRow(j) {
+    const when = j.completed_at || j.claimed_at || j.created_at;
+    const whenStr = when ? new Date(when).toLocaleString() : "";
+    const tag = j.reason === "price_change" ? `<span class="pc-tag">price change</span>` : "";
+    const icon = STATUS_ICON[j.status] || j.status;
+    const div = document.createElement("div");
+    div.className = "pc-row ph-row";
+    div.innerHTML = `
+      <span class="pc-info">
+        <span class="pc-name">${icon} ${escapeHtml(j.name || j.upc)} ${tag}</span>
+        <span class="pc-meta">UPC ${escapeHtml(j.upc || "")} · ${j.variant || "standard"} × ${j.copies || 1} · ${whenStr}${j.error ? " · " + escapeHtml(j.error) : ""}</span>
+      </span>
+      <button class="btn ph-reprint" ${j.product_id ? "" : "disabled title=\"product no longer in catalog\""}>🖨️ Reprint</button>`;
+    if (j.product_id) {
+      div.querySelector(".ph-reprint").onclick = () => reprintJob(j);
+    }
+    return div;
+  }
+
+  async function reprintJob(j) {
+    toast(`Reprinting ${j.name || j.upc}…`, 4000);
+    const { ok, body } = await getJSON("/api/print", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        product_id: j.product_id,
+        variant: j.variant || undefined,
+        copies: j.copies || 1,
+        fields: j.fields ? j.fields.split(",") : undefined,
+      }),
+    });
+    toast(ok ? `✓ Reprint queued for ${j.name || j.upc}.` : `✗ Reprint failed: ${(body && body.message) || "error"}`);
+    await refreshPrintHistory();
+  }
+
+  async function openPrintHistory() {
+    show(printHistoryCard);
+    await refreshPrintHistory();
+  }
+
+  async function refreshPrintHistory() {
+    const list = $("print-history-list");
+    list.innerHTML = `<p class="hint">Loading…</p>`;
+    const reason = $("ph-filter").value;
+    const qs = reason ? `?reason=${encodeURIComponent(reason)}` : "";
+    const { body } = await getJSON(`/api/print-history${qs}`);
+    const jobs = (body && body.jobs) || [];
+    list.innerHTML = "";
+    if (!jobs.length) {
+      list.innerHTML = `<p class="hint">No print jobs yet.</p>`;
+      return;
+    }
+    for (const j of jobs) list.appendChild(phRow(j));
+  }
+
   // ── camera (QuaggaJS) ──────────────────────────────────────────────────
   function startScanner() {
     if (scanning) return;
@@ -510,6 +571,7 @@
   $("btn-back2").onclick = () => show(scannerCard);
   $("btn-back3").onclick = () => show(scannerCard);
   $("btn-back4").onclick = () => show(scannerCard);
+  $("btn-back5").onclick = () => show(scannerCard);
   $("btn-custom").onclick = () => {
     show(customCard);
     $("c-name").focus();
@@ -521,6 +583,9 @@
     for (const b of document.querySelectorAll("#price-changes-list .pc-check"))
       b.checked = e.target.checked;
   };
+  $("btn-print-history").onclick = openPrintHistory;
+  $("btn-ph-refresh").onclick = refreshPrintHistory;
+  $("ph-filter").onchange = refreshPrintHistory;
   $("custom-form").onsubmit = createCustom;
   $("manual-input").oninput = onManualInput;
   $("manual-form").onsubmit = (e) => {

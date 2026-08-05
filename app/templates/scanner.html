@@ -22,6 +22,8 @@
       <span id="price-changes-count">0</span> price change(s) need new labels — Review
     </button>
 
+    <button id="btn-print-history" class="btn btn-link history-link">🕘 Print history</button>
+
     <!-- ── Scanner ─────────────────────────────────────────────── -->
     <section id="scanner-card" class="card">
       <div class="scanner-wrap">
@@ -130,6 +132,23 @@
       </div>
       <div id="price-changes-list" class="price-changes-list"></div>
       <p id="pc-status" class="print-status"></p>
+    </section>
+
+    <!-- ── Print history ────────────────────────────────────────── -->
+    <section id="print-history-card" class="card" hidden>
+      <button id="btn-back5" class="btn btn-link">← Back</button>
+      <h2>Print history</h2>
+      <div class="price-changes-actions">
+        <label class="field">Show
+          <select id="ph-filter">
+            <option value="">All prints</option>
+            <option value="manual">Manual/scan only</option>
+            <option value="price_change">Price-change only</option>
+          </select>
+        </label>
+        <button id="btn-ph-refresh" class="btn">↻ Refresh</button>
+      </div>
+      <div id="print-history-list" class="price-changes-list"></div>
     </section>
   </main>
 

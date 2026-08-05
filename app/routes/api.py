@@ -8,6 +8,7 @@ Implemented (Stage 1-4):
   POST /api/refresh            -> trigger a manual bulk refresh (guarded)
   POST /api/print              -> enqueue a label print job (single-worker queue)
   GET  /api/print/<job_id>     -> poll print job status
+  GET  /api/print-history      -> recent print jobs (manual + price-change)
   GET  /api/preview/<upc>.png  -> render label PNG (no print) for the scanner UI
   GET  /api/search?q=...       -> fuzzy search (rapidfuzz) for bad barcodes
   GET  /api/price-changes      -> unreviewed price changes needing a fresh label
@@ -258,10 +259,19 @@ def create_custom_product():
 
 
 def _enqueue_for_product(
-    product: Product, *, variant: str | None = None, copies: int = 1, fields_csv: str | None = None
+    product: Product,
+    *,
+    variant: str | None = None,
+    copies: int = 1,
+    fields_csv: str | None = None,
+    reason: str | None = None,
 ):
     """Queue a print job for `product`. Shared by /api/print and the
     price-change review/print flow.
+
+    `reason` tags why the job exists (None = manual scan/search print,
+    "price_change" = queued from the price-change review panel) so the
+    print-history view can distinguish them.
 
     Returns a SimpleNamespace(job_id, status, queue_depth). Raises QueueFull
     (bounded local queue) or RuntimeError (local worker not running).
@@ -278,6 +288,7 @@ def _enqueue_for_product(
             copies=copies_n,
             fields=fields_csv,
             status="queued",
+            reason=reason,
         )
         db.session.add(job)
         db.session.commit()
@@ -295,6 +306,7 @@ def _enqueue_for_product(
         copies=copies,
         product_id=product.id,
         fields=fields_csv,
+        reason=reason,
     )
 
 
@@ -390,6 +402,43 @@ def print_status(job_id: int):
     return jsonify({"job": job.to_dict()})
 
 
+@bp.get("/print-history")
+def print_history():
+    """Recent print jobs (manual + price-change), most recent first.
+
+    Query params:
+      limit  : default 100, max 500.
+      reason : filter to "price_change" or "manual" (manual = reason is NULL).
+    """
+    limit = min(request.args.get("limit", 100, type=int) or 100, 500)
+    reason = request.args.get("reason")
+
+    q = db.session.query(PrintJob)
+    if reason == "price_change":
+        q = q.filter(PrintJob.reason == "price_change")
+    elif reason == "manual":
+        q = q.filter(PrintJob.reason.is_(None))
+
+    rows = q.order_by(PrintJob.id.desc()).limit(limit).all()
+
+    # PrintJob has no name column — attach it from the product for display.
+    product_ids = {r.product_id for r in rows if r.product_id is not None}
+    names = {}
+    if product_ids:
+        names = {
+            p.id: p.name
+            for p in db.session.query(Product).filter(Product.id.in_(product_ids)).all()
+        }
+
+    out = []
+    for r in rows:
+        d = r.to_dict()
+        d["name"] = names.get(r.product_id)
+        out.append(d)
+
+    return jsonify({"count": len(out), "jobs": out})
+
+
 # ── Price-change review (Stage 6) ───────────────────────────────────────────
 # Every Toast sync / refresh upserts through loader.upsert_record, which
 # already appends a PriceHistory row whenever a price actually moves. These
@@ -446,7 +495,9 @@ def print_price_changes():
             results.append({"id": pid, "ok": False, "error": "product_missing"})
             continue
         try:
-            enq = _enqueue_for_product(product, variant=product.label_variant())
+            enq = _enqueue_for_product(
+                product, variant=product.label_variant(), reason="price_change"
+            )
         except RuntimeError:
             results.append({"id": pid, "ok": False, "error": "unavailable"})
             continue

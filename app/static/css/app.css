@@ -107,6 +107,15 @@ input:focus, select:focus { outline: 2px solid var(--red); outline-offset: 0; }
 .pc-new { font-weight: 700; color: var(--ink); }
 .pc-new.up { color: var(--red); }
 .pc-new.down { color: var(--ok); }
+.pc-tag { display: inline-block; margin-left: .4rem; padding: .05rem .4rem; border-radius: 6px;
+  background: #fff8e8; color: var(--warn); font-size: .7rem; font-weight: 700; vertical-align: middle; }
+
+.history-link { display: block; width: calc(100% - 2rem); max-width: 528px; margin: .4rem auto 0;
+  text-align: right; font-size: .85rem; }
+
+.ph-row { justify-content: space-between; align-items: center; cursor: default; }
+.ph-reprint { flex: 0 0 auto; font-size: .8rem; padding: .35rem .7rem; }
+.ph-reprint:disabled { opacity: .4; cursor: not-allowed; }
 
 .toast { position: fixed; left: 50%; bottom: 1.2rem; transform: translateX(-50%);
   background: #222; color: #fff; padding: .7rem 1rem; border-radius: 10px;

@@ -134,13 +134,16 @@ class PrintQueue:
         copies: int = 1,
         product_id: int | None = None,
         fields: str | None = None,
+        reason: str | None = None,
     ) -> EnqueueResult:
         """Create a PrintJob row (status=queued) and enqueue its id.
 
         Must be called within an app context (the request handler provides one).
         `product_id` pins the exact product when several share the barcode.
         If `variant` is None it is resolved from the product's computed variant
-        (sale/clearance/standard) so labels reflect current pricing. Raises
+        (sale/clearance/standard) so labels reflect current pricing. `reason`
+        tags why the job exists (None = manual print, "price_change" = queued
+        from the price-change review panel) for the print-history view. Raises
         QueueFull if the bounded queue is saturated.
         """
         copies = max(1, min(int(copies), 50))  # clamp absurd values
@@ -156,6 +159,7 @@ class PrintQueue:
             copies=copies,
             fields=fields,
             status="queued",
+            reason=reason,
         )
         db.session.add(job)
         db.session.commit()

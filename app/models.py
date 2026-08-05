@@ -217,6 +217,10 @@ class PrintJob(db.Model):
     # queued | printing | done | error
     status: Mapped[str] = mapped_column(String(20), default="queued", nullable=False)
     error: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # Why this job was queued: NULL/"" -> manual scan/search print (default),
+    # "price_change" -> queued from the price-change review panel. Lets the
+    # print-history view distinguish the two without joining PriceHistory.
+    reason: Mapped[str | None] = mapped_column(String(20), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, default=utcnow, nullable=False
     )
@@ -240,6 +244,7 @@ class PrintJob(db.Model):
             "fields": self.fields,
             "status": self.status,
             "error": self.error,
+            "reason": self.reason,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "claimed_at": self.claimed_at.isoformat() if self.claimed_at else None,
             "completed_at": (
