@@ -387,9 +387,25 @@
   // view is just a read of that table (no separate log to keep in sync).
   const STATUS_ICON = { queued: "⏳", printing: "🖨️", done: "✓", error: "✗" };
 
+  // Server timestamps (PrintJob.created_at etc.) are stored/serialized as
+  // naive UTC (no "Z"/offset) — appending "Z" tells Date to parse it as UTC
+  // instead of the browser silently treating it as local time. Always render
+  // in the store's timezone (America/New_York) so history reads consistently
+  // no matter what timezone the viewing device/browser is set to.
+  function estString(iso) {
+    if (!iso) return "";
+    const hasZone = /Z$|[+-]\d\d:\d\d$/.test(iso);
+    const d = new Date(hasZone ? iso : iso + "Z");
+    return d.toLocaleString("en-US", {
+      timeZone: "America/New_York",
+      dateStyle: "medium",
+      timeStyle: "short",
+    });
+  }
+
   function phRow(j) {
     const when = j.completed_at || j.claimed_at || j.created_at;
-    const whenStr = when ? new Date(when).toLocaleString() : "";
+    const whenStr = estString(when);
     const tag = j.reason === "price_change" ? `<span class="pc-tag">price change</span>` : "";
     const icon = STATUS_ICON[j.status] || j.status;
     const div = document.createElement("div");
