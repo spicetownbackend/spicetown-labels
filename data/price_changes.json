@@ -1,1 +1,30 @@
-[]
+[
+  {
+    "upc": "027578200250",
+    "name": "TYJ Spring Roll Pastry Sheet 8'' 25s",
+    "old_price": 2.49,
+    "new_price": 1.99,
+    "recorded_at": "2026-08-06T03:49:36.716560+00:00"
+  },
+  {
+    "upc": "793283755445",
+    "name": "TR Garlic Paste 750g",
+    "old_price": 4.49,
+    "new_price": 4.99,
+    "recorded_at": "2026-08-06T03:49:36.716560+00:00"
+  },
+  {
+    "upc": "8902579100087",
+    "name": "Frooti Mango 6 Pack",
+    "old_price": 3.99,
+    "new_price": 3.49,
+    "recorded_at": "2026-08-06T03:49:36.716560+00:00"
+  },
+  {
+    "upc": "8904057303546",
+    "name": "Arun Dark Chocolate Tub 1000ml",
+    "old_price": 14.49,
+    "new_price": 11.99,
+    "recorded_at": "2026-08-06T03:49:36.716560+00:00"
+  }
+]
