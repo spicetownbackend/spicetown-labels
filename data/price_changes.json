@@ -1,1 +1,79 @@
-[]
+[
+  {
+    "upc": "021121691236",
+    "name": "Anar Fresh Big",
+    "old_price": 5.99,
+    "new_price": 3.99,
+    "recorded_at": "2026-08-07T13:05:15.032068+00:00"
+  },
+  {
+    "upc": "021129656909",
+    "name": "Banana Burru/Burro (Green)",
+    "old_price": 2.49,
+    "new_price": 2.99,
+    "recorded_at": "2026-08-07T13:05:15.032068+00:00"
+  },
+  {
+    "upc": "027578200250",
+    "name": "TYJ Spring Roll Pastry Sheet 8'' 25s",
+    "old_price": 1.99,
+    "new_price": 2.29,
+    "recorded_at": "2026-08-07T13:05:15.032068+00:00"
+  },
+  {
+    "upc": "1287",
+    "name": "Karela in LBs",
+    "old_price": 2.99,
+    "new_price": 2.49,
+    "recorded_at": "2026-08-07T13:05:15.032068+00:00"
+  },
+  {
+    "upc": "174366075283",
+    "name": "Mango Green in LBs",
+    "old_price": 2.99,
+    "new_price": 3.99,
+    "recorded_at": "2026-08-07T13:05:15.032068+00:00"
+  },
+  {
+    "upc": "176334777564",
+    "name": "Onion Yellow 10lb",
+    "old_price": 8.99,
+    "new_price": 8.49,
+    "recorded_at": "2026-08-07T13:05:15.032068+00:00"
+  },
+  {
+    "upc": "179146498177",
+    "name": "Sweet Potato in LBs",
+    "old_price": 3.49,
+    "new_price": 3.79,
+    "recorded_at": "2026-08-07T13:05:15.032068+00:00"
+  },
+  {
+    "upc": "179316763692",
+    "name": "Valor Regular Flat in LBs",
+    "old_price": 4.99,
+    "new_price": 5.99,
+    "recorded_at": "2026-08-07T13:05:15.032068+00:00"
+  },
+  {
+    "upc": "664648720043",
+    "name": "Daily Delight Grated Coconut 1Lb",
+    "old_price": 5.49,
+    "new_price": 5.99,
+    "recorded_at": "2026-08-07T13:05:15.032068+00:00"
+  },
+  {
+    "upc": "TG-1FE8276196E6",
+    "name": "GITS Dosa Mix 200gm",
+    "old_price": 3.49,
+    "new_price": 2.99,
+    "recorded_at": "2026-08-07T13:05:15.032068+00:00"
+  },
+  {
+    "upc": "TG-6B63691F5B47",
+    "name": "Swad Frozen Shredded Coconut 340gm",
+    "old_price": 4.49,
+    "new_price": 3.99,
+    "recorded_at": "2026-08-07T13:05:15.032068+00:00"
+  }
+]
