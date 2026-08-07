@@ -1,135 +1,72 @@
 [
   {
-    "upc": "011433117609",
-    "name": "Deep Pre Toor Dal Dry 8lb - Each",
-    "old_price": 16.99,
-    "new_price": 15.99,
-    "recorded_at": "2026-08-06T07:28:49.318923+00:00"
+    "upc": "019893450823",
+    "name": "Whole Goat With Head in Lbs",
+    "old_price": 13.99,
+    "new_price": 11.99,
+    "recorded_at": "2026-08-07T00:24:26.300393+00:00"
   },
   {
-    "upc": "051179170902",
-    "name": "Swad Gram Flour (Canada) 4lb",
-    "old_price": 6.99,
-    "new_price": 6.49,
-    "recorded_at": "2026-08-06T07:28:49.318923+00:00"
+    "upc": "159263722409",
+    "name": "Chicken Whole in lbs (No Cut)",
+    "old_price": 1.99,
+    "new_price": 2.99,
+    "recorded_at": "2026-08-07T00:24:26.300393+00:00"
   },
   {
-    "upc": "662712226279",
-    "name": "Deccan Idli Rice 10lb",
-    "old_price": 10.99,
-    "new_price": 9.99,
-    "recorded_at": "2026-08-06T07:28:49.318923+00:00"
+    "upc": "469022108031",
+    "name": "Whole Chicken Clean & No Cut",
+    "old_price": 2.99,
+    "new_price": 3.49,
+    "recorded_at": "2026-08-07T00:24:26.300393+00:00"
   },
   {
-    "upc": "662712226408",
-    "name": "Deccan Jeerasamba Rice (Ghee) 10lb",
-    "old_price": 18.99,
-    "new_price": 17.99,
-    "recorded_at": "2026-08-06T07:28:49.318923+00:00"
-  },
-  {
-    "upc": "723246285122",
-    "name": "Laxmi Peanuts Jumbo 4lb - Each",
-    "old_price": 7.99,
+    "upc": "723246287812",
+    "name": "Laxmi Garlic Butter Naan 12pc 85gm",
+    "old_price": 5.99,
     "new_price": 6.99,
-    "recorded_at": "2026-08-06T07:28:49.318923+00:00"
+    "recorded_at": "2026-08-07T00:24:26.300393+00:00"
   },
   {
-    "upc": "788581410783",
-    "name": "Godavari Crystal Sona Masoori 20lb - Each",
-    "old_price": 27.99,
-    "new_price": 26.99,
-    "recorded_at": "2026-08-06T07:28:49.318923+00:00"
+    "upc": "793283751515",
+    "name": "TR Green Raisins 200g",
+    "old_price": 5.99,
+    "new_price": 4.99,
+    "recorded_at": "2026-08-07T00:24:26.300393+00:00"
   },
   {
-    "upc": "793283755438",
-    "name": "TR Ginger& Garlic Paste 750g",
+    "upc": "793283754646",
+    "name": "TR Roghni Kulcha 150gx3",
     "old_price": 4.99,
     "new_price": 3.99,
-    "recorded_at": "2026-08-06T07:28:49.318923+00:00"
+    "recorded_at": "2026-08-07T00:24:26.300393+00:00"
   },
   {
-    "upc": "793283755445",
-    "name": "TR Garlic Paste 750g",
-    "old_price": 4.99,
-    "new_price": 3.99,
-    "recorded_at": "2026-08-06T07:28:49.318923+00:00"
-  },
-  {
-    "upc": "793283755452",
-    "name": "TR Ginger Paste 750g",
-    "old_price": 4.99,
-    "new_price": 3.99,
-    "recorded_at": "2026-08-06T07:28:49.318923+00:00"
+    "upc": "793283754936",
+    "name": "TR Tandoori Naan 70.54oz",
+    "old_price": 10.99,
+    "new_price": 11.99,
+    "recorded_at": "2026-08-07T00:24:26.300393+00:00"
   },
   {
     "upc": "818720000091",
     "name": "Sher Atta Desi Style 20lb - Each",
-    "old_price": 20.99,
-    "new_price": 19.99,
-    "recorded_at": "2026-08-06T07:28:49.318923+00:00"
-  },
-  {
-    "upc": "850057207958",
-    "name": "Knorr Chatt Patta 66g",
-    "old_price": 0.79,
-    "new_price": 0.99,
-    "recorded_at": "2026-08-06T07:28:49.318923+00:00"
-  },
-  {
-    "upc": "8901058023800",
-    "name": "Maggie Family Pack 560g",
-    "old_price": 3.99,
-    "new_price": 4.99,
-    "recorded_at": "2026-08-06T07:28:49.318923+00:00"
-  },
-  {
-    "upc": "8901262030151",
-    "name": "Amul Pure Ghee 2.2lb ( 1 Ltr)",
     "old_price": 19.99,
     "new_price": 16.99,
-    "recorded_at": "2026-08-06T07:28:49.318923+00:00"
+    "recorded_at": "2026-08-07T00:24:26.300393+00:00"
   },
   {
-    "upc": "8901777508114",
-    "name": "Vadilal Malai Paneer Block 340g",
-    "old_price": 6.49,
-    "new_price": 5.49,
-    "recorded_at": "2026-08-06T07:28:49.318923+00:00"
+    "upc": "855434000023",
+    "name": "Johar Joshanda - 30 pkts",
+    "old_price": 5.99,
+    "new_price": 6.99,
+    "recorded_at": "2026-08-07T00:24:26.300393+00:00"
   },
   {
-    "upc": "8902579100087",
-    "name": "Frooti Mango 6 Pack",
-    "old_price": 3.49,
-    "new_price": 2.99,
-    "recorded_at": "2026-08-06T07:28:49.318923+00:00"
-  },
-  {
-    "upc": "8910786100028",
-    "name": "PAK Desi Ghee 1kg",
-    "old_price": 22.99,
-    "new_price": 21.99,
-    "recorded_at": "2026-08-06T07:28:49.318923+00:00"
-  },
-  {
-    "upc": "8961014034936",
-    "name": "Knorr Chicken Noodles 66g",
-    "old_price": 0.79,
-    "new_price": 0.99,
-    "recorded_at": "2026-08-06T07:28:49.318923+00:00"
-  },
-  {
-    "upc": "8964000008003",
-    "name": "Vital Tea Economy Pack 915g - Each",
-    "old_price": 10.99,
-    "new_price": 7.99,
-    "recorded_at": "2026-08-06T07:28:49.318923+00:00"
-  },
-  {
-    "upc": "Chetak",
-    "name": "Deep Pre Moong Dal 2lb - Each",
-    "old_price": 4.49,
-    "new_price": 3.99,
-    "recorded_at": "2026-08-06T07:28:49.318923+00:00"
+    "upc": "894559000754",
+    "name": "Dawn Plain Parantha 80gx30",
+    "old_price": 11.99,
+    "new_price": 12.99,
+    "recorded_at": "2026-08-07T00:24:26.300393+00:00"
   }
 ]
