@@ -1,1 +1,30 @@
-[]
+[
+  {
+    "upc": "00192425802847",
+    "name": "Hamna rich pure desi ghee",
+    "old_price": 18.99,
+    "new_price": 17.99,
+    "recorded_at": "2026-08-09T06:02:14.681261+00:00"
+  },
+  {
+    "upc": "071210789627",
+    "name": "Amul Gold Whole Milk 1 gal",
+    "old_price": 5.99,
+    "new_price": 6.99,
+    "recorded_at": "2026-08-09T06:02:14.681261+00:00"
+  },
+  {
+    "upc": "6288004001030",
+    "name": "Milaf Cola (No Sugar)",
+    "old_price": 1.99,
+    "new_price": 1.29,
+    "recorded_at": "2026-08-09T06:02:14.681261+00:00"
+  },
+  {
+    "upc": "6288004001030",
+    "name": "Milaf Cola (No Sugar) (Case)",
+    "old_price": 34.99,
+    "new_price": 22.99,
+    "recorded_at": "2026-08-09T06:02:14.681261+00:00"
+  }
+]
