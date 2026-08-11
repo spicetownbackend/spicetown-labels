@@ -1,9 +1,72 @@
 [
   {
-    "upc": "8964000008171",
-    "name": "Vital Tea Jar 1000g",
-    "old_price": 9.99,
-    "new_price": 8.99,
-    "recorded_at": "2026-08-11T01:48:27.052829+00:00"
+    "upc": "033383605005",
+    "name": "Scallion Bunch",
+    "old_price": 1.99,
+    "new_price": 0.99,
+    "recorded_at": "2026-08-11T08:57:47.712960+00:00"
+  },
+  {
+    "upc": "173991213923",
+    "name": "Bell Pepper Green in LBs",
+    "old_price": 2.49,
+    "new_price": 1.49,
+    "recorded_at": "2026-08-11T08:57:47.712960+00:00"
+  },
+  {
+    "upc": "174369085777",
+    "name": "Eggplant Fancy in LBs",
+    "old_price": 1.99,
+    "new_price": 1.29,
+    "recorded_at": "2026-08-11T08:57:47.712960+00:00"
+  },
+  {
+    "upc": "8901777034668",
+    "name": "Vadilal Green Chana 312g",
+    "old_price": 3.29,
+    "new_price": 2.99,
+    "recorded_at": "2026-08-11T08:57:47.712960+00:00"
+  },
+  {
+    "upc": "8901777071663",
+    "name": "Vadilal Coconut Slices 312g",
+    "old_price": 4.99,
+    "new_price": 3.99,
+    "recorded_at": "2026-08-11T08:57:47.712960+00:00"
+  },
+  {
+    "upc": "8901777242667",
+    "name": "Vadilal Green Mango Offcuts 312g",
+    "old_price": 3.49,
+    "new_price": 3.99,
+    "recorded_at": "2026-08-11T08:57:47.712960+00:00"
+  },
+  {
+    "upc": "8901777682043",
+    "name": "Vadilal Meetha Paan Ice Cream 100ml",
+    "old_price": 2.49,
+    "new_price": 1.99,
+    "recorded_at": "2026-08-11T08:57:47.712960+00:00"
+  },
+  {
+    "upc": "8901777963043",
+    "name": "Vadilal Strawberry Ice Cream 100ml",
+    "old_price": 2.49,
+    "new_price": 1.99,
+    "recorded_at": "2026-08-11T08:57:47.712960+00:00"
+  },
+  {
+    "upc": "8901777968048",
+    "name": "Vadilal Tuti Fruti Ice Cream 100ml",
+    "old_price": 2.49,
+    "new_price": 1.99,
+    "recorded_at": "2026-08-11T08:57:47.712960+00:00"
+  },
+  {
+    "upc": "8938558296014",
+    "name": "Coconut-Thai Young Each",
+    "old_price": 4.99,
+    "new_price": 3.99,
+    "recorded_at": "2026-08-11T08:57:47.712960+00:00"
   }
 ]
