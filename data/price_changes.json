@@ -1,1 +1,156 @@
-[]
+[
+  {
+    "upc": "011433114448",
+    "name": "Deep Kala Jeera 3.5oz",
+    "old_price": 3.99,
+    "new_price": 3.49,
+    "recorded_at": "2026-08-14T20:31:50.827377+00:00"
+  },
+  {
+    "upc": "011433114462",
+    "name": "Deep Whl Garam Masla 7oz",
+    "old_price": 4.49,
+    "new_price": 3.99,
+    "recorded_at": "2026-08-14T20:31:50.827377+00:00"
+  },
+  {
+    "upc": "011433150187",
+    "name": "Deep MysorMasala Dosa 4pc",
+    "old_price": 4.49,
+    "new_price": 3.99,
+    "recorded_at": "2026-08-14T20:31:50.827377+00:00"
+  },
+  {
+    "upc": "011433153652",
+    "name": "Deep MultiGrainFlour 20lb",
+    "old_price": 42.99,
+    "new_price": 26.99,
+    "recorded_at": "2026-08-14T20:31:50.827377+00:00"
+  },
+  {
+    "upc": "011433158497",
+    "name": "Bansi Takmaria 7oz",
+    "old_price": 3.49,
+    "new_price": 2.99,
+    "recorded_at": "2026-08-14T20:31:50.827377+00:00"
+  },
+  {
+    "upc": "021123675814",
+    "name": "Banana Apple (Small)",
+    "old_price": 2.99,
+    "new_price": 1.99,
+    "recorded_at": "2026-08-14T20:31:50.827377+00:00"
+  },
+  {
+    "upc": "023623991913",
+    "name": "Dudhi Short in LBs",
+    "old_price": 1.79,
+    "new_price": 1.99,
+    "recorded_at": "2026-08-14T20:31:50.827377+00:00"
+  },
+  {
+    "upc": "023627807197",
+    "name": "Pumpkin Yellow in LBs",
+    "old_price": 1.49,
+    "new_price": 1.99,
+    "recorded_at": "2026-08-14T20:31:50.827377+00:00"
+  },
+  {
+    "upc": "023628013030",
+    "name": "String Bean in LBs",
+    "old_price": 1.79,
+    "new_price": 1.49,
+    "recorded_at": "2026-08-14T20:31:50.827377+00:00"
+  },
+  {
+    "upc": "051179175204",
+    "name": "Swad Semolina 2lb",
+    "old_price": 4.49,
+    "new_price": 3.49,
+    "recorded_at": "2026-08-14T20:31:50.827377+00:00"
+  },
+  {
+    "upc": "051179191303",
+    "name": "Swad Cashew Whole 3lb",
+    "old_price": 22.99,
+    "new_price": 21.99,
+    "recorded_at": "2026-08-14T20:31:50.827377+00:00"
+  },
+  {
+    "upc": "051179191754",
+    "name": "Swad Coconut Flakes 14oz",
+    "old_price": 5.99,
+    "new_price": 4.99,
+    "recorded_at": "2026-08-14T20:31:50.827377+00:00"
+  },
+  {
+    "upc": "051179240803",
+    "name": "Swad Poha Thin 2lb",
+    "old_price": 3.79,
+    "new_price": 3.49,
+    "recorded_at": "2026-08-14T20:31:50.827377+00:00"
+  },
+  {
+    "upc": "051179241367",
+    "name": "Swad Phool Makhana 200gm",
+    "old_price": 8.49,
+    "new_price": 8.99,
+    "recorded_at": "2026-08-14T20:31:50.827377+00:00"
+  },
+  {
+    "upc": "051179310353",
+    "name": "Swad Ajwain Powder 100g",
+    "old_price": 2.99,
+    "new_price": 2.49,
+    "recorded_at": "2026-08-14T20:31:50.827377+00:00"
+  },
+  {
+    "upc": "051179316102",
+    "name": "Swad Charoli Seeds 3.5oz",
+    "old_price": 7.49,
+    "new_price": 6.99,
+    "recorded_at": "2026-08-14T20:31:50.827377+00:00"
+  },
+  {
+    "upc": "1287",
+    "name": "Karela in LBs",
+    "old_price": 2.49,
+    "new_price": 2.29,
+    "recorded_at": "2026-08-14T20:31:50.827377+00:00"
+  },
+  {
+    "upc": "162734333998",
+    "name": "Coconut Pooja",
+    "old_price": 3.99,
+    "new_price": 2.99,
+    "recorded_at": "2026-08-14T20:31:50.827377+00:00"
+  },
+  {
+    "upc": "173997329000",
+    "name": "Chilli Medium in LBs",
+    "old_price": 2.49,
+    "new_price": 2.99,
+    "recorded_at": "2026-08-14T20:31:50.827377+00:00"
+  },
+  {
+    "upc": "174363360641",
+    "name": "Eggplant Round in LBs",
+    "old_price": 1.29,
+    "new_price": 1.79,
+    "recorded_at": "2026-08-14T20:31:50.827377+00:00"
+  },
+  {
+    "upc": "174365783820",
+    "name": "Guava Fancy in LBs",
+    "old_price": 2.99,
+    "new_price": 2.49,
+    "recorded_at": "2026-08-14T20:31:50.827377+00:00"
+  },
+  {
+    "upc": "179148162748",
+    "name": "Edo / Arvi - Ch. in LBs",
+    "old_price": 1.79,
+    "new_price": 1.49,
+    "recorded_at": "2026-08-14T20:31:50.827377+00:00"
+  }
+]
