@@ -1,1 +1,23 @@
-[]
+[
+  {
+    "upc": "021121691236",
+    "name": "Anar Fresh Big",
+    "old_price": 5.99,
+    "new_price": 2.99,
+    "recorded_at": "2026-08-15T21:21:36.819686+00:00"
+  },
+  {
+    "upc": "021125510977",
+    "name": "Anar Fresh - Buy 3",
+    "old_price": 10.0,
+    "new_price": 7.49,
+    "recorded_at": "2026-08-15T21:21:36.819686+00:00"
+  },
+  {
+    "upc": "174365783820",
+    "name": "Guava Fancy in LBs",
+    "old_price": 2.49,
+    "new_price": 1.99,
+    "recorded_at": "2026-08-15T21:21:36.819686+00:00"
+  }
+]
