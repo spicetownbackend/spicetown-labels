@@ -1,1 +1,23 @@
-[]
+[
+  {
+    "upc": "9780201370058",
+    "name": "Aromiraa Jaggery Powder",
+    "old_price": 2.49,
+    "new_price": 1.99,
+    "recorded_at": "2026-08-16T22:47:12.813501+00:00"
+  },
+  {
+    "upc": "9780201371253",
+    "name": "Aromiraa Black Kavuni",
+    "old_price": 5.49,
+    "new_price": 3.99,
+    "recorded_at": "2026-08-16T22:47:12.813501+00:00"
+  },
+  {
+    "upc": "9780201375015",
+    "name": "Aromiraa Pirandai Powder 100g",
+    "old_price": 4.99,
+    "new_price": 4.49,
+    "recorded_at": "2026-08-16T22:47:12.813501+00:00"
+  }
+]
