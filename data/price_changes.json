@@ -1,1 +1,58 @@
-[]
+[
+  {
+    "upc": "739608159581",
+    "name": "Baker Cafe Chat Papdi 13oz",
+    "old_price": 5.49,
+    "new_price": 4.99,
+    "recorded_at": "2026-08-16T03:49:03.197893+00:00"
+  },
+  {
+    "upc": "8904067702513",
+    "name": "Jabson Chana Gud 150g",
+    "old_price": 2.99,
+    "new_price": 1.99,
+    "recorded_at": "2026-08-16T03:49:03.197893+00:00"
+  },
+  {
+    "upc": "8904067702537",
+    "name": "Jabson Peanut Spicy Masala 140g",
+    "old_price": 2.99,
+    "new_price": 1.99,
+    "recorded_at": "2026-08-16T03:49:03.197893+00:00"
+  },
+  {
+    "upc": "8904067702551",
+    "name": "Jabson Peanut Nimboo Pudina 140g",
+    "old_price": 2.99,
+    "new_price": 1.99,
+    "recorded_at": "2026-08-16T03:49:03.197893+00:00"
+  },
+  {
+    "upc": "8904067702568",
+    "name": "Jabson Peanut Hing Jeera 140g",
+    "old_price": 2.99,
+    "new_price": 1.99,
+    "recorded_at": "2026-08-16T03:49:03.197893+00:00"
+  },
+  {
+    "upc": "8904067702599",
+    "name": "Jabson Peanut Black Pepper 140g",
+    "old_price": 2.99,
+    "new_price": 1.99,
+    "recorded_at": "2026-08-16T03:49:03.197893+00:00"
+  },
+  {
+    "upc": "8904067709840",
+    "name": "Jabson Tandoori Peanut 140g",
+    "old_price": 2.99,
+    "new_price": 1.99,
+    "recorded_at": "2026-08-16T03:49:03.197893+00:00"
+  },
+  {
+    "upc": "8904067712055",
+    "name": "Jabson Nameen Tikka Masala Coated Peanut 400gm",
+    "old_price": 4.99,
+    "new_price": 3.99,
+    "recorded_at": "2026-08-16T03:49:03.197893+00:00"
+  }
+]
