@@ -1,1 +1,79 @@
-[]
+[
+  {
+    "upc": "624967436605",
+    "name": "AlSafa Hot Dogs Chicken 12.6oz",
+    "old_price": 6.99,
+    "new_price": 7.99,
+    "recorded_at": "2026-08-17T20:28:06.966989+00:00"
+  },
+  {
+    "upc": "892681000727",
+    "name": "CK Chicken Seeikh Kabab FamPack 636g",
+    "old_price": 16.99,
+    "new_price": 15.99,
+    "recorded_at": "2026-08-17T20:28:06.966989+00:00"
+  },
+  {
+    "upc": "8961014034899",
+    "name": "Knorr Chatt Patta instant noodles 200g",
+    "old_price": 2.29,
+    "new_price": 2.49,
+    "recorded_at": "2026-08-17T20:28:06.966989+00:00"
+  },
+  {
+    "upc": "8964000008201",
+    "name": "Vital Tea Bags 100pc/375g - Each",
+    "old_price": 5.99,
+    "new_price": 4.99,
+    "recorded_at": "2026-08-17T20:28:06.966989+00:00"
+  },
+  {
+    "upc": "8964000883600",
+    "name": "RES Burfee 1lb",
+    "old_price": 7.99,
+    "new_price": 8.99,
+    "recorded_at": "2026-08-17T20:28:06.966989+00:00"
+  },
+  {
+    "upc": "8964000884188",
+    "name": "RES Ras Malai 1kg",
+    "old_price": 13.99,
+    "new_price": 14.99,
+    "recorded_at": "2026-08-17T20:28:06.966989+00:00"
+  },
+  {
+    "upc": "8964000884300",
+    "name": "RES Khoya/Mawa 16oz",
+    "old_price": 7.99,
+    "new_price": 8.99,
+    "recorded_at": "2026-08-17T20:28:06.966989+00:00"
+  },
+  {
+    "upc": "8964000885925",
+    "name": "RES Shahi Mix 1lb",
+    "old_price": 7.99,
+    "new_price": 8.99,
+    "recorded_at": "2026-08-17T20:28:06.966989+00:00"
+  },
+  {
+    "upc": "8964001400356",
+    "name": "Vital Green Tea Leaves 250g",
+    "old_price": 3.99,
+    "new_price": 4.49,
+    "recorded_at": "2026-08-17T20:28:06.966989+00:00"
+  },
+  {
+    "upc": "8964003197025",
+    "name": "RES Shahi Mix 2lb",
+    "old_price": 13.99,
+    "new_price": 14.99,
+    "recorded_at": "2026-08-17T20:28:06.966989+00:00"
+  },
+  {
+    "upc": "8964003197261",
+    "name": "RES Daal Moth 100g",
+    "old_price": 1.49,
+    "new_price": 1.99,
+    "recorded_at": "2026-08-17T20:28:06.966989+00:00"
+  }
+]
