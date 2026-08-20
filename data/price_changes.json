@@ -1,16 +1,9 @@
 [
   {
-    "upc": "019507348140",
-    "name": "Korameenu (Frozen) 1Lb",
-    "old_price": 19.99,
-    "new_price": 23.99,
-    "recorded_at": "2026-08-19T23:47:56.484262+00:00"
-  },
-  {
-    "upc": "178942385607",
-    "name": "Sardine (Frozen) 1Lb",
-    "old_price": 16.99,
+    "upc": "178942385605",
+    "name": "Sardine (Fresh) 1Lb",
+    "old_price": 20.99,
     "new_price": 20.49,
-    "recorded_at": "2026-08-19T23:47:56.484262+00:00"
+    "recorded_at": "2026-08-20T01:16:34.337089+00:00"
   }
 ]
