@@ -1,9 +1,37 @@
 [
   {
-    "upc": "178942385605",
-    "name": "Sardine (Fresh) 1Lb",
-    "old_price": 20.99,
-    "new_price": 20.49,
-    "recorded_at": "2026-08-20T01:16:34.337089+00:00"
+    "upc": "723246115214",
+    "name": "Laxmi Idli Rice 20lb - Each",
+    "old_price": 17.99,
+    "new_price": 15.99,
+    "recorded_at": "2026-08-20T10:31:07.327286+00:00"
+  },
+  {
+    "upc": "723246236087",
+    "name": "Laxmi Thin Poha 4lb",
+    "old_price": 6.49,
+    "new_price": 5.99,
+    "recorded_at": "2026-08-20T10:31:07.327286+00:00"
+  },
+  {
+    "upc": "788581410783",
+    "name": "Godavari Crystal Sona Masoori 20lb - Each",
+    "old_price": 27.99,
+    "new_price": 25.99,
+    "recorded_at": "2026-08-20T10:31:07.327286+00:00"
+  },
+  {
+    "upc": "818720000091",
+    "name": "Sher Atta Desi Style 20lb - Each",
+    "old_price": 19.99,
+    "new_price": 17.99,
+    "recorded_at": "2026-08-20T10:31:07.327286+00:00"
+  },
+  {
+    "upc": "Chetak",
+    "name": "Deep Pre Moong Dal 2lb - Each",
+    "old_price": 4.49,
+    "new_price": 3.99,
+    "recorded_at": "2026-08-20T10:31:07.327286+00:00"
   }
 ]
