@@ -1,1 +1,23 @@
-[]
+[
+  {
+    "upc": "011433120012",
+    "name": "Bansi Sesame Oil 16.9oz",
+    "old_price": 6.49,
+    "new_price": 6.99,
+    "recorded_at": "2026-08-21T19:48:47.219626+00:00"
+  },
+  {
+    "upc": "011433150606",
+    "name": "Deep Jumbo Punjabi Samosa 15pc Each",
+    "old_price": 11.99,
+    "new_price": 14.99,
+    "recorded_at": "2026-08-21T19:48:47.219626+00:00"
+  },
+  {
+    "upc": "011433160209",
+    "name": "Bhagwati Dudhi Thepla 8 pcs",
+    "old_price": 2.49,
+    "new_price": 2.99,
+    "recorded_at": "2026-08-21T19:48:47.219626+00:00"
+  }
+]
