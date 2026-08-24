@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "upc": "656846510519",
+    "name": "Amul Butter Salted 1.1lb (500g)",
+    "old_price": 12.99,
+    "new_price": 9.99,
+    "recorded_at": "2026-08-24T21:30:01.753710+00:00"
+  },
+  {
+    "upc": "8901262030151",
+    "name": "Amul Pure Ghee 2.2lb ( 1 Ltr)",
+    "old_price": 19.99,
+    "new_price": 14.99,
+    "recorded_at": "2026-08-24T21:30:01.753710+00:00"
+  }
+]
