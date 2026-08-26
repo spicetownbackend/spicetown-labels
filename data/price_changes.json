@@ -1,16 +1,1 @@
-[
-  {
-    "upc": "012000140525",
-    "name": "Pepsi 2lt",
-    "old_price": 3.99,
-    "new_price": 5.49,
-    "recorded_at": "2026-08-26T18:15:42.574045+00:00"
-  },
-  {
-    "upc": "079836251518",
-    "name": "Canola Fry Oil ADM 35LB",
-    "old_price": 82.99,
-    "new_price": 39.24,
-    "recorded_at": "2026-08-26T18:15:42.574045+00:00"
-  }
-]
+[]
