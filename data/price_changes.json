@@ -1,1 +1,142 @@
-[]
+[
+  {
+    "upc": "022724078431",
+    "name": "Drumstick(Murunga) Leaves in LBs",
+    "old_price": 7.99,
+    "new_price": 8.99,
+    "recorded_at": "2026-08-27T22:57:26.279153+00:00"
+  },
+  {
+    "upc": "459691847591",
+    "name": "Kalasamala (0.5 x 0.5)",
+    "old_price": 5.99,
+    "new_price": 19.99,
+    "recorded_at": "2026-08-27T22:57:26.279153+00:00"
+  },
+  {
+    "upc": "6949191200018",
+    "name": "Green Tea With Lemon Ginger & Honey 40g",
+    "old_price": 3.49,
+    "new_price": 3.99,
+    "recorded_at": "2026-08-27T22:57:26.279153+00:00"
+  },
+  {
+    "upc": "6949191202241",
+    "name": "Instant Ginseng Tea15g",
+    "old_price": 2.99,
+    "new_price": 3.99,
+    "recorded_at": "2026-08-27T22:57:26.279153+00:00"
+  },
+  {
+    "upc": "810158442160",
+    "name": "Anand Frozen Drumsticks (Peeled) 11oz",
+    "old_price": 4.99,
+    "new_price": 3.49,
+    "recorded_at": "2026-08-27T22:57:26.279153+00:00"
+  },
+  {
+    "upc": "810158444898",
+    "name": "Anand Frozen Shredded Coconut 400g",
+    "old_price": 4.99,
+    "new_price": 4.49,
+    "recorded_at": "2026-08-27T22:57:26.279153+00:00"
+  },
+  {
+    "upc": "878776002371",
+    "name": "Anand Frozen Sambar Mix (Mixed Veg) 1lb",
+    "old_price": 3.49,
+    "new_price": 3.99,
+    "recorded_at": "2026-08-27T22:57:26.279153+00:00"
+  },
+  {
+    "upc": "8787760032626",
+    "name": "Anand Frozen Veg Puffs 1lb",
+    "old_price": 4.49,
+    "new_price": 4.99,
+    "recorded_at": "2026-08-27T22:57:26.279153+00:00"
+  },
+  {
+    "upc": "878776009264",
+    "name": "Meenu Anchovy H/L Large 2lb",
+    "old_price": 13.99,
+    "new_price": 14.99,
+    "recorded_at": "2026-08-27T22:57:26.279153+00:00"
+  },
+  {
+    "upc": "8885014211114",
+    "name": "PC Corniche Ginger Chew Orange 100g",
+    "old_price": 3.49,
+    "new_price": 4.99,
+    "recorded_at": "2026-08-27T22:57:26.279153+00:00"
+  },
+  {
+    "upc": "8885014211121",
+    "name": "PC Corniche Ginger Chew Mango 100g",
+    "old_price": 3.49,
+    "new_price": 4.99,
+    "recorded_at": "2026-08-27T22:57:26.279153+00:00"
+  },
+  {
+    "upc": "8904057302020",
+    "name": "Arun Jack Fruit Tub 1000ml",
+    "old_price": 11.99,
+    "new_price": 8.99,
+    "recorded_at": "2026-08-27T22:57:26.279153+00:00"
+  },
+  {
+    "upc": "8904057303539",
+    "name": "Arun Butterscotch Tub 1000ml",
+    "old_price": 11.99,
+    "new_price": 8.99,
+    "recorded_at": "2026-08-27T22:57:26.279153+00:00"
+  },
+  {
+    "upc": "8935270816513",
+    "name": "PC American Dew Bubble Tea Brown Sugar 490ml",
+    "old_price": 3.99,
+    "new_price": 4.99,
+    "recorded_at": "2026-08-27T22:57:26.279153+00:00"
+  },
+  {
+    "upc": "8935270818722",
+    "name": "PC American Drop 100% Mango Juice With Pulp 490ml",
+    "old_price": 2.99,
+    "new_price": 3.49,
+    "recorded_at": "2026-08-27T22:57:26.279153+00:00"
+  },
+  {
+    "upc": "8935270819880",
+    "name": "American Drop 100% Lychee Juice With Pulp 490ml",
+    "old_price": 2.99,
+    "new_price": 3.49,
+    "recorded_at": "2026-08-27T22:57:26.279153+00:00"
+  },
+  {
+    "upc": "8935360700678",
+    "name": "PC American Drop 100% Pink Guava Juice With Pulp 490ml",
+    "old_price": 2.99,
+    "new_price": 3.49,
+    "recorded_at": "2026-08-27T22:57:26.279153+00:00"
+  },
+  {
+    "upc": "8936177707942",
+    "name": "PC Nawon Green Smoothie 500ml",
+    "old_price": 2.99,
+    "new_price": 3.49,
+    "recorded_at": "2026-08-27T22:57:26.279153+00:00"
+  },
+  {
+    "upc": "8936177707959",
+    "name": "PC Nawon Yellow Smoothie 500ml",
+    "old_price": 2.99,
+    "new_price": 3.49,
+    "recorded_at": "2026-08-27T22:57:26.279153+00:00"
+  },
+  {
+    "upc": "TG-26156453B9BC",
+    "name": "American Drop Bubble tea Taro 490ml",
+    "old_price": 5.99,
+    "new_price": 4.99,
+    "recorded_at": "2026-08-27T22:57:26.279153+00:00"
+  }
+]
