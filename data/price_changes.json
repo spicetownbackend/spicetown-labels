@@ -1,30 +1,44 @@
 [
   {
-    "upc": "021129656909",
-    "name": "Banana Burru/Burro (Green)",
-    "old_price": 2.99,
+    "upc": "011433119733",
+    "name": "Deep Dahi Lowfat 5lb",
+    "old_price": 7.99,
+    "new_price": 6.49,
+    "recorded_at": "2026-08-28T17:37:26.527142+00:00"
+  },
+  {
+    "upc": "011433119740",
+    "name": "Deep Dahi Whole Milk 2lb",
+    "old_price": 3.99,
     "new_price": 3.49,
-    "recorded_at": "2026-08-28T05:10:11.032975+00:00"
+    "recorded_at": "2026-08-28T17:37:26.527142+00:00"
   },
   {
-    "upc": "459691847591",
-    "name": "Kalasamala (0.5 x 0.5)",
-    "old_price": 19.99,
-    "new_price": 14.99,
-    "recorded_at": "2026-08-28T05:10:11.032975+00:00"
+    "upc": "011433119757",
+    "name": "Deep Dahi Whole Milk 5lb",
+    "old_price": 6.99,
+    "new_price": 5.99,
+    "recorded_at": "2026-08-28T17:37:26.527142+00:00"
   },
   {
-    "upc": "850006018239",
-    "name": "Garlic 5-Pack",
-    "old_price": 2.99,
-    "new_price": 3.49,
-    "recorded_at": "2026-08-28T05:10:11.032975+00:00"
+    "upc": "011433133456",
+    "name": "Deep Green Pistachios 7oz",
+    "old_price": 10.99,
+    "new_price": 9.99,
+    "recorded_at": "2026-08-28T17:37:26.527142+00:00"
   },
   {
-    "upc": "TG-CB5D7377505B",
-    "name": "Swad Org Dakshin Sona Masoori 20ml (Red Label)",
-    "old_price": 35.49,
-    "new_price": 24.99,
-    "recorded_at": "2026-08-28T05:10:11.032975+00:00"
+    "upc": "011433162357",
+    "name": "Deep Premium Chana Dal 4lb",
+    "old_price": 7.99,
+    "new_price": 8.99,
+    "recorded_at": "2026-08-28T17:37:26.527142+00:00"
+  },
+  {
+    "upc": "837654132937",
+    "name": "JF Kaju Katri 11oz",
+    "old_price": 8.99,
+    "new_price": 9.49,
+    "recorded_at": "2026-08-28T17:37:26.527142+00:00"
   }
 ]
