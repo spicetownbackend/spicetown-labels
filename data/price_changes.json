@@ -1,1 +1,9 @@
-[]
+[
+  {
+    "upc": "490015209497",
+    "name": "Curry Leaf Plant",
+    "old_price": 18.99,
+    "new_price": 24.99,
+    "recorded_at": "2026-08-30T17:41:14.912780+00:00"
+  }
+]
