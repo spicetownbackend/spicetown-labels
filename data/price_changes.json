@@ -1,1 +1,9 @@
-[]
+[
+  {
+    "upc": "174368825916",
+    "name": "Curry Leaves Pouch",
+    "old_price": 0.99,
+    "new_price": 1.49,
+    "recorded_at": "2026-09-03T23:26:06.988687+00:00"
+  }
+]
