@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "upc": "022727391568",
+    "name": "Fresh Pan Leaves in LBs",
+    "old_price": 20.99,
+    "new_price": 22.99,
+    "recorded_at": "2026-09-03T18:23:12.773349+00:00"
+  },
+  {
+    "upc": "469480840238",
+    "name": "Drumstick Pods in Lbs",
+    "old_price": 3.99,
+    "new_price": 7.99,
+    "recorded_at": "2026-09-03T18:23:12.773349+00:00"
+  }
+]
