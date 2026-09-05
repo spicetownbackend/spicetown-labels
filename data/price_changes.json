@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "upc": "745042112013",
+    "name": "Royal Basmati Rice 20lb",
+    "old_price": 25.99,
+    "new_price": 23.99,
+    "recorded_at": "2026-09-05T20:57:38.375456+00:00"
+  },
+  {
+    "upc": "899450002005",
+    "name": "Roti Fresh Chapathi",
+    "old_price": 6.99,
+    "new_price": 7.49,
+    "recorded_at": "2026-09-05T20:57:38.375456+00:00"
+  }
+]
