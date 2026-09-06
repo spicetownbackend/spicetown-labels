@@ -1,65 +1,16 @@
 [
   {
+    "upc": "011433136365",
+    "name": "Deep Masala Popcorn 5oz",
+    "old_price": 2.49,
+    "new_price": 1.99,
+    "recorded_at": "2026-09-06T00:39:00.881753+00:00"
+  },
+  {
     "upc": "022727391568",
     "name": "Fresh Pan Leaves in LBs",
-    "old_price": 22.99,
-    "new_price": 23.0,
-    "recorded_at": "2026-09-05T22:45:42.692376+00:00"
-  },
-  {
-    "upc": "158112911933",
-    "name": "Mango Leaves (10 leaves)",
-    "old_price": 2.99,
-    "new_price": 3.0,
-    "recorded_at": "2026-09-05T22:45:42.692376+00:00"
-  },
-  {
-    "upc": "158115530261",
-    "name": "Red Button Roses 500 gms",
-    "old_price": 24.99,
+    "old_price": 23.0,
     "new_price": 25.0,
-    "recorded_at": "2026-09-05T22:45:42.692376+00:00"
-  },
-  {
-    "upc": "463789812880",
-    "name": "Arali (Loose) 100g",
-    "old_price": 7.0,
-    "new_price": 8.0,
-    "recorded_at": "2026-09-05T22:45:42.692376+00:00"
-  },
-  {
-    "upc": "463789812880",
-    "name": "Arali (Loose) 200g",
-    "old_price": 13.0,
-    "new_price": 15.0,
-    "recorded_at": "2026-09-05T22:45:42.692376+00:00"
-  },
-  {
-    "upc": "463789812880",
-    "name": "Arali (Loose) 500g",
-    "old_price": 28.0,
-    "new_price": 30.0,
-    "recorded_at": "2026-09-05T22:45:42.692376+00:00"
-  },
-  {
-    "upc": "465541367517",
-    "name": "Mixed Button Roses (Loose) 100g",
-    "old_price": 7.0,
-    "new_price": 8.0,
-    "recorded_at": "2026-09-05T22:45:42.692376+00:00"
-  },
-  {
-    "upc": "465541367519",
-    "name": "Mixed Button Roses (Loose) 200g",
-    "old_price": 13.0,
-    "new_price": 15.0,
-    "recorded_at": "2026-09-05T22:45:42.692376+00:00"
-  },
-  {
-    "upc": "494004093227",
-    "name": "Lily Sampangi (Loose) 500g",
-    "old_price": 35.0,
-    "new_price": 30.0,
-    "recorded_at": "2026-09-05T22:45:42.692376+00:00"
+    "recorded_at": "2026-09-06T00:39:00.881753+00:00"
   }
 ]
