@@ -1,1 +1,9 @@
-[]
+[
+  {
+    "upc": "8901262020039",
+    "name": "Amul Processed Cheese 200 G",
+    "old_price": 5.99,
+    "new_price": 4.99,
+    "recorded_at": "2026-09-06T13:45:41.919263+00:00"
+  }
+]
