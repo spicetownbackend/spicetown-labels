@@ -187,8 +187,17 @@ class Config:
     BULK_LOAD_BATCH_SIZE = _as_int(os.getenv("STL_BULK_LOAD_BATCH_SIZE"), 500)
     NIGHTLY_REFRESH_HOUR = _as_int(os.getenv("STL_REFRESH_HOUR"), 3)  # 03:00
     NIGHTLY_REFRESH_MINUTE = _as_int(os.getenv("STL_REFRESH_MINUTE"), 0)
+    # Frequent live sync (on top of the nightly full refresh) so a price
+    # change at Toast reaches the shelf label same-day, not just overnight.
+    REFRESH_INTERVAL_MINUTES = _as_int(os.getenv("STL_REFRESH_INTERVAL_MINUTES"), 30)
     ENABLE_SCHEDULER = _as_bool(os.getenv("STL_ENABLE_SCHEDULER"), True)
     SCHEDULER_TIMEZONE = os.getenv("STL_SCHEDULER_TIMEZONE", "America/New_York")
+
+    # Print a fresh label automatically for every real price change a sync
+    # detects (nightly, the periodic live sync, and a manual refresh), and
+    # log it to print_jobs (reason="price_change") — no staff review click
+    # needed. Set false to fall back to the manual Price Changes review panel.
+    AUTO_PRINT_PRICE_CHANGES = _as_bool(os.getenv("STL_AUTO_PRINT_PRICE_CHANGES"), True)
 
     # ── Logging (rotating file handlers) ──────────────────────────────────────
     LOG_DIR = LOG_DIR

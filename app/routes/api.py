@@ -29,6 +29,7 @@ from flask import Blueprint, Response, current_app, jsonify, request
 from ..extensions import db
 from ..models import PriceHistory, PrintJob, Product, utcnow
 from ..services.label import parse_fields, render_to_png_bytes
+from ..services.auto_print import auto_print_price_changes
 from ..services.loader import (
     RefreshInProgress,
     bulk_load_guarded,
@@ -199,6 +200,7 @@ def manual_refresh():
                         price_change_threshold=threshold,
                         shorten_max_chars=short_chars,
                     )
+                    auto_print_price_changes(app)
                 except RefreshInProgress:
                     app.logger.warning("async refresh skipped: already running")
                 except Exception:
@@ -221,7 +223,8 @@ def manual_refresh():
     except RefreshInProgress:
         return jsonify({"status": "busy", "message": "refresh already running"}), 409
 
-    return jsonify({"status": "ok", "stats": stats.as_dict()})
+    auto_printed = auto_print_price_changes(current_app._get_current_object())
+    return jsonify({"status": "ok", "stats": stats.as_dict(), "auto_printed": auto_printed})
 
 
 @bp.post("/products/custom")
