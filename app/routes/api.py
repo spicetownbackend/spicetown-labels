@@ -8,7 +8,7 @@ Implemented (Stage 1-4):
   POST /api/refresh            -> trigger a manual bulk refresh (guarded)
   POST /api/print              -> enqueue a label print job (single-worker queue)
   GET  /api/print/<job_id>     -> poll print job status
-  GET  /api/print-history      -> recent print jobs (manual + price-change)
+  GET  /api/print-history      -> print jobs (manual + price-change), optional date range
   GET  /api/preview/<upc>.png  -> render label PNG (no print) for the scanner UI
   GET  /api/search?q=...       -> fuzzy search (rapidfuzz) for bad barcodes
   GET  /api/price-changes      -> unreviewed price changes needing a fresh label
@@ -20,7 +20,9 @@ from __future__ import annotations
 
 import threading
 import uuid
+from datetime import date, datetime, time, timezone
 from types import SimpleNamespace
+from zoneinfo import ZoneInfo
 
 from flask import Blueprint, Response, current_app, jsonify, request
 
@@ -35,6 +37,23 @@ from ..services.loader import (
 from ..services.print_queue import QueueFull
 
 bp = Blueprint("api", __name__, url_prefix="/api")
+
+STORE_TZ = ZoneInfo("America/New_York")
+
+
+def _local_day_bounds_utc(day_str: str) -> tuple[datetime, datetime]:
+    """Given a store-local calendar date (YYYY-MM-DD), return that day's
+    [start, end] as naive UTC datetimes, matching how PrintJob timestamps are
+    stored (naive UTC via utcnow()). Mirrors the scanner UI's own convention
+    of always rendering/filtering print history in America/New_York, so a
+    "today" filter matches what's actually shown on screen."""
+    d = date.fromisoformat(day_str)
+    start_local = datetime.combine(d, time.min, tzinfo=STORE_TZ)
+    end_local = datetime.combine(d, time.max, tzinfo=STORE_TZ)
+    return (
+        start_local.astimezone(timezone.utc).replace(tzinfo=None),
+        end_local.astimezone(timezone.utc).replace(tzinfo=None),
+    )
 
 
 @bp.get("/health")
@@ -373,6 +392,26 @@ def enqueue_print():
     except QueueFull:
         return jsonify({"error": "busy", "message": "print queue full"}), 503
 
+    # A normal scan-and-print (this endpoint) is just as much "handling" a
+    # pending price change as the review panel's dedicated print action is —
+    # printing *any* fresh label for this product means whatever price is on
+    # it is now current, so it shouldn't keep sitting in the review queue.
+    # Mirrors the reviewed_at/label_printed bookkeeping in
+    # print_price_changes() below; without this, only prints that go through
+    # the review panel ever clear the queue, and everyday scanner prints
+    # leave stale rows behind indefinitely.
+    unreviewed = (
+        db.session.query(PriceHistory)
+        .filter(PriceHistory.product_id == product.id, PriceHistory.reviewed_at.is_(None))
+        .all()
+    )
+    if unreviewed:
+        now = utcnow()
+        for row in unreviewed:
+            row.reviewed_at = now
+            row.label_printed = True
+        db.session.commit()
+
     if wait:
         timeout = float(current_app.config.get("PRINT_JOB_TIMEOUT_SECONDS", 20.0))
         job = pq.wait_for(enq.job_id, timeout=timeout)
@@ -404,20 +443,35 @@ def print_status(job_id: int):
 
 @bp.get("/print-history")
 def print_history():
-    """Recent print jobs (manual + price-change), most recent first.
+    """Print jobs (manual + price-change), most recent first.
 
     Query params:
-      limit  : default 100, max 500.
+      limit  : default 100 (default 1000 when start/end given), max 500
+               (max 2000 when start/end given).
       reason : filter to "price_change" or "manual" (manual = reason is NULL).
+      start, end : optional inclusive local-calendar-date range (YYYY-MM-DD,
+                   store timezone America/New_York) filtered on created_at.
+                   Both must be given together.
     """
-    limit = min(request.args.get("limit", 100, type=int) or 100, 500)
     reason = request.args.get("reason")
+    start = request.args.get("start")
+    end = request.args.get("end")
+
+    ranged = bool(start and end)
+    default_limit = 1000 if ranged else 100
+    max_limit = 2000 if ranged else 500
+    limit = min(request.args.get("limit", default_limit, type=int) or default_limit, max_limit)
 
     q = db.session.query(PrintJob)
     if reason == "price_change":
         q = q.filter(PrintJob.reason == "price_change")
     elif reason == "manual":
         q = q.filter(PrintJob.reason.is_(None))
+
+    if ranged:
+        utc_start, _ = _local_day_bounds_utc(start)
+        _, utc_end = _local_day_bounds_utc(end)
+        q = q.filter(PrintJob.created_at >= utc_start, PrintJob.created_at <= utc_end)
 
     rows = q.order_by(PrintJob.id.desc()).limit(limit).all()
 

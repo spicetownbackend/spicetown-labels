@@ -96,6 +96,8 @@ input:focus, select:focus { outline: 2px solid var(--red); outline-offset: 0; }
 .price-changes-actions .btn { flex: 0 0 auto; }
 .select-all { display: flex; align-items: center; gap: .35rem; font-size: .85rem; color: var(--muted); margin-right: auto; }
 
+#ph-custom-range { display: flex; align-items: center; gap: .4rem; font-size: .85rem; color: var(--muted); }
+
 .price-changes-list { display: flex; flex-direction: column; gap: .5rem; margin-top: .4rem; }
 .pc-row { display: flex; align-items: flex-start; gap: .6rem; padding: .6rem .7rem;
   border: 1px solid var(--line); border-radius: 10px; cursor: pointer; }

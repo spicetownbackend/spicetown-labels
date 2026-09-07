@@ -146,6 +146,20 @@
             <option value="price_change">Price-change only</option>
           </select>
         </label>
+        <label class="field">Range
+          <select id="ph-range">
+            <option value="today" selected>Today</option>
+            <option value="7">Last 7 days</option>
+            <option value="30">Month</option>
+            <option value="90">3 months</option>
+            <option value="custom">Custom range…</option>
+          </select>
+        </label>
+        <span id="ph-custom-range" class="print-row" hidden>
+          <input type="date" id="ph-start">
+          <span>to</span>
+          <input type="date" id="ph-end">
+        </span>
         <button id="btn-ph-refresh" class="btn">↻ Refresh</button>
       </div>
       <div id="print-history-list" class="price-changes-list"></div>

@@ -403,6 +403,22 @@
     });
   }
 
+  // Store-local (America/New_York) YYYY-MM-DD, regardless of the viewing
+  // device's own timezone - "en-CA" is a locale trick that happens to format
+  // as YYYY-MM-DD. Keeps "Today"/"Last 7 days" aligned with the dates shown
+  // in the history rows above (estString), not the browser's local day.
+  function localDateStr(d) {
+    return d.toLocaleDateString("en-CA", { timeZone: "America/New_York" });
+  }
+  function todayLocalStr() {
+    return localDateStr(new Date());
+  }
+  function daysAgoLocalStr(days) {
+    const d = new Date();
+    d.setDate(d.getDate() - days);
+    return localDateStr(d);
+  }
+
   function phRow(j) {
     const when = j.completed_at || j.claimed_at || j.created_at;
     const whenStr = estString(when);
@@ -443,16 +459,54 @@
     await refreshPrintHistory();
   }
 
+  // Same shape as the dashboard's date-range pickers: fixed presets (days
+  // back from today) plus "Custom" revealing an explicit start/end pair.
+  function currentPhRange() {
+    const preset = $("ph-range").value;
+    if (preset === "custom") {
+      return { start: $("ph-start").value, end: $("ph-end").value };
+    }
+    if (preset === "today") {
+      const t = todayLocalStr();
+      return { start: t, end: t };
+    }
+    return { start: daysAgoLocalStr(Number(preset)), end: todayLocalStr() };
+  }
+
+  function handlePhRangeChange() {
+    const isCustom = $("ph-range").value === "custom";
+    $("ph-custom-range").hidden = !isCustom;
+    if (isCustom) {
+      $("ph-end").max = todayLocalStr();
+      if (!$("ph-start").value) $("ph-start").value = daysAgoLocalStr(7);
+      if (!$("ph-end").value) $("ph-end").value = todayLocalStr();
+    }
+    refreshPrintHistory();
+  }
+
+  function handlePhCustomDateChange() {
+    if ($("ph-start").value) $("ph-end").min = $("ph-start").value;
+    if ($("ph-end").value) $("ph-start").max = $("ph-end").value;
+    refreshPrintHistory();
+  }
+
   async function refreshPrintHistory() {
     const list = $("print-history-list");
     list.innerHTML = `<p class="hint">Loading…</p>`;
     const reason = $("ph-filter").value;
-    const qs = reason ? `?reason=${encodeURIComponent(reason)}` : "";
+    const { start, end } = currentPhRange();
+    const params = new URLSearchParams();
+    if (reason) params.set("reason", reason);
+    if (start && end) {
+      params.set("start", start);
+      params.set("end", end);
+    }
+    const qs = params.toString() ? `?${params.toString()}` : "";
     const { body } = await getJSON(`/api/print-history${qs}`);
     const jobs = (body && body.jobs) || [];
     list.innerHTML = "";
     if (!jobs.length) {
-      list.innerHTML = `<p class="hint">No print jobs yet.</p>`;
+      list.innerHTML = `<p class="hint">No print jobs in this range.</p>`;
       return;
     }
     for (const j of jobs) list.appendChild(phRow(j));
@@ -602,6 +656,9 @@
   $("btn-print-history").onclick = openPrintHistory;
   $("btn-ph-refresh").onclick = refreshPrintHistory;
   $("ph-filter").onchange = refreshPrintHistory;
+  $("ph-range").onchange = handlePhRangeChange;
+  $("ph-start").onchange = handlePhCustomDateChange;
+  $("ph-end").onchange = handlePhCustomDateChange;
   $("custom-form").onsubmit = createCustom;
   $("manual-input").oninput = onManualInput;
   $("manual-form").onsubmit = (e) => {
