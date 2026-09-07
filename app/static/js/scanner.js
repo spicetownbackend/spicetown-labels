@@ -490,7 +490,18 @@
     refreshPrintHistory();
   }
 
+  // Changing the range fires a fresh refreshPrintHistory() call per field
+  // (start, then end) - two overlapping requests in flight is normal, but
+  // with no guard here they can resolve out of order (the wider start-only
+  // request landing AFTER the final narrow one) and silently overwrite the
+  // correct, narrower result with the wider one - looking exactly like "the
+  // filter does nothing". phRequestSeq is a per-call ticket: only the
+  // response matching the LATEST call is allowed to render; a stale one is
+  // dropped.
+  let phRequestSeq = 0;
+
   async function refreshPrintHistory() {
+    const seq = ++phRequestSeq;
     const list = $("print-history-list");
     list.innerHTML = `<p class="hint">Loading…</p>`;
     const reason = $("ph-filter").value;
@@ -503,6 +514,7 @@
     }
     const qs = params.toString() ? `?${params.toString()}` : "";
     const { body } = await getJSON(`/api/print-history${qs}`);
+    if (seq !== phRequestSeq) return; // a newer request already started - discard this stale one
     const jobs = (body && body.jobs) || [];
     list.innerHTML = "";
     if (!jobs.length) {
