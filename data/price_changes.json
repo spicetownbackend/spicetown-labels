@@ -1,1 +1,30 @@
-[]
+[
+  {
+    "upc": "41034",
+    "name": "Varalaxmi Sabudana Papad 80gm",
+    "old_price": 0.79,
+    "new_price": 1.49,
+    "recorded_at": "2026-09-09T23:26:13.635639+00:00"
+  },
+  {
+    "upc": "KP Produce;Raja Foods;Sai Florals",
+    "name": "Tulasi Leaves 500g",
+    "old_price": 2.0,
+    "new_price": 50.0,
+    "recorded_at": "2026-09-09T23:26:13.635639+00:00"
+  },
+  {
+    "upc": "TG-6954055677DA",
+    "name": "Lijjat Urad ( Black Pepper ) Papad 200gm",
+    "old_price": 1.99,
+    "new_price": 2.49,
+    "recorded_at": "2026-09-09T23:26:13.635639+00:00"
+  },
+  {
+    "upc": "TG-F7359ACC4B0C",
+    "name": "Cotton Wick Akhand Jyothy",
+    "old_price": 0.49,
+    "new_price": 0.99,
+    "recorded_at": "2026-09-09T23:26:13.635639+00:00"
+  }
+]
