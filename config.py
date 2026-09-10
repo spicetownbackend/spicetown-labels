@@ -95,6 +95,18 @@ class Config:
     )
     TOAST_RESTAURANT_GUID = os.getenv("STL_TOAST_RESTAURANT_GUID", "")
 
+    # ── Dashboard-shared login gate ─────────────────────────────────────────────
+    # When true, every page/API request here requires a valid spicetown-backend
+    # dashboard session (the SAME cookie set by logging into ops.spicetown.shop,
+    # shared via that app's SESSION_COOKIE_DOMAIN=.spicetown.shop) - this app has
+    # no login of its own by design, it borrows the dashboard's instead. See
+    # app/services/dashboard_auth.py. Defaults off so local dev/tests never need
+    # a real dashboard DB on disk.
+    REQUIRE_DASHBOARD_LOGIN = _as_bool(os.getenv("STL_REQUIRE_DASHBOARD_LOGIN"), False)
+    DASHBOARD_DB_PATH = os.getenv("STL_DASHBOARD_DB_PATH", "")
+    DASHBOARD_SESSION_COOKIE_NAME = os.getenv("STL_DASHBOARD_SESSION_COOKIE_NAME", "session_token")
+    DASHBOARD_LOGIN_URL = os.getenv("STL_DASHBOARD_LOGIN_URL", "https://ops.spicetown.shop/")
+
     # ── Cache TTL strategy ────────────────────────────────────────────────────
     # SQLite is authoritative; the data source is only consulted when a UPC is
     # missing or its cached record has expired.
@@ -227,6 +239,9 @@ class TestingConfig(Config):
     # Discard prints by default; tests opt into 'file' with a tmp spool dir.
     PRINT_TRANSPORT = "null"
     ENABLE_PRINT_WORKER = False
+    # Explicit, not just relying on the Config base default - tests never
+    # have a real dashboard DB on disk to check against.
+    REQUIRE_DASHBOARD_LOGIN = False
 
 
 # Registry used by the app factory: create_app("production"), etc.

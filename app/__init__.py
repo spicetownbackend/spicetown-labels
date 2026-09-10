@@ -126,6 +126,11 @@ def create_app(
     app.register_blueprint(bridge_bp)
     app.register_blueprint(views_bp)
 
+    # 6b) Gate every request on a valid spicetown-backend dashboard session
+    # (no-op unless REQUIRE_DASHBOARD_LOGIN is set - see config.py and
+    # services/dashboard_auth.py).
+    _register_dashboard_auth_gate(app)
+
     # 7) Error handlers -> JSON for API, logged to rotating files.
     _register_error_handlers(app)
 
@@ -230,6 +235,35 @@ def _apply_micro_migrations(app: Flask) -> None:
             )
     except Exception:  # pragma: no cover - defensive
         app.logger.exception("micro-migration check failed")
+
+
+def _register_dashboard_auth_gate(app: Flask) -> None:
+    """Redirect/401 anyone without a valid spicetown-backend session.
+
+    `/healthz` (uptime checks), `/api/bridge/*` (its own separate
+    STL_BRIDGE_TOKEN auth - see routes/bridge.py) and `/static/*` (no data,
+    just assets) are exempt. Everything else needs the shared dashboard
+    cookie - a page request redirects to the dashboard's login, an API
+    request gets a plain 401 JSON body instead (a fetch() call can't follow
+    a cross-origin redirect usefully).
+    """
+    from flask import jsonify, redirect, request
+
+    from .services.dashboard_auth import is_valid_dashboard_session
+
+    @app.before_request
+    def _require_dashboard_login():
+        if not app.config.get("REQUIRE_DASHBOARD_LOGIN", False):
+            return None
+        path = request.path
+        if path == "/healthz" or path.startswith("/api/bridge") or path.startswith("/static"):
+            return None
+        token = request.cookies.get(app.config.get("DASHBOARD_SESSION_COOKIE_NAME", "session_token"))
+        if is_valid_dashboard_session(app.config.get("DASHBOARD_DB_PATH", ""), token):
+            return None
+        if path.startswith("/api"):
+            return jsonify({"error": "unauthorized", "message": "Log into the dashboard first"}), 401
+        return redirect(app.config.get("DASHBOARD_LOGIN_URL", "/"))
 
 
 def _register_print_worker_shutdown(app: Flask, print_queue) -> None:
