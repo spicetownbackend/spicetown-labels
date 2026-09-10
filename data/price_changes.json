@@ -1,30 +1,72 @@
 [
   {
-    "upc": "41034",
-    "name": "Varalaxmi Sabudana Papad 80gm",
-    "old_price": 0.79,
-    "new_price": 1.49,
-    "recorded_at": "2026-09-09T23:26:13.635639+00:00"
+    "upc": "041331024006",
+    "name": "Goya Red kidney Beans 29oz",
+    "old_price": 3.99,
+    "new_price": 5.99,
+    "recorded_at": "2026-09-10T01:19:33.368008+00:00"
   },
   {
-    "upc": "KP Produce;Raja Foods;Sai Florals",
-    "name": "Tulasi Leaves 500g",
-    "old_price": 2.0,
-    "new_price": 50.0,
-    "recorded_at": "2026-09-09T23:26:13.635639+00:00"
+    "upc": "041331124027",
+    "name": "Goya Chick Peas Tin 15.5 Oz",
+    "old_price": 2.29,
+    "new_price": 3.49,
+    "recorded_at": "2026-09-10T01:19:33.368008+00:00"
   },
   {
-    "upc": "TG-6954055677DA",
-    "name": "Lijjat Urad ( Black Pepper ) Papad 200gm",
-    "old_price": 1.99,
-    "new_price": 2.49,
-    "recorded_at": "2026-09-09T23:26:13.635639+00:00"
+    "upc": "041331124669",
+    "name": "Goya Black Beans 15.5oz",
+    "old_price": 7.99,
+    "new_price": 3.99,
+    "recorded_at": "2026-09-10T01:19:33.368008+00:00"
   },
   {
-    "upc": "TG-F7359ACC4B0C",
-    "name": "Cotton Wick Akhand Jyothy",
-    "old_price": 0.49,
-    "new_price": 0.99,
-    "recorded_at": "2026-09-09T23:26:13.635639+00:00"
+    "upc": "8964001525585",
+    "name": "Mario pasta roasted vermicelli",
+    "old_price": 2.99,
+    "new_price": 1.99,
+    "recorded_at": "2026-09-10T01:19:33.368008+00:00"
+  },
+  {
+    "upc": "8964001525646",
+    "name": "Mario pasta chicken makhni macaroni",
+    "old_price": 2.99,
+    "new_price": 1.99,
+    "recorded_at": "2026-09-10T01:19:33.368008+00:00"
+  },
+  {
+    "upc": "8964001525660",
+    "name": "Mario pasta karahi macaroni",
+    "old_price": 2.99,
+    "new_price": 1.99,
+    "recorded_at": "2026-09-10T01:19:33.368008+00:00"
+  },
+  {
+    "upc": "8964001525691",
+    "name": "Mario pasta qeema macaroni",
+    "old_price": 2.99,
+    "new_price": 1.99,
+    "recorded_at": "2026-09-10T01:19:33.368008+00:00"
+  },
+  {
+    "upc": "8964001525950",
+    "name": "Mario pasta fajita spaghetti",
+    "old_price": 2.99,
+    "new_price": 1.99,
+    "recorded_at": "2026-09-10T01:19:33.368008+00:00"
+  },
+  {
+    "upc": "8964001529194",
+    "name": "Mario pasta tikka macaroni",
+    "old_price": 2.99,
+    "new_price": 1.99,
+    "recorded_at": "2026-09-10T01:19:33.368008+00:00"
+  },
+  {
+    "upc": "8964001529279",
+    "name": "Mario pasta achari macaroni",
+    "old_price": 2.99,
+    "new_price": 1.99,
+    "recorded_at": "2026-09-10T01:19:33.368008+00:00"
   }
 ]
