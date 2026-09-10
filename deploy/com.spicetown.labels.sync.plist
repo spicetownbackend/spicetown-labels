@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.spicetown.labels.sync</string>
+
+    <!-- Pulls catalog updates the GitHub Action commits (products.csv,
+         price_changes.json) and tells the running app to reload - the
+         local equivalent of Render's auto-deploy-on-push. Runs every 15
+         minutes, tighter than the Action's own best-effort ~30min cadence
+         so this Mac isn't the slower link in the chain. -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/sundar/spicetown-labels/scripts/sync_catalog.sh</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/sundar/spicetown-labels</string>
+
+    <key>UserName</key>
+    <string>sundar</string>
+
+    <key>StartInterval</key>
+    <integer>900</integer>
+
+    <key>StandardOutPath</key>
+    <string>/Users/sundar/spicetown-labels/logs/sync.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/sundar/spicetown-labels/logs/sync.err.log</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin:/opt/homebrew/sbin</string>
+        <key>STL_PORT</key>
+        <string>8080</string>
+    </dict>
+</dict>
+</plist>
