@@ -21,7 +21,7 @@ from PIL import Image
 
 from app import create_app
 from app.extensions import db
-from app.models import PrintJob, Product
+from app.models import PriceHistory, PrintJob, Product
 from app.services.label import LabelSpec, render_label, render_to_png_bytes
 from app.services.print_queue import PrintQueue, QueueFull
 from app.services.printer import (
@@ -75,7 +75,7 @@ def _seed(upc, name="Test Item", price=5.0, **kw):
 def test_render_label_dimensions_62mm():
     img = render_label(SAMPLE, _spec())
     assert isinstance(img, Image.Image)
-    assert img.size == (696, 390)  # 62mm @ 300dpi, default length
+    assert img.size == (696, 426)  # 62mm @ 300dpi, default length
     assert img.mode == "RGB"
 
 
@@ -83,7 +83,7 @@ def test_render_png_bytes_is_valid_png():
     png = render_to_png_bytes(SAMPLE, _spec())
     assert png[:8] == b"\x89PNG\r\n\x1a\n"
     reopened = Image.open(io.BytesIO(png))
-    assert reopened.size == (696, 390)
+    assert reopened.size == (696, 426)
 
 
 def test_render_variants_differ():
@@ -98,7 +98,7 @@ def test_render_variants_differ():
 def test_render_long_name_does_not_overflow():
     long_name = "Super Extra Premium Authentic Himalayan Pink Rock Salt Fine Grind"
     img = render_label({**SAMPLE, "name": long_name}, _spec())
-    assert img.size == (696, 390)  # renderer fit/truncated rather than crashing
+    assert img.size == (696, 426)  # renderer fit/truncated rather than crashing
 
 
 def test_render_die_cut_size_fixed_height():
@@ -114,7 +114,7 @@ def test_null_transport_counts():
     assert t.health_check() is True
     t.send(img, copies=3, job_id=1)
     assert t.sent == 3
-    assert t.last_size == (696, 390)
+    assert t.last_size == (696, 426)
 
 
 def test_file_transport_writes_png(tmp_path):
@@ -124,7 +124,7 @@ def test_file_transport_writes_png(tmp_path):
     assert out.endswith(".png")
     files = list(tmp_path.glob("*.png"))
     assert len(files) == 1
-    assert Image.open(files[0]).size == (696, 390)
+    assert Image.open(files[0]).size == (696, 426)
 
 
 def test_build_printer_from_config():
@@ -287,6 +287,30 @@ def test_api_print_worker_down_503(app, client):
     assert r.status_code == 503
 
 
+def test_api_print_clears_pending_price_change(app, client):
+    # A normal scan-and-print is just as much "handling" a pending price
+    # change as the review panel's dedicated print button — it should also
+    # clear the item out of the price-review queue, not leave it stale.
+    with app.app_context():
+        p = _seed("pricechg1", "Cardamom", 12.99)
+        hist = PriceHistory(product_id=p.id, old_price=9.99, new_price=12.99)
+        db.session.add(hist)
+        db.session.commit()
+        hist_id = hist.id
+
+    app.extensions["print_queue"].start()
+    try:
+        r = client.post("/api/print", json={"upc": "pricechg1", "wait": True})
+        assert r.status_code == 200
+    finally:
+        app.extensions["print_queue"].stop()
+
+    with app.app_context():
+        row = db.session.get(PriceHistory, hist_id)
+        assert row.reviewed_at is not None
+        assert row.label_printed is True
+
+
 def test_api_preview_png(app, client):
     with app.app_context():
         _seed("prev1", "Saffron", 18.99, sale_price=14.99, on_sale=True)
@@ -294,7 +318,7 @@ def test_api_preview_png(app, client):
     assert r.status_code == 200
     assert r.mimetype == "image/png"
     assert r.data[:8] == b"\x89PNG\r\n\x1a\n"
-    assert Image.open(io.BytesIO(r.data)).size == (696, 390)
+    assert Image.open(io.BytesIO(r.data)).size == (696, 426)
 
 
 def test_api_preview_unknown_404(client):
@@ -304,10 +328,10 @@ def test_api_preview_unknown_404(client):
 # ── 29x62mm landscape die-cut (DK-1209) + CUPS scaling options ────────────────
 def test_label_29x62_landscape_geometry():
     spec = LabelSpec.for_media("29x62", dpi=300, compact=True)
-    assert (spec.width_px, spec.height_px) == (732, 306)
+    assert (spec.width_px, spec.height_px) == (732, 336)
     assert spec.compact is True
     img = render_label(SAMPLE, spec)
-    assert img.size == (732, 306)  # renders cleanly, compact layout
+    assert img.size == (732, 336)  # renders cleanly, compact layout
 
 
 def test_compact_label_renders_essentials():
@@ -315,7 +339,7 @@ def test_compact_label_renders_essentials():
     spec = LabelSpec.for_media("29x62", dpi=300, compact=True)
     std = render_label({**SAMPLE, "label_variant": "standard"}, spec)
     sale = render_label({**SAMPLE, "label_variant": "sale"}, spec)
-    assert std.size == (732, 306)
+    assert std.size == (732, 336)
     assert std.tobytes() != sale.tobytes()  # banner makes them differ
 
 
@@ -361,7 +385,7 @@ def test_render_full_name_preferred_over_short_name():
     p = {**SAMPLE, "name": "Shan Biryani Masala B1G1",
          "short_name": "Shan Biryani Masala…"}
     img = render_label(p, _spec())
-    assert img.size == (696, 390)
+    assert img.size == (696, 426)
 
     draw = ImageDraw.Draw(PILImage.new("RGB", (10, 10)))
     spec = _spec()
@@ -376,7 +400,7 @@ def test_render_very_long_name_wraps_two_lines_keeps_barcode():
 
     long_name = "Laxmi Freshly Ground Organic Coriander Cumin Powder Blend 400g"
     img = render_label({**SAMPLE, "name": long_name, "short_name": None}, _spec())
-    assert img.size == (696, 390)
+    assert img.size == (696, 426)
 
     draw = ImageDraw.Draw(PILImage.new("RGB", (10, 10)))
     spec = _spec()

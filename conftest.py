@@ -9,7 +9,17 @@ import pytest
 sys.path.insert(0, os.path.dirname(__file__))
 
 # Isolate tests from any local .env and force the in-memory testing DB.
+# STL_ENV alone doesn't do this - config.py's `load_dotenv()` still fills in
+# every other STL_* var from a real .env if one exists (e.g. a production
+# label size), since dotenv only skips vars already present. Pin every
+# printer/label setting the test suite's own assertions assume, so a real
+# local .env can't change what the tests expect.
 os.environ.setdefault("STL_ENV", "testing")
+os.environ.setdefault("STL_LABEL_SIZE", "62")
+os.environ.setdefault("STL_LABEL_LENGTH_PX", "390")
+os.environ.setdefault("STL_CUPS_LP_OPTIONS", "")
+os.environ.setdefault("STL_PRINT_TRANSPORT", "null")
+os.environ.setdefault("STL_PRINT_MODE", "local")
 
 
 @pytest.fixture(autouse=True)

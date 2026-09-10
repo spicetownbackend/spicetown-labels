@@ -216,6 +216,14 @@ def job_raster(job_id: int):
     )
 
 
+# app/services/label.py's QL_MEDIA_PX keys this app's own rendered-image sizes
+# by (e.g. "29x62" for the DK-1209 landscape geometry it renders at). The
+# brother_ql library names some of the same physical die-cut labels the other
+# way around ("62x29") - translate here, at the one call site that actually
+# hands a label name to brother_ql, rather than renaming our own convention.
+_BROTHER_QL_LABEL_ALIASES = {"29x62": "62x29"}
+
+
 def _convert_to_raster(image, *, model: str, label_size: str, copies: int) -> bytes:
     from PIL import Image
 
@@ -232,7 +240,7 @@ def _convert_to_raster(image, *, model: str, label_size: str, copies: int) -> by
     return convert(
         qlr=qlr,
         images=[image] * max(1, copies),
-        label=label_size,
+        label=_BROTHER_QL_LABEL_ALIASES.get(label_size, label_size),
         rotate="auto",
         threshold=70.0,
         dither=False,

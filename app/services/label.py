@@ -61,8 +61,10 @@ QL_MEDIA_PX: dict[str, tuple[int, int | None]] = {
     "62x29": (696, 271),
     "62x100": (696, 1109),
     # DK-1209 small address labels (29mm tape x 62mm long) rendered in LANDSCAPE
-    # reading orientation: 62mm wide x 29mm tall @ 300 DPI.
-    "29x62": (732, 306),
+    # reading orientation: 62mm wide x 29mm tall @ 300 DPI. Height is a hair
+    # under the true 29mm (342px) to leave a safety margin against the
+    # die-cutter's edge tolerance, while still using nearly the full tape.
+    "29x62": (732, 336),
 }
 
 # Default printed length (dots) for a continuous-tape price label (~33mm).
@@ -162,6 +164,10 @@ class LabelSpec:
     # Compact mode drops the department header + size line so the essentials
     # (name, price, barcode) fit a short label (e.g. 29mm-tall die-cut).
     compact: bool = False
+    # Blank white margin added to the TOP and BOTTOM only (each side gets
+    # this many px), outside the design area, before the image is handed to
+    # the printer. See the comment on `for_media` below for why this exists.
+    bleed_px: int = 0
 
     @classmethod
     def for_media(
@@ -175,6 +181,26 @@ class LabelSpec:
         w, h = QL_MEDIA_PX.get(str(label_size), (696, None))
         if h is None:  # continuous tape → choose a length
             h = length_px or DEFAULT_CONTINUOUS_LENGTH_PX
+            # Continuous tape has a non-printable margin at the leading/
+            # trailing edge of each cut (the FEED direction — our label's
+            # height) that nothing else accounts for. Compare: QL_MEDIA_PX's
+            # continuous "62" entry is already 696px wide, not the full
+            # 732px (62mm) a naive px/mm conversion would give — that 36px
+            # gap is Brother's own documented printable-width margin for
+            # 62mm tape (~1.5mm/side). The WIDTH axis bakes this in; nothing
+            # upstream ever did the equivalent for HEIGHT, so a border drawn
+            # flush to the top/bottom edge (by design, see render_label) was
+            # landing exactly in the printer's dead zone and getting cut
+            # off. Add a matching ~1.5mm/side (18px) safety margin here, as
+            # blank bleed outside the design area rather than by shrinking
+            # the design itself. This must stay paired with a matching bump
+            # to the CUPS page height (STL_CUPS_LP_OPTIONS' media=...) or
+            # fit-to-page will just scale the extra canvas back away.
+            kwargs.setdefault("bleed_px", 18)
+        # Short die-cut media (e.g. 29x62's 306px/~26mm) doesn't have room for
+        # a department header + size line on top of name/price/barcode; drop
+        # them automatically so the name and barcode get the vertical space.
+        kwargs.setdefault("compact", h < 340)
         return cls(width_px=w, height_px=h, dpi=dpi, **kwargs)
 
 
@@ -313,17 +339,22 @@ def _render_barcode(
         bio.seek(0)
         img = Image.open(bio).convert("RGB")
 
-        # Scale to the target height, preserving aspect ratio.
+        # Resize to the target height WITHOUT touching width: bar module width
+        # is the X-dimension that actually encodes data, so it must stay
+        # pixel-accurate for a scanner to decode it. A 1D barcode tolerates
+        # vertical compression fine (the scanner just needs the beam to sweep
+        # across it) — an aspect-locked resize was previously shrinking module
+        # width in lockstep with height on short labels, which is what made
+        # small labels' barcodes unscannable.
         if img.height != target_height and img.height > 0:
-            ratio = target_height / img.height
-            img = img.resize(
-                (max(1, int(img.width * ratio)), target_height), Image.NEAREST
-            )
-        # If still wider than the label, downscale to fit width.
+            img = img.resize((img.width, target_height), Image.NEAREST)
+        # If still wider than the label, downscale width only as a last
+        # resort (this does soften scannability, so it's worth sizing labels
+        # to avoid hitting this path for normal-length UPCs).
         if img.width > max_width:
             ratio = max_width / img.width
             img = img.resize(
-                (max_width, max(1, int(img.height * ratio))), Image.NEAREST
+                (max_width, img.height), Image.NEAREST
             )
         return img
     except Exception:
@@ -432,6 +463,21 @@ def _render_shelf(
     return img
 
 
+def _add_bleed(img: Image.Image, spec: LabelSpec) -> Image.Image:
+    """Pad `img` with `spec.bleed_px` of blank white margin top and bottom.
+
+    This runs *after* the design is fully drawn, so it never competes with
+    the layout budget (name/price/barcode sizing above is untouched) — it
+    just wraps the finished label in the safety margin continuous tape
+    needs. See the comment on `LabelSpec.for_media` for why this exists.
+    """
+    if spec.bleed_px <= 0:
+        return img
+    padded = Image.new("RGB", (img.width, img.height + 2 * spec.bleed_px), "white")
+    padded.paste(img, (0, spec.bleed_px))
+    return padded
+
+
 def render_label(
     product: dict,
     spec: LabelSpec,
@@ -458,25 +504,27 @@ def render_label(
 
     variant = variant or product.get("label_variant", "standard")
     if variant == "shelf":
-        return _render_shelf(product, spec, fields=fields)
+        return _add_bleed(_render_shelf(product, spec, fields=fields), spec)
     style = VARIANT_STYLE.get(variant, VARIANT_STYLE["standard"])
 
     W, H = spec.width_px, spec.height_px
     img = Image.new("RGB", (W, H), "white")
     draw = ImageDraw.Draw(img)
 
-    # Outer variant border.
-    bw = spec.border_width
+    # Outer variant border. Compact (short die-cut) labels use a thinner
+    # border + margin, like the shelf-tag layout, since every pixel of the
+    # ~26mm-tall canvas is needed for name/price/barcode.
+    bw = min(spec.border_width, 4) if spec.compact else spec.border_width
     for i in range(bw):
         draw.rectangle([i, i, W - 1 - i, H - 1 - i], outline=style["border"])
 
-    m = spec.margin + bw
+    m = (10 if spec.compact else spec.margin) + bw
     inner_w = W - 2 * m
     y = m
 
     # ── Header row: department (left) + variant banner (right) ────────────────
     # Compact labels (short die-cut) skip the department text to save height,
-    # but still show the sale/clearance banner.
+    # but still show the sale/clearance banner (smaller, to save height).
     head_font = _load_font(spec.font_path_regular, 26, bold=False)
     if not spec.compact and _has("department"):
         dept = (product.get("department") or spec.store_name).upper()
@@ -484,9 +532,9 @@ def render_label(
         draw.text((m, y), dept, font=head_font, fill=(60, 60, 60))
 
     if style["banner"]:
-        banner_font = _load_font(spec.font_path_bold, 26, bold=True)
+        banner_font = _load_font(spec.font_path_bold, 18 if spec.compact else 26, bold=True)
         bw_w, bw_h = _text_size(draw, style["banner"], banner_font)
-        pad = 8
+        pad = 5 if spec.compact else 8
         bx1 = W - m - bw_w - 2 * pad
         by1 = y - 2
         draw.rectangle(
@@ -494,9 +542,9 @@ def render_label(
             fill=style["banner_bg"],
         )
         draw.text((bx1 + pad, by1 + pad), style["banner"], font=banner_font, fill="white")
-    # Advance past the header band (smaller when compact + no banner).
-    if spec.compact and not style["banner"]:
-        y += 4
+    # Advance past the header band (smaller when compact).
+    if spec.compact:
+        y += 26 if style["banner"] else 4
     else:
         y += 38
 
@@ -508,45 +556,54 @@ def render_label(
     #   5. last resort: min-size + ellipsis
     full_name = (product.get("name") or "") if _has("name") else ""
     short_name = product.get("short_name") or full_name
-    # Two-line mode needs vertical room (compact die-cut labels don't have it).
-    allow_two_lines = not spec.compact and spec.height_px >= 340
+    # Two-line mode needs vertical room. Compact labels drop the department +
+    # size lines specifically to free up room for this, so they're eligible
+    # too (name legibility matters more than a header on a small price tag).
+    allow_two_lines = spec.height_px >= 260
+    # Compact labels have plenty of WIDTH (732px on 29x62) but very little
+    # HEIGHT, so width-based font fitting alone would happily pick a huge
+    # font that fits one line's width while starving the price/barcode below
+    # it. Cap the starting sizes much lower than the continuous-roll label.
+    single_start, single_min = (42, 26) if spec.compact else (58, 28)
+    two_start, two_min = (30, 20) if spec.compact else (40, 22)
+    fallback_start, fallback_min = (34, 18) if spec.compact else (58, 24)
 
     name_lines: list[str] = []
     name_font = None
     if full_name:
         name_font = _fit_single(
-            draw, full_name, spec.font_path_bold, True, inner_w, 58, 28
+            draw, full_name, spec.font_path_bold, True, inner_w, single_start, single_min
         )
     if name_font is not None:
         name_lines = [full_name]
     elif full_name and allow_two_lines:
         two = _fit_two_lines(
-            draw, full_name, spec.font_path_bold, True, inner_w, 40, 22
+            draw, full_name, spec.font_path_bold, True, inner_w, two_start, two_min
         )
         if two is not None:
             name_font, l1, l2 = two
             name_lines = [l1, l2]
     if full_name and not name_lines:
         name_font = _fit_single(
-            draw, short_name, spec.font_path_bold, True, inner_w, 58, 24
+            draw, short_name, spec.font_path_bold, True, inner_w, fallback_start, fallback_min
         )
         if name_font is not None:
             name_lines = [short_name]
     if full_name and not name_lines:
         abbreviated = shorten_name(full_name, max_chars=24)
         name_font = _fit_single(
-            draw, abbreviated, spec.font_path_bold, True, inner_w, 58, 24
+            draw, abbreviated, spec.font_path_bold, True, inner_w, fallback_start, fallback_min
         )
         if name_font is not None:
             name_lines = [abbreviated]
     if full_name and not name_lines:
-        name_font = _load_font(spec.font_path_bold, 24, True)
+        name_font = _load_font(spec.font_path_bold, fallback_min, True)
         name_lines = [_truncate_to_width(draw, short_name, name_font, inner_w)]
 
     for line in name_lines:
         draw.text((m, y), line, font=name_font, fill="black")
-        y += _text_size(draw, line, name_font)[1] + 6
-    y += 8
+        y += _text_size(draw, line, name_font)[1] + (3 if spec.compact else 6)
+    y += 3 if spec.compact else 8
 
     # ── Size / unit line (skipped in compact mode) ────────────────────────────
     sub_bits = [b for b in [product.get("size"), product.get("unit")] if b]
@@ -559,7 +616,10 @@ def render_label(
     # Zero/open-priced items (or a deselected price field) render no price.
     eff = product.get("effective_price", product.get("price", 0.0))
     if _has("price") and eff is not None and eff > 0:
-        price_font = _load_font(spec.font_path_bold, 72, bold=True)
+        # Compact (short die-cut) labels can't spare the full 72pt price the
+        # continuous roll uses, but the price should still read as the most
+        # prominent bold element on the label after the name.
+        price_font = _load_font(spec.font_path_bold, 58 if spec.compact else 72, bold=True)
         price_str = _money(eff)
         draw.text((m, y), price_str, font=price_font, fill="black")
         pw, ph = _text_size(draw, price_str, price_font)
@@ -573,33 +633,44 @@ def render_label(
             ww, wh = _text_size(draw, was_str, was_font)
             # strike-through the original price
             draw.line([wx, wy + wh // 2, wx + ww, wy + wh // 2], fill=(120, 120, 120), width=3)
-        y += ph + 16
+        y += ph + (6 if spec.compact else 16)
 
     # ── Barcode + human-readable UPC, bottom-aligned ──────────────────────────
+    # A price label with NO barcode can't be scanned/re-priced at all, so this
+    # must degrade gracefully (shrink) under a tight layout rather than ever
+    # disappear outright. band_h used to be floored at a "legible minimum"
+    # (70px) even when the REAL remaining space was smaller — which handed
+    # _render_barcode a target taller than what was actually available, so the
+    # honest fit-check right below it would then correctly reject it and drop
+    # the barcode entirely. The floor must never exceed the true budget.
     upc = str(product.get("upc", ""))
     if spec.draw_barcode and upc and _has("barcode"):
         upc_font = _load_font(spec.font_path_regular, 24, bold=False)
         upc_text_h = _text_size(draw, upc, upc_font)[1]
-        # Reserve a band at the bottom for the barcode + its digits.
-        band_h = min(110, max(60, (H - m) - y - 4))  # available vertical space
-        bc_height = max(40, band_h - upc_text_h - 6)
-        bc = _render_barcode(upc, inner_w, bc_height, spec.dpi)
-        if bc is not None and bc.height + upc_text_h + 6 <= (H - m) - y:
-            bc_x = m + max(0, (inner_w - bc.width) // 2)  # center horizontally
-            bc_y = H - m - bc.height - upc_text_h - 4
-            bc_y = max(bc_y, y)  # never overlap the price line
-            img.paste(bc, (bc_x, bc_y))
-            uw, _ = _text_size(draw, upc, upc_font)
-            draw.text(
-                ((W - uw) // 2, bc_y + bc.height + 2),
-                upc,
-                font=upc_font,
-                fill="black",
-            )
+        avail = max(0, (H - m) - y - 4)  # real remaining vertical space
+        band_h = min(130, avail)
+        bc_height = max(24, band_h - upc_text_h - 6)
+        if avail > upc_text_h + 30:  # enough for a real (if small) barcode
+            bc = _render_barcode(upc, inner_w, bc_height, spec.dpi)
+            if bc is not None:
+                bc_x = m + max(0, (inner_w - bc.width) // 2)  # center horizontally
+                bc_y = H - m - bc.height - upc_text_h - 4
+                bc_y = max(bc_y, y)  # never overlap the price line
+                img.paste(bc, (bc_x, bc_y))
+                uw, _ = _text_size(draw, upc, upc_font)
+                draw.text(
+                    ((W - uw) // 2, bc_y + bc.height + 2),
+                    upc,
+                    font=upc_font,
+                    fill="black",
+                )
         else:
-            logger.debug("barcode skipped: insufficient vertical space (upc=%s)", upc)
+            logger.warning(
+                "barcode dropped: no vertical space left (upc=%s, avail=%dpx)",
+                upc, avail,
+            )
 
-    return img
+    return _add_bleed(img, spec)
 
 
 def render_to_png_bytes(

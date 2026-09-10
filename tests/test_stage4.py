@@ -268,7 +268,7 @@ def test_label_uses_short_name():
         "label_variant": "standard",
     }
     img = render_label(product, spec)
-    assert img.size == (696, 390)  # renders cleanly with the short name
+    assert img.size == (696, 426)  # renders cleanly with the short name
 
 
 def test_label_shortens_when_no_short_name():
@@ -281,4 +281,4 @@ def test_label_shortens_when_no_short_name():
         "label_variant": "standard",
     }
     img = render_label(product, spec)  # must not raise / overflow
-    assert img.size == (696, 390)
+    assert img.size == (696, 426)

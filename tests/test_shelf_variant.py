@@ -48,8 +48,11 @@ def _spec():
 
 
 def test_shelf_is_29mm_tall():
-    img = render_label(_product(), _spec(), variant="shelf")
-    expected_h = int(round(SHELF_LENGTH_MM / 25.4 * 300))
+    spec = _spec()
+    img = render_label(_product(), spec, variant="shelf")
+    # Continuous media adds blank top/bottom bleed outside the 29mm design
+    # (see LabelSpec.for_media) — the design itself is still exactly 29mm.
+    expected_h = int(round(SHELF_LENGTH_MM / 25.4 * 300)) + 2 * spec.bleed_px
     assert img.height == expected_h
     assert img.width == 696
 
@@ -58,10 +61,15 @@ def test_shelf_has_no_barcode():
     # A barcode band would put long black bar runs in the lower half.
     # Instead just verify shelf output differs from standard and the lower
     # half is mostly white except the price text on the left.
-    img = render_label(_product(), _spec(), variant="shelf")
-    # right third, lower half: no barcode there → nearly all white
+    spec = _spec()
+    img = render_label(_product(), spec, variant="shelf")
+    # right third, lower half of the DESIGN area (excluding the blank bleed
+    # margin, which is trivially all white and would skew the fraction):
+    # no barcode there → nearly all white
     w, h = img.size
-    region = img.crop((int(w * 0.7), int(h * 0.55), w - 12, h - 12))
+    top, bottom = spec.bleed_px, h - spec.bleed_px
+    content_h = bottom - top
+    region = img.crop((int(w * 0.7), top + int(content_h * 0.55), w - 12, bottom - 12))
     px = list(region.convert("L").getdata())
     dark = sum(1 for v in px if v < 128)
     assert dark / len(px) < 0.02
