@@ -14,6 +14,8 @@ Covers:
 from __future__ import annotations
 
 import io
+import os
+import tempfile
 import time
 
 import pytest
@@ -50,8 +52,30 @@ SAMPLE = {
 
 @pytest.fixture()
 def app():
-    app = create_app(config_object=TestingConfig, start_background=False)
+    # A real temp-file DB, not TestingConfig's default sqlite:///:memory: -
+    # this file's tests are the only ones in the suite that spin up a real
+    # PrintQueue worker THREAD touching the DB concurrently with the main
+    # test thread. SQLAlchemy backs a `:memory:` URI with StaticPool (one
+    # single shared physical connection for the whole process, required so
+    # every "connection" sees the same in-memory data) - two threads hitting
+    # that one connection at truly the same instant corrupts SQLite's
+    # C-level state (`sqlite3.InterfaceError: bad parameter or other API
+    # misuse`), intermittently. A real file lets each thread get its own
+    # genuine connection, coordinated by SQLite's own file locking +
+    # busy_timeout (already configured for every connection in
+    # app/extensions.py) - exactly how production (a real file DB, never
+    # `:memory:`) already avoids this race, so this just makes the test
+    # environment match production's actual concurrency model instead of
+    # working around a `:memory:`-only artifact.
+    fd, db_path = tempfile.mkstemp(suffix=".db")
+    os.close(fd)
+
+    class _ThreadSafeTestConfig(TestingConfig):
+        SQLALCHEMY_DATABASE_URI = f"sqlite:///{db_path}"
+
+    app = create_app(config_object=_ThreadSafeTestConfig, start_background=False)
     yield app
+    os.unlink(db_path)
 
 
 @pytest.fixture()
