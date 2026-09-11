@@ -1,1 +1,23 @@
-[]
+[
+  {
+    "upc": "012042001150",
+    "name": "KCB Veg Cake Rusk 10oz",
+    "old_price": 3.49,
+    "new_price": 3.99,
+    "recorded_at": "2026-09-11T03:27:45.704218+00:00"
+  },
+  {
+    "upc": "G240D",
+    "name": "Besan Ladoo 9oz",
+    "old_price": 11.49,
+    "new_price": 9.99,
+    "recorded_at": "2026-09-11T03:27:45.704218+00:00"
+  },
+  {
+    "upc": "K325D",
+    "name": "Modak 11oz",
+    "old_price": 11.49,
+    "new_price": 9.99,
+    "recorded_at": "2026-09-11T03:27:45.704218+00:00"
+  }
+]
