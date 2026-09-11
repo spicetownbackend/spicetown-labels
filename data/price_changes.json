@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "upc": "158119422029",
+    "name": "Ganesh Puja Pathri Bag",
+    "old_price": 15.0,
+    "new_price": 9.0,
+    "recorded_at": "2026-09-11T22:18:09.943672+00:00"
+  },
+  {
+    "upc": "Sai Florals",
+    "name": "Ganesh Puja Pathri & Flowers Package",
+    "old_price": 25.0,
+    "new_price": 18.0,
+    "recorded_at": "2026-09-11T22:18:09.943672+00:00"
+  }
+]
