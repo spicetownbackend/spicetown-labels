@@ -1,1 +1,72 @@
-[]
+[
+  {
+    "upc": "021121691236",
+    "name": "Anar Fresh (Pomogrenade)",
+    "old_price": 2.99,
+    "new_price": 5.99,
+    "recorded_at": "2026-09-12T04:55:47.879476+00:00"
+  },
+  {
+    "upc": "023627807197",
+    "name": "Pumpkin Yellow in LBs",
+    "old_price": 1.99,
+    "new_price": 1.49,
+    "recorded_at": "2026-09-12T04:55:47.879476+00:00"
+  },
+  {
+    "upc": "059000415567",
+    "name": "Golden Temple Atta 20Lb",
+    "old_price": 22.99,
+    "new_price": 18.99,
+    "recorded_at": "2026-09-12T04:55:47.879476+00:00"
+  },
+  {
+    "upc": "1582",
+    "name": "Winter Melon in LBs",
+    "old_price": 1.99,
+    "new_price": 1.49,
+    "recorded_at": "2026-09-12T04:55:47.879476+00:00"
+  },
+  {
+    "upc": "173994624863",
+    "name": "Chilli Small in LBs",
+    "old_price": 3.49,
+    "new_price": 3.99,
+    "recorded_at": "2026-09-12T04:55:47.879476+00:00"
+  },
+  {
+    "upc": "174363360641",
+    "name": "Eggplant Round in LBs",
+    "old_price": 1.79,
+    "new_price": 1.99,
+    "recorded_at": "2026-09-12T04:55:47.879476+00:00"
+  },
+  {
+    "upc": "174367348782",
+    "name": "Curry Leaves in LBs",
+    "old_price": 19.99,
+    "new_price": 22.99,
+    "recorded_at": "2026-09-12T04:55:47.879476+00:00"
+  },
+  {
+    "upc": "6291103750051",
+    "name": "MDH Butter Chicken Masala 100G",
+    "old_price": 2.99,
+    "new_price": 3.49,
+    "recorded_at": "2026-09-12T04:55:47.879476+00:00"
+  },
+  {
+    "upc": "6291103750303",
+    "name": "MDH Pulao Biryani 1.75",
+    "old_price": 2.99,
+    "new_price": 3.49,
+    "recorded_at": "2026-09-12T04:55:47.879476+00:00"
+  },
+  {
+    "upc": "Sai Florals",
+    "name": "Erukkam poo Garland",
+    "old_price": 6.0,
+    "new_price": 8.0,
+    "recorded_at": "2026-09-12T04:55:47.879476+00:00"
+  }
+]
