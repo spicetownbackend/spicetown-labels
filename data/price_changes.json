@@ -2,8 +2,22 @@
   {
     "upc": "021121691236",
     "name": "Anar Fresh (Pomogrenade)",
-    "old_price": 5.99,
-    "new_price": 3.99,
-    "recorded_at": "2026-09-13T19:12:57.638799+00:00"
+    "old_price": 3.99,
+    "new_price": 5.99,
+    "recorded_at": "2026-09-13T21:34:35.869273+00:00"
+  },
+  {
+    "upc": "158119422029",
+    "name": "Ganesh Puja Pathri Bag",
+    "old_price": 9.0,
+    "new_price": 5.0,
+    "recorded_at": "2026-09-13T21:34:35.869273+00:00"
+  },
+  {
+    "upc": "494004093211",
+    "name": "Lily Sampangi (Loose) 100g",
+    "old_price": 8.0,
+    "new_price": 6.0,
+    "recorded_at": "2026-09-13T21:34:35.869273+00:00"
   }
 ]
