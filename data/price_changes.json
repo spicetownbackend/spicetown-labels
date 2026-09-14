@@ -1,1 +1,23 @@
-[]
+[
+  {
+    "upc": "723246287812",
+    "name": "Laxmi Garlic Butter Naan 12pc 85gm",
+    "old_price": 6.99,
+    "new_price": 8.99,
+    "recorded_at": "2026-09-14T23:19:07.485721+00:00"
+  },
+  {
+    "upc": "723246290072",
+    "name": "Laxmi Tandoori Plain Naan BLK 16x85gm",
+    "old_price": 6.99,
+    "new_price": 7.99,
+    "recorded_at": "2026-09-14T23:19:07.485721+00:00"
+  },
+  {
+    "upc": "723246292601",
+    "name": "Laxmi Homestyle Paratha FP",
+    "old_price": 6.99,
+    "new_price": 8.99,
+    "recorded_at": "2026-09-14T23:19:07.485721+00:00"
+  }
+]
