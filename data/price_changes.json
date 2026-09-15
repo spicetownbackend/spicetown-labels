@@ -1,149 +1,72 @@
 [
   {
-    "upc": "164561459599",
-    "name": "Black Thread Each",
-    "old_price": 0.99,
-    "new_price": 2.99,
-    "recorded_at": "2026-09-15T20:24:43.206894+00:00"
-  },
-  {
-    "upc": "173998829400",
-    "name": "Bell Pepper Red in lbs",
-    "old_price": 2.79,
-    "new_price": 1.99,
-    "recorded_at": "2026-09-15T20:24:43.206894+00:00"
-  },
-  {
-    "upc": "179312733187",
-    "name": "Cucumber Seedless Each",
-    "old_price": 1.49,
-    "new_price": 1.99,
-    "recorded_at": "2026-09-15T20:24:43.206894+00:00"
-  },
-  {
-    "upc": "179319037738",
-    "name": "Cauliflower Each",
-    "old_price": 3.99,
+    "upc": "4179489440693",
+    "name": "Pancharanga Turnp Cauliflower Pickle 800g",
+    "old_price": 5.49,
     "new_price": 4.99,
-    "recorded_at": "2026-09-15T20:24:43.206894+00:00"
+    "recorded_at": "2026-09-15T23:04:31.139876+00:00"
   },
   {
-    "upc": "723246222868",
-    "name": "Parle-G 799gm",
-    "old_price": 3.49,
-    "new_price": 3.99,
-    "recorded_at": "2026-09-15T20:24:43.206894+00:00"
+    "upc": "723246310329",
+    "name": "Parle Monaco 6x44.1 GM (VALUE PACK)",
+    "old_price": 2.49,
+    "new_price": 4.99,
+    "recorded_at": "2026-09-15T23:04:31.139876+00:00"
   },
   {
-    "upc": "788821004239",
-    "name": "Shan Arabic Fish Spice 50g",
-    "old_price": 1.99,
-    "new_price": 2.49,
-    "recorded_at": "2026-09-15T20:24:43.206894+00:00"
+    "upc": "8901030658761",
+    "name": "Taj Mahal 450gm",
+    "old_price": 7.99,
+    "new_price": 8.99,
+    "recorded_at": "2026-09-15T23:04:31.139876+00:00"
   },
   {
-    "upc": "840222000149",
-    "name": "LG Hing Bottle 50g",
-    "old_price": 3.49,
-    "new_price": 2.99,
-    "recorded_at": "2026-09-15T20:24:43.206894+00:00"
+    "upc": "8901777050668",
+    "name": "Vadilal Shredded Coconut 312g",
+    "old_price": 3.99,
+    "new_price": 7.49,
+    "recorded_at": "2026-09-15T23:04:31.139876+00:00"
   },
   {
-    "upc": "8901491100267",
-    "name": "Lays Hot N Sweet Chilli 52.9g",
-    "old_price": 0.49,
-    "new_price": 0.99,
-    "recorded_at": "2026-09-15T20:24:43.206894+00:00"
+    "upc": "8906005501097",
+    "name": "Bikaji Moong Dal 1000g",
+    "old_price": 9.49,
+    "new_price": 8.99,
+    "recorded_at": "2026-09-15T23:04:31.139876+00:00"
   },
   {
-    "upc": "8901777895177",
-    "name": "Vadilal Butterscotch 1 ltr",
-    "old_price": 12.99,
+    "upc": "8906005508591",
+    "name": "Bikaji Milk Cake 400g",
+    "old_price": 10.49,
+    "new_price": 8.99,
+    "recorded_at": "2026-09-15T23:04:31.139876+00:00"
+  },
+  {
+    "upc": "8906005508867",
+    "name": "Bikaji Kaju Katli 340g",
+    "old_price": 13.49,
     "new_price": 9.99,
-    "recorded_at": "2026-09-15T20:24:43.206894+00:00"
+    "recorded_at": "2026-09-15T23:04:31.139876+00:00"
   },
   {
-    "upc": "8901777985977",
-    "name": "Vadilal Kesarpista Cone 110ml",
-    "old_price": 2.99,
-    "new_price": 3.99,
-    "recorded_at": "2026-09-15T20:24:43.206894+00:00"
+    "upc": "8906064701421",
+    "name": "Kozhi Kod Bombay mixture 400g",
+    "old_price": 5.49,
+    "new_price": 4.99,
+    "recorded_at": "2026-09-15T23:04:31.139876+00:00"
   },
   {
-    "upc": "8902418000011",
-    "name": "Pan Parag Masala",
-    "old_price": 14.99,
-    "new_price": 15.99,
-    "recorded_at": "2026-09-15T20:24:43.206894+00:00"
-  },
-  {
-    "upc": "8904209303554",
-    "name": "Aachi Mutton Masala 100g",
-    "old_price": 1.99,
-    "new_price": 2.99,
-    "recorded_at": "2026-09-15T20:24:43.206894+00:00"
-  },
-  {
-    "upc": "8906021123990",
-    "name": "Aachi Chicken Curry Masala 100g",
-    "old_price": 2.49,
-    "new_price": 2.99,
-    "recorded_at": "2026-09-15T20:24:43.206894+00:00"
-  },
-  {
-    "upc": "8906028061554",
-    "name": "Blue Heaven Classic Kajal Each",
-    "old_price": 1.49,
-    "new_price": 2.99,
-    "recorded_at": "2026-09-15T20:24:43.206894+00:00"
-  },
-  {
-    "upc": "8906147055304",
-    "name": "Deccan Sunflower Oil 2lt",
-    "old_price": 12.99,
-    "new_price": 10.99,
-    "recorded_at": "2026-09-15T20:24:43.206894+00:00"
-  },
-  {
-    "upc": "8939123689996",
-    "name": "Jiya's Soft Broom Each",
-    "old_price": 4.99,
-    "new_price": 5.99,
-    "recorded_at": "2026-09-15T20:24:43.206894+00:00"
-  },
-  {
-    "upc": "8939126890016",
-    "name": "Jiya Mini Jaggery Cubes Brown 500g",
-    "old_price": 2.49,
-    "new_price": 2.99,
-    "recorded_at": "2026-09-15T20:24:43.206894+00:00"
+    "upc": "8906147054574",
+    "name": "Deccan Brown Sona Masoori 20lb",
+    "old_price": 35.49,
+    "new_price": 22.99,
+    "recorded_at": "2026-09-15T23:04:31.139876+00:00"
   },
   {
     "upc": "8939126892232",
     "name": "Jiya's Jeera Rice Crackers 500g",
-    "old_price": 3.49,
-    "new_price": 3.99,
-    "recorded_at": "2026-09-15T20:24:43.206894+00:00"
-  },
-  {
-    "upc": "8964000660928",
-    "name": "Pakola Ice Cream Soda 250ml",
-    "old_price": 0.99,
-    "new_price": 1.29,
-    "recorded_at": "2026-09-15T20:24:43.206894+00:00"
-  },
-  {
-    "upc": "8993560024987",
-    "name": "Dettol Soap Original 100g",
-    "old_price": 1.49,
-    "new_price": 2.49,
-    "recorded_at": "2026-09-15T20:24:43.206894+00:00"
-  },
-  {
-    "upc": "TG-400BEA4D3C59",
-    "name": "Lays American Cream & Onion 52.9g",
-    "old_price": 0.49,
-    "new_price": 0.99,
-    "recorded_at": "2026-09-15T20:24:43.206894+00:00"
+    "old_price": 3.99,
+    "new_price": 4.99,
+    "recorded_at": "2026-09-15T23:04:31.139876+00:00"
   }
 ]
