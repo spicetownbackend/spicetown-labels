@@ -1,1 +1,373 @@
-[]
+[
+  {
+    "upc": "019896348031",
+    "name": "Whole Lamb With Head in Lbs",
+    "old_price": 13.99,
+    "new_price": 10.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "5034660021537",
+    "name": "Cadbury Hot Chocolate 250gm",
+    "old_price": 5.99,
+    "new_price": 6.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "745042000167",
+    "name": "Royal Sella Basmati Rice 20lb",
+    "old_price": 25.99,
+    "new_price": 26.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "788364267702",
+    "name": "DN Plain Paratha 5pc",
+    "old_price": 3.49,
+    "new_price": 2.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "788364267719",
+    "name": "DN Paratha Plain 20pcs",
+    "old_price": 11.49,
+    "new_price": 6.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "788364267771",
+    "name": "DN Aloo Paratha 3pc",
+    "old_price": 3.49,
+    "new_price": 3.79,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "788364267788",
+    "name": "DN Onion Paratha 5pc",
+    "old_price": 3.49,
+    "new_price": 3.79,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "788364267818",
+    "name": "DN Plain Paratha 30pc",
+    "old_price": 10.99,
+    "new_price": 7.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "788364267900",
+    "name": "DN Tandoori Naan 5pc",
+    "old_price": 3.49,
+    "new_price": 2.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "788364267917",
+    "name": "DN Tandoori Naan 16pc",
+    "old_price": 9.49,
+    "new_price": 7.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "853271008325",
+    "name": "Brio Sunflower Oil 5ltr",
+    "old_price": 18.99,
+    "new_price": 19.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "8901030893599",
+    "name": "Brookbond Red Label Tea 500g",
+    "old_price": 6.99,
+    "new_price": 5.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "8901058013658",
+    "name": "Maggi Hot & Sweet Sauce 500g",
+    "old_price": 3.49,
+    "new_price": 3.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "8901786061204",
+    "name": "Everest Chaat Masala 100gm",
+    "old_price": 1.99,
+    "new_price": 2.49,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "8901786101207",
+    "name": "Everest Garam Masala 100gm",
+    "old_price": 2.29,
+    "new_price": 2.49,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "890187412851",
+    "name": "KX Frozen Rumali Roti 240g",
+    "old_price": 4.49,
+    "new_price": 3.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "8901874131086",
+    "name": "KX Choliya 312g",
+    "old_price": 2.49,
+    "new_price": 2.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "8901874131116",
+    "name": "KX Sweet Corn 312g",
+    "old_price": 1.99,
+    "new_price": 2.79,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "8901874131154",
+    "name": "KX Drumsticks 312g",
+    "old_price": 2.49,
+    "new_price": 2.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "8901874131185",
+    "name": "KX Green Chilli 312g",
+    "old_price": 2.49,
+    "new_price": 2.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "8901874131239",
+    "name": "KX Tender Jack Fruit 312g",
+    "old_price": 2.49,
+    "new_price": 3.49,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "8901874131277",
+    "name": "KX Lotus Roots 312g",
+    "old_price": 2.99,
+    "new_price": 3.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "8901874131475",
+    "name": "KX Green Peas 908g",
+    "old_price": 7.49,
+    "new_price": 5.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "8901874131598",
+    "name": "KX Baby Onion 312g",
+    "old_price": 2.49,
+    "new_price": 2.79,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "8901874131987",
+    "name": "KX Coconut Shredded 312g",
+    "old_price": 4.99,
+    "new_price": 4.49,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "8904063202383",
+    "name": "Haldiram'ss boondi masala 400g",
+    "old_price": 3.49,
+    "new_price": 3.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "8904063202437",
+    "name": "Haldiram's Ragi Roti 360gm",
+    "old_price": 3.49,
+    "new_price": 3.79,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "8904063205001",
+    "name": "Haldiram's Soan Papdi 500g",
+    "old_price": 4.49,
+    "new_price": 7.49,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "8904063205261",
+    "name": "Haldiram's Paneer Cubes 450g",
+    "old_price": 9.99,
+    "new_price": 10.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "8904063210029",
+    "name": "Haldiram's Rasgulla 1kg",
+    "old_price": 6.99,
+    "new_price": 7.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "8904063224699",
+    "name": "Haldiram's Bhatura 5piece",
+    "old_price": 3.49,
+    "new_price": 3.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "8904063224903",
+    "name": "Haldiram Onion Samosa 16pcs",
+    "old_price": 4.99,
+    "new_price": 5.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "8904063230959",
+    "name": "Haldiram RTE Hydrabadi Biryani 200gm",
+    "old_price": 2.49,
+    "new_price": 2.29,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "8904063252821",
+    "name": "Haldiram's Cocktail Samosa 1.4kg",
+    "old_price": 15.99,
+    "new_price": 16.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "8904063253552",
+    "name": "Haldiram's Gulab Jamun 1 Kg",
+    "old_price": 9.99,
+    "new_price": 7.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "8904063253675",
+    "name": "Haldiram's Homestyle Paratha 20PC/1.2kg",
+    "old_price": 8.99,
+    "new_price": 9.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "8904063253941",
+    "name": "Haldiram Paneer SLAB 360g",
+    "old_price": 7.99,
+    "new_price": 8.49,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "8904063253958",
+    "name": "Haldiram's Rasmalai 1kg (20pc)",
+    "old_price": 14.99,
+    "new_price": 15.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "8904063255006",
+    "name": "Haldiram's Punjabi Samosa 650g - 8pc",
+    "old_price": 7.99,
+    "new_price": 8.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "8904063256249",
+    "name": "Haldiram PANEER SLABS 800g",
+    "old_price": 15.99,
+    "new_price": 16.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "8904063281142",
+    "name": "Haldiram's Paneer Paratha 4PC",
+    "old_price": 5.49,
+    "new_price": 6.49,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "8904063281197",
+    "name": "Haldiram's Homestyle Paratha 360g/6PC",
+    "old_price": 2.99,
+    "new_price": 3.29,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "8904063281234",
+    "name": "Haldiram's Phulka Roti 360g",
+    "old_price": 3.49,
+    "new_price": 3.79,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "8904063281401",
+    "name": "Haldiram's Kaju Katli 340gm",
+    "old_price": 10.99,
+    "new_price": 12.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "8904063281494",
+    "name": "Haldiram's Rasmalai 1kg/12pc",
+    "old_price": 10.99,
+    "new_price": 7.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "8904063281500",
+    "name": "Haldiram's Pao Bhaji 283 gms",
+    "old_price": 3.49,
+    "new_price": 2.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "8904063281616",
+    "name": "Haldiram's Paneer Makhani 10oz",
+    "old_price": 5.49,
+    "new_price": 5.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "TG-4A8823EF5F82",
+    "name": "Everest Eazy Chef Mutton Curry Mix 80g",
+    "old_price": 1.49,
+    "new_price": 1.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "TG-807E872F5203",
+    "name": "Everest Eazy Chef Chicken Biryani Mix 45g",
+    "old_price": 1.49,
+    "new_price": 1.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "TG-962F8A6EA8E4",
+    "name": "Everest Eazy Chef Mutter Paneer Mix 45g",
+    "old_price": 1.49,
+    "new_price": 1.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "TG-97CE6719E329",
+    "name": "Everest Eazy Chef Paneer Tikka Mix 50g",
+    "old_price": 1.49,
+    "new_price": 1.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "TG-C2FB43BEA794",
+    "name": "Everest Eazy Chef Chicken Butter Mix 50g",
+    "old_price": 1.49,
+    "new_price": 1.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  },
+  {
+    "upc": "TG-DD150857F4EE",
+    "name": "Frozen Haldiram's Kalakand 340g",
+    "old_price": 10.49,
+    "new_price": 8.99,
+    "recorded_at": "2026-09-18T04:00:36.127277+00:00"
+  }
+]
