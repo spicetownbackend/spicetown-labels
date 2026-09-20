@@ -1,1 +1,163 @@
-[]
+[
+  {
+    "upc": "620514000701",
+    "name": "National Mixed Pickle 1kg",
+    "old_price": 8.49,
+    "new_price": 6.99,
+    "recorded_at": "2026-09-20T17:34:58.896541+00:00"
+  },
+  {
+    "upc": "620514011684",
+    "name": "National Garlic Paste 310g",
+    "old_price": 3.99,
+    "new_price": 3.79,
+    "recorded_at": "2026-09-20T17:34:58.896541+00:00"
+  },
+  {
+    "upc": "624967000158",
+    "name": "Alsafa Samosa Chatpata Potato 19.4oz",
+    "old_price": 11.49,
+    "new_price": 9.99,
+    "recorded_at": "2026-09-20T17:34:58.896541+00:00"
+  },
+  {
+    "upc": "624967422004",
+    "name": "AlSafa Chicken Breaded Nuggets 21oz",
+    "old_price": 14.99,
+    "new_price": 15.99,
+    "recorded_at": "2026-09-20T17:34:58.896541+00:00"
+  },
+  {
+    "upc": "624967436100",
+    "name": "AlSafa Hot Dogs Beef 12.6oz",
+    "old_price": 11.99,
+    "new_price": 12.99,
+    "recorded_at": "2026-09-20T17:34:58.896541+00:00"
+  },
+  {
+    "upc": "629040000100",
+    "name": "Taza Qandhari Naan 3pc",
+    "old_price": 5.99,
+    "new_price": 6.49,
+    "recorded_at": "2026-09-20T17:34:58.896541+00:00"
+  },
+  {
+    "upc": "629040000926",
+    "name": "Taza Tandoori Naan Value Pack 20pc",
+    "old_price": 9.99,
+    "new_price": 10.99,
+    "recorded_at": "2026-09-20T17:34:58.896541+00:00"
+  },
+  {
+    "upc": "723246287812",
+    "name": "Laxmi Garlic Butter Naan 12pc 85gm",
+    "old_price": 7.99,
+    "new_price": 6.99,
+    "recorded_at": "2026-09-20T17:34:58.896541+00:00"
+  },
+  {
+    "upc": "723246290072",
+    "name": "Laxmi Tandoori Plain Naan BLK 16x85gm",
+    "old_price": 7.99,
+    "new_price": 5.99,
+    "recorded_at": "2026-09-20T17:34:58.896541+00:00"
+  },
+  {
+    "upc": "788821012289",
+    "name": "Shan Jelly Banana 80g",
+    "old_price": 1.29,
+    "new_price": 1.79,
+    "recorded_at": "2026-09-20T17:34:58.896541+00:00"
+  },
+  {
+    "upc": "8910786100028",
+    "name": "Desi Ghee 1kg",
+    "old_price": 15.99,
+    "new_price": 12.99,
+    "recorded_at": "2026-09-20T17:34:58.896541+00:00"
+  },
+  {
+    "upc": "892681000727",
+    "name": "CK Chicken Seeikh Kabab FamPack 636g",
+    "old_price": 15.99,
+    "new_price": 16.99,
+    "recorded_at": "2026-09-20T17:34:58.896541+00:00"
+  },
+  {
+    "upc": "8961100092642",
+    "name": "Falak Extreeme Long Basmati 10lb",
+    "old_price": 17.99,
+    "new_price": 18.99,
+    "recorded_at": "2026-09-20T17:34:58.896541+00:00"
+  },
+  {
+    "upc": "8964000883327",
+    "name": "RES Cake Rusk 350g",
+    "old_price": 4.49,
+    "new_price": 4.99,
+    "recorded_at": "2026-09-20T17:34:58.896541+00:00"
+  },
+  {
+    "upc": "8964000883617",
+    "name": "RES Carrot/Gajar Halwa 1lb",
+    "old_price": 7.99,
+    "new_price": 9.99,
+    "recorded_at": "2026-09-20T17:34:58.896541+00:00"
+  },
+  {
+    "upc": "8964000883679",
+    "name": "RES Cake Kalakand 1lb",
+    "old_price": 7.99,
+    "new_price": 8.99,
+    "recorded_at": "2026-09-20T17:34:58.896541+00:00"
+  },
+  {
+    "upc": "8964000883761",
+    "name": "RES Habshi Halwa 1lb",
+    "old_price": 7.99,
+    "new_price": 8.99,
+    "recorded_at": "2026-09-20T17:34:58.896541+00:00"
+  },
+  {
+    "upc": "8964000883860",
+    "name": "RES Cake Rusk 700g",
+    "old_price": 7.99,
+    "new_price": 8.99,
+    "recorded_at": "2026-09-20T17:34:58.896541+00:00"
+  },
+  {
+    "upc": "8964001416432",
+    "name": "Eatco Plain Paratha 30pc",
+    "old_price": 11.49,
+    "new_price": 11.99,
+    "recorded_at": "2026-09-20T17:34:58.896541+00:00"
+  },
+  {
+    "upc": "8964003197698",
+    "name": "RES Gulab Jamun 1lb",
+    "old_price": 7.99,
+    "new_price": 8.99,
+    "recorded_at": "2026-09-20T17:34:58.896541+00:00"
+  },
+  {
+    "upc": "896546000365",
+    "name": "Taza Plain Paratha Jumbo 20pc",
+    "old_price": 6.99,
+    "new_price": 7.99,
+    "recorded_at": "2026-09-20T17:34:58.896541+00:00"
+  },
+  {
+    "upc": "TG-1DD689CCED82",
+    "name": "CK Crispy Chicken Samosa 312g(12)",
+    "old_price": 11.99,
+    "new_price": 9.99,
+    "recorded_at": "2026-09-20T17:34:58.896541+00:00"
+  },
+  {
+    "upc": "TG-A3EE9D216CDA",
+    "name": "National Garam Masala 3.5oz",
+    "old_price": 4.49,
+    "new_price": 3.99,
+    "recorded_at": "2026-09-20T17:34:58.896541+00:00"
+  }
+]
