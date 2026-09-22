@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "upc": "500617",
+    "name": "Honey Wheat Bread",
+    "old_price": 3.49,
+    "new_price": 2.99,
+    "recorded_at": "2026-09-22T01:04:02.677191+00:00"
+  },
+  {
+    "upc": "652010000060",
+    "name": "Salt Iodized",
+    "old_price": 1.99,
+    "new_price": 1.49,
+    "recorded_at": "2026-09-22T01:04:02.677191+00:00"
+  }
+]
