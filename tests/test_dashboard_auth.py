@@ -233,3 +233,22 @@ def test_real_session_still_reaches_printing(demo_app_client):
 def test_demo_session_can_still_look_things_up(demo_app_client):
     demo_app_client.set_cookie("session_token", "demotoken")
     assert demo_app_client.get("/api/health").status_code == 200
+
+
+def test_demo_refresh_never_auto_prints(demo_app_client, monkeypatch):
+    """A manual catalog refresh normally prints labels for unreviewed price
+    changes straight away - not when a demo login pressed it."""
+    import app.routes.api as api
+
+    calls = []
+    monkeypatch.setattr(api, "auto_print_price_changes", lambda app: calls.append(1) or {"printed": 1})
+    monkeypatch.setattr(api, "bulk_load_guarded", lambda *a, **k: type("S", (), {"as_dict": lambda self: {}})())
+    demo_app_client.set_cookie("session_token", "demotoken")
+    r = demo_app_client.post("/api/refresh")
+    assert r.status_code == 200
+    assert r.get_json()["auto_printed"] == {"printed": 0, "failed": 0, "skipped": True}
+    assert calls == []
+
+    demo_app_client.set_cookie("session_token", "stafftoken")
+    r = demo_app_client.post("/api/refresh")
+    assert r.status_code == 200 and calls == [1]

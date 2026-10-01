@@ -179,8 +179,12 @@ def manual_refresh():
     Body (optional JSON): {"async": true} to run in a background thread and
     return 202 immediately; otherwise runs synchronously and returns stats.
     A 409 is returned if a refresh (manual or nightly) is already running.
+    For an App Review demo login the catalog still refreshes, but the
+    automatic price-change label printing is skipped (the scheduled refresh
+    prints those labels later) - a demo request never reaches the printer.
     """
     provider = current_app.extensions["data_provider"]
+    demo = _is_demo_request()
     batch_size = current_app.config["BULK_LOAD_BATCH_SIZE"]
     threshold = current_app.config["PRICE_CHANGE_WARN_DELTA"]
     short_chars = current_app.config["LABEL_NAME_MAX_CHARS"]
@@ -200,7 +204,8 @@ def manual_refresh():
                         price_change_threshold=threshold,
                         shorten_max_chars=short_chars,
                     )
-                    auto_print_price_changes(app)
+                    if not demo:
+                        auto_print_price_changes(app)
                 except RefreshInProgress:
                     app.logger.warning("async refresh skipped: already running")
                 except Exception:
@@ -223,7 +228,10 @@ def manual_refresh():
     except RefreshInProgress:
         return jsonify({"status": "busy", "message": "refresh already running"}), 409
 
-    auto_printed = auto_print_price_changes(current_app._get_current_object())
+    if demo:
+        auto_printed = {"printed": 0, "failed": 0, "skipped": True}
+    else:
+        auto_printed = auto_print_price_changes(current_app._get_current_object())
     return jsonify({"status": "ok", "stats": stats.as_dict(), "auto_printed": auto_printed})
 
 
@@ -349,15 +357,21 @@ def _session_token() -> str | None:
     return value.strip() or None
 
 
-def _demo_print_refusal():
-    """403 for an App Review demo login, else None (see config.DEMO_USERNAMES)."""
+def _is_demo_request() -> bool:
+    """The request's dashboard session is an App Review demo login (see
+    config.DEMO_USERNAMES)."""
     from ..services.dashboard_auth import is_demo_session
 
-    if is_demo_session(
+    return is_demo_session(
         current_app.config.get("DASHBOARD_DB_PATH", ""),
         _session_token(),
         current_app.config.get("DEMO_USERNAMES", ""),
-    ):
+    )
+
+
+def _demo_print_refusal():
+    """403 for an App Review demo login, else None."""
+    if _is_demo_request():
         return jsonify({"error": DEMO_PRINT_REFUSED}), 403
     return None
 
