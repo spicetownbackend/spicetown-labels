@@ -310,3 +310,88 @@ def test_db_error_refuses_printing_with_503(tmp_path, monkeypatch):
     # No session at all (gate off, e.g. local use): unchanged - reaches printing.
     anon = create_app(config_object=BrokenConfig, start_background=False).test_client()
     assert anon.post("/api/print", json={}).status_code == 400  # "upc is required"
+
+
+# ── Demo login can't change label data either (pre-App-Store audit) ───────────
+DEMO_WRITE_ERROR = "The demo account can look around but can't change the store's real data."
+
+
+def test_demo_session_cannot_create_custom_product(demo_app_client):
+    from app.extensions import db
+    from app.models import Product
+
+    demo_app_client.set_cookie("session_token", "demotoken")
+    r = demo_app_client.post("/api/products/custom", json={"name": "Reviewer Item", "price": 1.0})
+    assert r.status_code == 403
+    assert r.get_json()["error"] == DEMO_WRITE_ERROR
+    with demo_app_client.application.app_context():
+        assert db.session.query(Product).filter_by(name="Reviewer Item").count() == 0
+
+
+def test_demo_session_cannot_dismiss_price_changes(demo_app_client):
+    demo_app_client.set_cookie("session_token", "demotoken")
+    r = demo_app_client.post("/api/price-changes/dismiss", json={"ids": [1]})
+    assert r.status_code == 403 and r.get_json()["error"] == DEMO_WRITE_ERROR
+
+
+def test_real_session_can_still_write(demo_app_client):
+    demo_app_client.set_cookie("session_token", "stafftoken")
+    r = demo_app_client.post("/api/products/custom", json={"name": "Staff Item", "price": 2.5})
+    assert r.status_code == 201 and r.get_json()["created"] is True
+    r = demo_app_client.post("/api/price-changes/dismiss", json={"ids": [999]})
+    assert r.status_code == 200 and r.get_json() == {"dismissed": 0}
+
+
+def test_every_mutating_api_route_refuses_demo(demo_app_client):
+    """Enumerate the app's routes: every non-GET /api route (bridge excluded -
+    it has its own token auth) refuses a demo login, except /api/refresh,
+    which only re-pulls Toast's catalog and never prints for a demo."""
+    app = demo_app_client.application
+    demo_app_client.set_cookie("session_token", "demotoken")
+    allowed = {"/api/refresh"}
+    seen = []
+    for rule in app.url_map.iter_rules():
+        path = rule.rule
+        if not path.startswith("/api") or path.startswith("/api/bridge") or path in allowed:
+            continue
+        for method in rule.methods - {"GET", "HEAD", "OPTIONS"}:
+            seen.append((method, path))
+            r = demo_app_client.open(path, method=method, json={})
+            assert r.status_code == 403, (method, path, r.status_code)
+            assert "demo account" in r.get_json()["error"], (method, path)
+    assert ("POST", "/api/products/custom") in seen
+
+
+def test_unreadable_session_db_refuses_writes_with_503(tmp_path):
+    broken = tmp_path / "broken.db"
+    broken.write_bytes(b"this is not a sqlite database")
+
+    class BrokenConfig(TestingConfig):
+        REQUIRE_DASHBOARD_LOGIN = False
+        DASHBOARD_DB_PATH = str(broken)
+        DASHBOARD_SESSION_COOKIE_NAME = "session_token"
+
+    client = create_app(config_object=BrokenConfig, start_background=False).test_client()
+    client.set_cookie("session_token", "stafftoken")
+    r = client.post("/api/products/custom", json={"name": "X"})
+    assert r.status_code == 503 and "couldn't check your login" in r.get_json()["error"]
+    r = client.post("/api/price-changes/dismiss", json={"ids": [1]})
+    assert r.status_code == 503
+
+
+# ── 404 bodies carry a human message (the app shows `message`) ─────────────────
+def test_not_found_bodies_have_a_message(demo_app_client):
+    demo_app_client.set_cookie("session_token", "stafftoken")
+    r = demo_app_client.post("/api/print", json={"product_id": 987654})
+    assert r.status_code == 404
+    body = r.get_json()
+    assert body["error"] == "not_found" and body["product_id"] == 987654
+    assert body["message"] and body["message"] != "not_found"
+
+    r = demo_app_client.get("/api/preview/x.png?id=987654")
+    assert r.status_code == 404
+    assert r.get_json()["error"] == "not_found" and r.get_json()["message"]
+
+    r = demo_app_client.get("/api/print/987654")
+    assert r.status_code == 404
+    assert r.get_json()["job_id"] == 987654 and r.get_json()["message"]

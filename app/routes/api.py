@@ -41,6 +41,10 @@ bp = Blueprint("api", __name__, url_prefix="/api")
 
 STORE_TZ = ZoneInfo("America/New_York")
 
+# Human text for 404s (the app shows `message`; `error` stays "not_found").
+UPC_NOT_FOUND_MESSAGE = "This barcode isn't in the catalog. Try searching by name."
+PRODUCT_GONE_MESSAGE = "That product isn't in the catalog any more. Scan or search for it again."
+
 
 def _local_day_bounds_utc(day_str: str) -> tuple[datetime, datetime]:
     """Given a store-local calendar date (YYYY-MM-DD), return that day's
@@ -249,7 +253,11 @@ def create_custom_product():
     Rows are stored with source="custom"; the catalog sync only upserts
     provider rows, so custom products survive refreshes. Re-posting the same
     upc+name updates the row instead of duplicating it.
+    Returns 403 for an App Review demo login (nothing saved).
     """
+    refused = _demo_write_refusal()
+    if refused is not None:
+        return refused
     body = request.get_json(silent=True) or {}
     name = str(body.get("name", "")).strip()
     if not name:
@@ -393,6 +401,30 @@ def _demo_print_refusal():
     return jsonify({"error": DEMO_CHECK_UNAVAILABLE}), 503
 
 
+# Same wording as spicetown-backend's demo_guard.DEMO_READ_ONLY.
+DEMO_WRITE_REFUSED = "The demo account can look around but can't change the store's real data."
+DEMO_WRITE_CHECK_UNAVAILABLE = "Saving is paused: we couldn't check your login. Try again in a minute."
+
+
+def _demo_write_refusal():
+    """Every other mutating /api route (custom products, dismissing price
+    changes): 403 for an App Review demo login, 503 when that couldn't be
+    checked (`message` repeats `error` for the web scanner, which shows it) (fails closed, like printing), else None. The manual catalog
+    refresh is the one exception - it only re-pulls Toast's own data and
+    never prints for a demo login (see manual_refresh)."""
+    from ..services.dashboard_auth import DEMO, REAL
+
+    status = _demo_status()
+    if status == REAL:
+        return None
+    if status == DEMO:
+        return jsonify({"error": DEMO_WRITE_REFUSED, "message": DEMO_WRITE_REFUSED}), 403
+    return (
+        jsonify({"error": DEMO_WRITE_CHECK_UNAVAILABLE, "message": DEMO_WRITE_CHECK_UNAVAILABLE}),
+        503,
+    )
+
+
 @bp.post("/print")
 def enqueue_print():
     """Enqueue a label print job and return immediately (decoupled worker).
@@ -431,7 +463,13 @@ def enqueue_print():
         product = db.session.get(Product, int(product_id))
         if product is None:
             return (
-                jsonify({"error": "not_found", "product_id": product_id}),
+                jsonify(
+                    {
+                        "error": "not_found",
+                        "product_id": product_id,
+                        "message": PRODUCT_GONE_MESSAGE,
+                    }
+                ),
                 404,
             )
         upc = product.upc
@@ -440,7 +478,7 @@ def enqueue_print():
         result = cache.get(upc, allow_remote=True)
         if not result.found:
             return (
-                jsonify({"error": "not_found", "upc": upc, "message": "UPC not in catalog"}),
+                jsonify({"error": "not_found", "upc": upc, "message": UPC_NOT_FOUND_MESSAGE}),
                 404,
             )
         product = result.product
@@ -504,7 +542,10 @@ def print_status(job_id: int):
     """Poll the status of a print job: queued | printing | done | error."""
     job = db.session.get(PrintJob, job_id)
     if job is None:
-        return jsonify({"error": "not_found", "job_id": job_id}), 404
+        return (
+            jsonify({"error": "not_found", "job_id": job_id, "message": "That print job wasn't found."}),
+            404,
+        )
     return jsonify({"job": job.to_dict()})
 
 
@@ -642,7 +683,11 @@ def dismiss_price_changes():
     """Mark selected price changes reviewed without printing a label.
 
     Body (JSON): {"ids": [<price_history id>, ...]}
+    Returns 403 for an App Review demo login (nothing marked).
     """
+    refused = _demo_write_refusal()
+    if refused is not None:
+        return refused
     ids, err = _resolve_price_change_ids()
     if err:
         return jsonify(err), 400
@@ -670,12 +715,20 @@ def preview_label(upc: str):
     if product_id is not None:
         product = db.session.get(Product, product_id)
         if product is None:
-            return jsonify({"error": "not_found", "product_id": product_id}), 404
+            return (
+                jsonify(
+                    {"error": "not_found", "product_id": product_id, "message": PRODUCT_GONE_MESSAGE}
+                ),
+                404,
+            )
     else:
         cache = current_app.extensions["cache"]
         result = cache.get(upc, allow_remote=True)
         if not result.found:
-            return jsonify({"error": "not_found", "upc": upc}), 404
+            return (
+                jsonify({"error": "not_found", "upc": upc, "message": UPC_NOT_FOUND_MESSAGE}),
+                404,
+            )
         product = result.product
 
     spec = current_app.extensions["label_spec"]
