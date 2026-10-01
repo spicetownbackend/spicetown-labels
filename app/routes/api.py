@@ -333,6 +333,35 @@ def _enqueue_for_product(
 
 
 # ── Printing (Stage 3) ────────────────────────────────────────────────────────
+DEMO_PRINT_REFUSED = "Printing is turned off for the demo account."
+
+
+def _session_token() -> str | None:
+    """The spicetown-backend session behind this request: the shared
+    dashboard cookie (web and the mobile app both send it), else a Bearer
+    token."""
+    token = request.cookies.get(current_app.config.get("DASHBOARD_SESSION_COOKIE_NAME", "session_token"))
+    if token:
+        return token
+    scheme, _, value = (request.headers.get("Authorization") or "").partition(" ")
+    if scheme.lower() != "bearer":
+        return None
+    return value.strip() or None
+
+
+def _demo_print_refusal():
+    """403 for an App Review demo login, else None (see config.DEMO_USERNAMES)."""
+    from ..services.dashboard_auth import is_demo_session
+
+    if is_demo_session(
+        current_app.config.get("DASHBOARD_DB_PATH", ""),
+        _session_token(),
+        current_app.config.get("DEMO_USERNAMES", ""),
+    ):
+        return jsonify({"error": DEMO_PRINT_REFUSED}), 403
+    return None
+
+
 @bp.post("/print")
 def enqueue_print():
     """Enqueue a label print job and return immediately (decoupled worker).
@@ -347,7 +376,11 @@ def enqueue_print():
 
     Returns 202 with the job id (or 200 with the final status when wait=true).
     Returns 503 if the bounded queue is full; 404 if the UPC is unknown.
+    Returns 403 for an App Review demo login (nothing is printed).
     """
+    refused = _demo_print_refusal()
+    if refused is not None:
+        return refused
     body = request.get_json(silent=True) or {}
     upc = str(body.get("upc", "")).strip()
     product_id = body.get("product_id")
@@ -536,7 +569,11 @@ def print_price_changes():
 
     Body (JSON): {"ids": [<price_history id>, ...]}
     Returns per-id results; partial failures don't block the rest.
+    Returns 403 for an App Review demo login (nothing printed or marked).
     """
+    refused = _demo_print_refusal()
+    if refused is not None:
+        return refused
     ids, err = _resolve_price_change_ids()
     if err:
         return jsonify(err), 400

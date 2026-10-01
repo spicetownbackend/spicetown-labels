@@ -145,3 +145,91 @@ def test_gate_disabled_by_default_even_with_no_dashboard_db_configured():
     client = app.test_client()
     assert client.get("/").status_code == 200
     assert client.get("/api/health").status_code == 200
+
+
+# ── App Review demo login: printing refused (build 7 contract §1) ──────────────
+from app.services.dashboard_auth import dashboard_session_username, is_demo_session  # noqa: E402
+
+DEMO_ERROR = {"error": "Printing is turned off for the demo account."}
+
+
+def _make_db_with_users(tmp_path):
+    """user_sessions + users, as in spicetown-backend: a demo login, a real
+    one, and an expired demo session."""
+    db_path = tmp_path / "dashboard_users.db"
+    conn = sqlite3.connect(db_path)
+    conn.execute("CREATE TABLE user_sessions (token TEXT PRIMARY KEY, user_id INTEGER, expires_at TEXT)")
+    conn.execute("CREATE TABLE users (id INTEGER PRIMARY KEY, username TEXT)")
+    conn.execute("INSERT INTO users VALUES (8, 'App_Store_Review'), (2, 'ravi')")
+    now = dt.datetime.now(dt.timezone.utc).replace(tzinfo=None)
+    future = (now + dt.timedelta(days=1)).isoformat(sep=" ")
+    past = (now - dt.timedelta(days=1)).isoformat(sep=" ")
+    conn.execute("INSERT INTO user_sessions VALUES ('demotoken', 8, ?)", (future,))
+    conn.execute("INSERT INTO user_sessions VALUES ('stafftoken', 2, ?)", (future,))
+    conn.execute("INSERT INTO user_sessions VALUES ('olddemo', 8, ?)", (past,))
+    conn.commit()
+    conn.close()
+    return str(db_path)
+
+
+def test_session_username_lookup(tmp_path):
+    db_path = _make_db_with_users(tmp_path)
+    assert dashboard_session_username(db_path, "demotoken") == "App_Store_Review"
+    assert dashboard_session_username(db_path, "stafftoken") == "ravi"
+    assert dashboard_session_username(db_path, "olddemo") is None
+    assert dashboard_session_username(db_path, "nope") is None
+    assert dashboard_session_username(db_path, None) is None
+    assert dashboard_session_username(str(tmp_path / "missing.db"), "demotoken") is None
+
+
+def test_is_demo_session(tmp_path):
+    db_path = _make_db_with_users(tmp_path)
+    names = "app_store_review,appreview"
+    assert is_demo_session(db_path, "demotoken", names) is True
+    assert is_demo_session(db_path, "stafftoken", names) is False
+    assert is_demo_session(db_path, "olddemo", names) is False
+    assert is_demo_session(db_path, "demotoken", "") is False
+
+
+@pytest.fixture(params=[True, False], ids=["gate_on", "gate_off"])
+def demo_app_client(request, tmp_path):
+    db_path = _make_db_with_users(tmp_path)
+
+    class DemoConfig(TestingConfig):
+        REQUIRE_DASHBOARD_LOGIN = request.param
+        DASHBOARD_DB_PATH = db_path
+        DASHBOARD_SESSION_COOKIE_NAME = "session_token"
+
+    app = create_app(config_object=DemoConfig, start_background=False)
+    return app.test_client()
+
+
+def test_demo_session_cannot_print(demo_app_client):
+    demo_app_client.set_cookie("session_token", "demotoken")
+    r = demo_app_client.post("/api/print", json={"upc": "012345678905"})
+    assert r.status_code == 403 and r.get_json() == DEMO_ERROR
+    r = demo_app_client.post("/api/price-changes/print", json={"ids": [1]})
+    assert r.status_code == 403 and r.get_json() == DEMO_ERROR
+
+
+def test_demo_bearer_token_cannot_print(demo_app_client):
+    r = demo_app_client.post(
+        "/api/print", json={"upc": "012345678905"}, headers={"Authorization": "Bearer demotoken"}
+    )
+    # With the gate on, a Bearer-only request is stopped by the login gate
+    # (401) before it gets here; with it off, the demo check refuses it.
+    assert r.status_code in (401, 403)
+    assert r.status_code == 401 or r.get_json() == DEMO_ERROR
+
+
+def test_real_session_still_reaches_printing(demo_app_client):
+    demo_app_client.set_cookie("session_token", "stafftoken")
+    r = demo_app_client.post("/api/print", json={})
+    assert r.status_code == 400  # past the demo check: "upc is required"
+    r = demo_app_client.post("/api/price-changes/print", json={"ids": "x"})
+    assert r.status_code == 400
+
+
+def test_demo_session_can_still_look_things_up(demo_app_client):
+    demo_app_client.set_cookie("session_token", "demotoken")
+    assert demo_app_client.get("/api/health").status_code == 200

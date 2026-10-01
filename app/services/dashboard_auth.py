@@ -64,3 +64,52 @@ def is_valid_dashboard_session(db_path: str, token: str | None) -> bool:
 
     now = dt.datetime.now(dt.timezone.utc).replace(tzinfo=None)
     return expires_at > now
+
+
+def dashboard_session_username(db_path: str, token: str | None) -> str | None:
+    """The username behind a real, unexpired spicetown-backend session, or
+    None (no token, unknown/expired session, missing DB, any DB error).
+    Same read-only connection as is_valid_dashboard_session."""
+    if not token or not db_path:
+        return None
+    path = Path(db_path)
+    if not path.is_file():
+        return None
+    try:
+        conn = sqlite3.connect(f"file:{path}?mode=ro", uri=True, timeout=2.0)
+        try:
+            row = conn.execute(
+                "SELECT u.username, s.expires_at FROM user_sessions s "
+                "JOIN users u ON u.id = s.user_id WHERE s.token = ?",
+                (token,),
+            ).fetchone()
+        finally:
+            conn.close()
+    except sqlite3.Error:
+        logger.exception("dashboard session user lookup failed")
+        return None
+    if row is None:
+        return None
+    try:
+        expires_at = dt.datetime.fromisoformat(row[1])
+    except (TypeError, ValueError):
+        return None
+    if expires_at <= dt.datetime.now(dt.timezone.utc).replace(tzinfo=None):
+        return None
+    return row[0]
+
+
+def parse_demo_usernames(raw: str | None) -> set[str]:
+    return {n.strip().lower() for n in (raw or "").split(",") if n.strip()}
+
+
+def is_demo_session(db_path: str, token: str | None, demo_usernames: str | None) -> bool:
+    """True when the session belongs to an App Review demo login
+    (spicetown-backend's DEMO_USERNAMES - keep STL_DEMO_USERNAMES in step).
+    Printing is refused for those: a reviewer must never put a real label on
+    the store printer."""
+    names = parse_demo_usernames(demo_usernames)
+    if not names:
+        return False
+    username = dashboard_session_username(db_path, token)
+    return bool(username) and username.strip().lower() in names

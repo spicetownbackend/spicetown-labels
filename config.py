@@ -106,6 +106,11 @@ class Config:
     DASHBOARD_DB_PATH = os.getenv("STL_DASHBOARD_DB_PATH", "")
     DASHBOARD_SESSION_COOKIE_NAME = os.getenv("STL_DASHBOARD_SESSION_COOKIE_NAME", "session_token")
     DASHBOARD_LOGIN_URL = os.getenv("STL_DASHBOARD_LOGIN_URL", "https://ops.spicetown.shop/")
+    # App Review demo logins (spicetown-backend's DEMO_USERNAMES - keep the two
+    # in step): /api/print and /api/price-changes/print refuse them with a 403,
+    # so a reviewer never prints a real label on the store printer. Checked
+    # against the dashboard session (DASHBOARD_DB_PATH) whenever one is sent.
+    DEMO_USERNAMES = os.getenv("STL_DEMO_USERNAMES", "app_store_review,appreview")
 
     # ── Cache TTL strategy ────────────────────────────────────────────────────
     # SQLite is authoritative; the data source is only consulted when a UPC is
