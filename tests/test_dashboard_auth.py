@@ -252,3 +252,61 @@ def test_demo_refresh_never_auto_prints(demo_app_client, monkeypatch):
     demo_app_client.set_cookie("session_token", "stafftoken")
     r = demo_app_client.post("/api/refresh")
     assert r.status_code == 200 and calls == [1]
+
+
+# ── Demo check fails CLOSED for print paths ─────────────────────────────────────
+from app.services.dashboard_auth import DEMO, REAL, UNKNOWN, demo_session_status  # noqa: E402
+
+UNAVAILABLE = {"error": "Printing is paused: we couldn't check your login. Try again in a minute."}
+
+
+def test_demo_session_status(tmp_path):
+    db_path = _make_db_with_users(tmp_path)
+    names = "app_store_review,appreview"
+    assert demo_session_status(db_path, "demotoken", names) == DEMO
+    assert demo_session_status(db_path, "stafftoken", names) == REAL
+    assert demo_session_status(db_path, "olddemo", names) == REAL
+    assert demo_session_status(db_path, None, names) == REAL  # no session sent: nothing to check
+    assert demo_session_status(db_path, "demotoken", "") == REAL  # demo names turned off
+    # A token that can't be checked is UNKNOWN - and is_demo_session treats it as demo.
+    missing = str(tmp_path / "missing.db")
+    assert demo_session_status(missing, "stafftoken", names) == UNKNOWN
+    assert demo_session_status("", "stafftoken", names) == UNKNOWN
+    assert is_demo_session(missing, "stafftoken", names) is True
+    broken = tmp_path / "broken.db"
+    broken.write_bytes(b"this is not a sqlite database")
+    assert demo_session_status(str(broken), "stafftoken", names) == UNKNOWN
+    empty = tmp_path / "empty.db"
+    sqlite3.connect(empty).close()  # no user_sessions table -> DB error
+    assert demo_session_status(str(empty), "stafftoken", names) == UNKNOWN
+
+
+def test_db_error_refuses_printing_with_503(tmp_path, monkeypatch):
+    """Gate off (so the login gate can't be what stops it): the session DB is
+    unreadable, so the demo check can't run - printing is refused, never
+    let through."""
+    broken = tmp_path / "broken.db"
+    broken.write_bytes(b"this is not a sqlite database")
+
+    class BrokenConfig(TestingConfig):
+        REQUIRE_DASHBOARD_LOGIN = False
+        DASHBOARD_DB_PATH = str(broken)
+        DASHBOARD_SESSION_COOKIE_NAME = "session_token"
+
+    import app.routes.api as api
+
+    calls = []
+    monkeypatch.setattr(api, "auto_print_price_changes", lambda app: calls.append(1) or {"printed": 1})
+    monkeypatch.setattr(api, "bulk_load_guarded", lambda *a, **k: type("S", (), {"as_dict": lambda self: {}})())
+    client = create_app(config_object=BrokenConfig, start_background=False).test_client()
+    client.set_cookie("session_token", "stafftoken")
+    r = client.post("/api/print", json={"upc": "012345678905"})
+    assert r.status_code == 503 and r.get_json() == UNAVAILABLE
+    r = client.post("/api/price-changes/print", json={"ids": [1]})
+    assert r.status_code == 503 and r.get_json() == UNAVAILABLE
+    # A manual refresh still refreshes, but never auto-prints.
+    r = client.post("/api/refresh")
+    assert r.status_code == 200 and r.get_json()["auto_printed"]["skipped"] is True and calls == []
+    # No session at all (gate off, e.g. local use): unchanged - reaches printing.
+    anon = create_app(config_object=BrokenConfig, start_background=False).test_client()
+    assert anon.post("/api/print", json={}).status_code == 400  # "upc is required"

@@ -103,13 +103,59 @@ def parse_demo_usernames(raw: str | None) -> set[str]:
     return {n.strip().lower() for n in (raw or "").split(",") if n.strip()}
 
 
+# demo_session_status results.
+DEMO = "demo"
+REAL = "real"
+UNKNOWN = "unknown"
+
+
+def demo_session_status(db_path: str, token: str | None, demo_usernames: str | None) -> str:
+    """Whether the request's dashboard session is an App Review demo login.
+
+    REAL    - no demo names configured, no session token sent, or the token
+              is not a live session (unknown / expired): nothing to refuse.
+    DEMO    - a live session of a demo login.
+    UNKNOWN - a token was sent but it couldn't be checked: no dashboard DB
+              path configured, the DB file is missing/unreadable, any DB
+              error, or an unreadable expiry. Print paths FAIL CLOSED on this
+              (treated as demo), so a DB problem can never let a demo login
+              print a real label.
+    """
+    names = parse_demo_usernames(demo_usernames)
+    if not names or not token:
+        return REAL
+    if not db_path or not Path(db_path).is_file():
+        logger.error("demo check: dashboard DB not found at %r - refusing to print", db_path)
+        return UNKNOWN
+    try:
+        conn = sqlite3.connect(f"file:{Path(db_path)}?mode=ro", uri=True, timeout=2.0)
+        try:
+            row = conn.execute(
+                "SELECT u.username, s.expires_at FROM user_sessions s "
+                "JOIN users u ON u.id = s.user_id WHERE s.token = ?",
+                (token,),
+            ).fetchone()
+        finally:
+            conn.close()
+    except sqlite3.Error:
+        logger.exception("demo check: dashboard session lookup failed - refusing to print")
+        return UNKNOWN
+    if row is None:
+        return REAL
+    try:
+        expires_at = dt.datetime.fromisoformat(row[1])
+    except (TypeError, ValueError):
+        logger.error("demo check: unparseable expires_at %r - refusing to print", row[1])
+        return UNKNOWN
+    if expires_at <= dt.datetime.now(dt.timezone.utc).replace(tzinfo=None):
+        return REAL
+    return DEMO if (row[0] or "").strip().lower() in names else REAL
+
+
 def is_demo_session(db_path: str, token: str | None, demo_usernames: str | None) -> bool:
     """True when the session belongs to an App Review demo login
-    (spicetown-backend's DEMO_USERNAMES - keep STL_DEMO_USERNAMES in step).
+    (spicetown-backend's DEMO_USERNAMES - keep STL_DEMO_USERNAMES in step), OR
+    when that couldn't be checked (fails closed - see demo_session_status).
     Printing is refused for those: a reviewer must never put a real label on
     the store printer."""
-    names = parse_demo_usernames(demo_usernames)
-    if not names:
-        return False
-    username = dashboard_session_username(db_path, token)
-    return bool(username) and username.strip().lower() in names
+    return demo_session_status(db_path, token, demo_usernames) != REAL

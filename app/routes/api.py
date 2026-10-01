@@ -357,23 +357,40 @@ def _session_token() -> str | None:
     return value.strip() or None
 
 
-def _is_demo_request() -> bool:
-    """The request's dashboard session is an App Review demo login (see
-    config.DEMO_USERNAMES)."""
-    from ..services.dashboard_auth import is_demo_session
+DEMO_CHECK_UNAVAILABLE = "Printing is paused: we couldn't check your login. Try again in a minute."
 
-    return is_demo_session(
+
+def _demo_status() -> str:
+    """dashboard_auth.demo_session_status for this request (demo / real /
+    unknown - see config.DEMO_USERNAMES)."""
+    from ..services.dashboard_auth import demo_session_status
+
+    return demo_session_status(
         current_app.config.get("DASHBOARD_DB_PATH", ""),
         _session_token(),
         current_app.config.get("DEMO_USERNAMES", ""),
     )
 
 
+def _is_demo_request() -> bool:
+    """The request's dashboard session is an App Review demo login - or it
+    couldn't be checked (fails closed: treated as demo)."""
+    from ..services.dashboard_auth import REAL
+
+    return _demo_status() != REAL
+
+
 def _demo_print_refusal():
-    """403 for an App Review demo login, else None."""
-    if _is_demo_request():
+    """403 for an App Review demo login, 503 when that couldn't be checked
+    (DB missing / error - fails closed), else None."""
+    from ..services.dashboard_auth import DEMO, REAL
+
+    status = _demo_status()
+    if status == REAL:
+        return None
+    if status == DEMO:
         return jsonify({"error": DEMO_PRINT_REFUSED}), 403
-    return None
+    return jsonify({"error": DEMO_CHECK_UNAVAILABLE}), 503
 
 
 @bp.post("/print")
