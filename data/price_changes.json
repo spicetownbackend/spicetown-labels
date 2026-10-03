@@ -1,1 +1,128 @@
-[]
+[
+  {
+    "upc": "723246176918",
+    "name": "Laxmi Star Anise 200g",
+    "old_price": 6.49,
+    "new_price": 7.49,
+    "recorded_at": "2026-10-03T11:54:16.076315+00:00"
+  },
+  {
+    "upc": "793283750129",
+    "name": "TR Almond Whole 400g",
+    "old_price": 7.49,
+    "new_price": 8.99,
+    "recorded_at": "2026-10-03T11:54:16.076315+00:00"
+  },
+  {
+    "upc": "793283750785",
+    "name": "TR Almond Whole 2lb",
+    "old_price": 12.99,
+    "new_price": 15.99,
+    "recorded_at": "2026-10-03T11:54:16.076315+00:00"
+  },
+  {
+    "upc": "793283750808",
+    "name": "TR Almond Whole 200g",
+    "old_price": 4.49,
+    "new_price": 4.99,
+    "recorded_at": "2026-10-03T11:54:16.076315+00:00"
+  },
+  {
+    "upc": "793283754646",
+    "name": "TR Roghni Kulcha 150gx3",
+    "old_price": 3.99,
+    "new_price": 4.99,
+    "recorded_at": "2026-10-03T11:54:16.076315+00:00"
+  },
+  {
+    "upc": "793283755438",
+    "name": "TR Ginger& Garlic Paste 750g",
+    "old_price": 5.49,
+    "new_price": 6.99,
+    "recorded_at": "2026-10-03T11:54:16.076315+00:00"
+  },
+  {
+    "upc": "793283756312",
+    "name": "TR Star Anise 200g",
+    "old_price": 6.49,
+    "new_price": 7.49,
+    "recorded_at": "2026-10-03T11:54:16.076315+00:00"
+  },
+  {
+    "upc": "810158440913",
+    "name": "Anand Almond Chikki Bar 35g",
+    "old_price": 1.99,
+    "new_price": 2.49,
+    "recorded_at": "2026-10-03T11:54:16.076315+00:00"
+  },
+  {
+    "upc": "8822111020270",
+    "name": "United King Nan Khatai 360g",
+    "old_price": 6.49,
+    "new_price": 6.99,
+    "recorded_at": "2026-10-03T11:54:16.076315+00:00"
+  },
+  {
+    "upc": "8901058023800",
+    "name": "Maggi Masala Noodles 600g - Each",
+    "old_price": 3.99,
+    "new_price": 4.99,
+    "recorded_at": "2026-10-03T11:54:16.076315+00:00"
+  },
+  {
+    "upc": "8904057300378",
+    "name": "Arun Almond Crunch Ibar 80ml",
+    "old_price": 3.49,
+    "new_price": 3.99,
+    "recorded_at": "2026-10-03T11:54:16.076315+00:00"
+  },
+  {
+    "upc": "8906014765275",
+    "name": "Bajaj Almond Hair Oil 475ml",
+    "old_price": 7.99,
+    "new_price": 8.99,
+    "recorded_at": "2026-10-03T11:54:16.076315+00:00"
+  },
+  {
+    "upc": "894559000686",
+    "name": "Mezban Chicken Seeikh Kebab 280g",
+    "old_price": 10.99,
+    "new_price": 11.99,
+    "recorded_at": "2026-10-03T11:54:16.076315+00:00"
+  },
+  {
+    "upc": "8961005100091",
+    "name": "Mitchells Sarson Ka Saag 800g",
+    "old_price": 6.49,
+    "new_price": 6.99,
+    "recorded_at": "2026-10-03T11:54:16.076315+00:00"
+  },
+  {
+    "upc": "8961005100145",
+    "name": "Mitchells Spinach Puree 800g",
+    "old_price": 5.99,
+    "new_price": 6.99,
+    "recorded_at": "2026-10-03T11:54:16.076315+00:00"
+  },
+  {
+    "upc": "8964000883655",
+    "name": "RES Almond Halwa 1lb",
+    "old_price": 8.99,
+    "new_price": 9.99,
+    "recorded_at": "2026-10-03T11:54:16.076315+00:00"
+  },
+  {
+    "upc": "8964000885598",
+    "name": "RES Almond Burfee 1lb",
+    "old_price": 7.99,
+    "new_price": 8.99,
+    "recorded_at": "2026-10-03T11:54:16.076315+00:00"
+  },
+  {
+    "upc": "8964003276416",
+    "name": "United King Gulab Jamun 4.5kg",
+    "old_price": 59.99,
+    "new_price": 69.99,
+    "recorded_at": "2026-10-03T11:54:16.076315+00:00"
+  }
+]
