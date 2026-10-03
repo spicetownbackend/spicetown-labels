@@ -1,58 +1,9 @@
 [
   {
-    "upc": "8904057302020",
-    "name": "Arun Jack Fruit Tub 1000ml",
-    "old_price": 8.99,
-    "new_price": 11.99,
-    "recorded_at": "2026-10-03T15:51:10.022470+00:00"
-  },
-  {
-    "upc": "8904057302051",
-    "name": "Arun Kaju Kishmish Tub 1000ml",
-    "old_price": 8.99,
-    "new_price": 11.99,
-    "recorded_at": "2026-10-03T15:51:10.022470+00:00"
-  },
-  {
-    "upc": "8904057302099",
-    "name": "Arun Strawberry Blast Tub 1000ml",
-    "old_price": 8.99,
-    "new_price": 11.99,
-    "recorded_at": "2026-10-03T15:51:10.022470+00:00"
-  },
-  {
-    "upc": "8904057303485",
-    "name": "Arun Gulab Jamun Tub 1000ml",
-    "old_price": 8.99,
-    "new_price": 11.99,
-    "recorded_at": "2026-10-03T15:51:10.022470+00:00"
-  },
-  {
-    "upc": "8904057303508",
-    "name": "Arun Vanilla Tub 1000ml",
-    "old_price": 8.99,
-    "new_price": 11.99,
-    "recorded_at": "2026-10-03T15:51:10.022470+00:00"
-  },
-  {
-    "upc": "8904057303539",
-    "name": "Arun Butterscotch Tub 1000ml",
-    "old_price": 8.99,
-    "new_price": 11.99,
-    "recorded_at": "2026-10-03T15:51:10.022470+00:00"
-  },
-  {
-    "upc": "8904057303546",
-    "name": "Arun Dark Chocolate Tub 1000ml",
-    "old_price": 8.99,
-    "new_price": 11.99,
-    "recorded_at": "2026-10-03T15:51:10.022470+00:00"
-  },
-  {
-    "upc": "8904057303584",
-    "name": "Arun Fruit Falooda Tub 1000ml",
-    "old_price": 8.99,
-    "new_price": 11.99,
-    "recorded_at": "2026-10-03T15:51:10.022470+00:00"
+    "upc": "149302510081",
+    "name": "Paneer Fresh - Regular",
+    "old_price": 0.0,
+    "new_price": 6.99,
+    "recorded_at": "2026-10-03T22:19:34.412267+00:00"
   }
 ]
