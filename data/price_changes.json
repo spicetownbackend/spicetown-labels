@@ -1,44 +1,9 @@
 [
   {
-    "upc": "174369085777",
-    "name": "Eggplant Fancy in LBs",
-    "old_price": 1.29,
-    "new_price": 1.99,
-    "recorded_at": "2026-10-06T16:08:31.378832+00:00"
-  },
-  {
-    "upc": "8901063136274",
-    "name": "Britannia Marie Gold 250g",
-    "old_price": 1.99,
-    "new_price": 2.99,
-    "recorded_at": "2026-10-06T16:08:31.378832+00:00"
-  },
-  {
-    "upc": "8901063151741",
-    "name": "Britannia Marie gold FP 600g - 4 Packs",
-    "old_price": 3.49,
-    "new_price": 4.99,
-    "recorded_at": "2026-10-06T16:08:31.378832+00:00"
-  },
-  {
-    "upc": "9780201380057",
-    "name": "Aromiraa Peanut Chikki 100g",
-    "old_price": 2.99,
-    "new_price": 3.79,
-    "recorded_at": "2026-10-06T16:08:31.378832+00:00"
-  },
-  {
-    "upc": "TG-45B9E9E2237E",
-    "name": "Aromiraa Moringa Soup 50g",
-    "old_price": 2.49,
-    "new_price": 1.99,
-    "recorded_at": "2026-10-06T16:08:31.378832+00:00"
-  },
-  {
-    "upc": "TG-71B444211B94",
-    "name": "Aromiraa Garam Masala 50g",
-    "old_price": 2.49,
-    "new_price": 1.99,
-    "recorded_at": "2026-10-06T16:08:31.378832+00:00"
+    "upc": "843603074043",
+    "name": "Swad Saffron 1g",
+    "old_price": 6.49,
+    "new_price": 6.99,
+    "recorded_at": "2026-10-06T21:07:29.287932+00:00"
   }
 ]
