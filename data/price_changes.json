@@ -1,135 +1,44 @@
 [
   {
-    "upc": "628950001238",
-    "name": "Mampster Suji Pani Puri 290g",
-    "old_price": 6.99,
-    "new_price": 7.99,
-    "recorded_at": "2026-10-09T19:37:52.749537+00:00"
+    "upc": "021121691236",
+    "name": "Anar Fresh (Pomogrenade)",
+    "old_price": 5.99,
+    "new_price": 1.99,
+    "recorded_at": "2026-10-09T23:51:00.787649+00:00"
   },
   {
-    "upc": "643864530391",
-    "name": "Shree Pooja Cloth Red",
-    "old_price": 2.99,
-    "new_price": 4.95,
-    "recorded_at": "2026-10-09T19:37:52.749537+00:00"
-  },
-  {
-    "upc": "643864530490",
-    "name": "Shree Pooja Cloth Yellow",
-    "old_price": 2.99,
-    "new_price": 3.45,
-    "recorded_at": "2026-10-09T19:37:52.749537+00:00"
-  },
-  {
-    "upc": "675208011075",
-    "name": "Tez Mustard Oil 2ltr",
-    "old_price": 11.99,
-    "new_price": 10.99,
-    "recorded_at": "2026-10-09T19:37:52.749537+00:00"
-  },
-  {
-    "upc": "745042000143",
-    "name": "Royal Rice Sella 40lb",
-    "old_price": 64.99,
-    "new_price": 59.99,
-    "recorded_at": "2026-10-09T19:37:52.749537+00:00"
-  },
-  {
-    "upc": "745042002024",
-    "name": "Royal Brown Basmati Rice 2lb",
-    "old_price": 7.99,
-    "new_price": 6.99,
-    "recorded_at": "2026-10-09T19:37:52.749537+00:00"
-  },
-  {
-    "upc": "8525180067596",
-    "name": "Vedic Aloe Vera Juice 500ml",
-    "old_price": 7.99,
-    "new_price": 9.99,
-    "recorded_at": "2026-10-09T19:37:52.749537+00:00"
-  },
-  {
-    "upc": "853271008301",
-    "name": "Brio Sunflower Oil 2lt",
-    "old_price": 8.99,
-    "new_price": 9.99,
-    "recorded_at": "2026-10-09T19:37:52.749537+00:00"
-  },
-  {
-    "upc": "8901242107415",
-    "name": "Bambino Roasted Vermicelli 350g",
-    "old_price": 2.79,
-    "new_price": 2.49,
-    "recorded_at": "2026-10-09T19:37:52.749537+00:00"
-  },
-  {
-    "upc": "8904063230010",
-    "name": "Haldiram's Regular Bhujia 400g",
-    "old_price": 4.49,
-    "new_price": 3.95,
-    "recorded_at": "2026-10-09T19:37:52.749537+00:00"
-  },
-  {
-    "upc": "8904063252951",
-    "name": "Haldiram's Dal Kachori 1.04kg",
-    "old_price": 12.99,
-    "new_price": 13.95,
-    "recorded_at": "2026-10-09T19:37:52.749537+00:00"
-  },
-  {
-    "upc": "8904063281234",
-    "name": "Haldiram's Phulka Roti 360g",
-    "old_price": 3.79,
-    "new_price": 3.45,
-    "recorded_at": "2026-10-09T19:37:52.749537+00:00"
-  },
-  {
-    "upc": "8904109497100",
-    "name": "Patanjali Aloe Vera Gel 150 ML",
-    "old_price": 3.99,
-    "new_price": 4.45,
-    "recorded_at": "2026-10-09T19:37:52.749537+00:00"
-  },
-  {
-    "upc": "8904287001045",
-    "name": "Bambino Vermicelli 350g",
-    "old_price": 1.99,
-    "new_price": 2.29,
-    "recorded_at": "2026-10-09T19:37:52.749537+00:00"
-  },
-  {
-    "upc": "TG-3A697EE71C2C",
-    "name": "Telugu Sesame Chikki Balls 200g",
-    "old_price": 1.49,
-    "new_price": 1.95,
-    "recorded_at": "2026-10-09T19:37:52.749537+00:00"
-  },
-  {
-    "upc": "TG-8E4D3BE78B52",
-    "name": "Bhakti Pooja Cloth Orange 1pc",
-    "old_price": 2.49,
-    "new_price": 3.95,
-    "recorded_at": "2026-10-09T19:37:52.749537+00:00"
-  },
-  {
-    "upc": "TG-AE28F5E4D3F2",
-    "name": "Parle Fab Vanilla 112g",
-    "old_price": 0.99,
-    "new_price": 1.25,
-    "recorded_at": "2026-10-09T19:37:52.749537+00:00"
-  },
-  {
-    "upc": "TG-DD4C22174537",
-    "name": "Parle Fab Orange 112g",
-    "old_price": 0.99,
-    "new_price": 1.25,
-    "recorded_at": "2026-10-09T19:37:52.749537+00:00"
-  },
-  {
-    "upc": "TG-F93C19FDC0A8",
-    "name": "Himani Navratan Oil 270ml",
+    "upc": "021125510977",
+    "name": "Anar Fresh - Buy 3",
     "old_price": 7.49,
-    "new_price": 7.99,
-    "recorded_at": "2026-10-09T19:37:52.749537+00:00"
+    "new_price": 5.49,
+    "recorded_at": "2026-10-09T23:51:00.787649+00:00"
+  },
+  {
+    "upc": "617230911985",
+    "name": "Spyce Buffalo Sauce 12oz",
+    "old_price": 7.99,
+    "new_price": 5.95,
+    "recorded_at": "2026-10-09T23:51:00.787649+00:00"
+  },
+  {
+    "upc": "617230911985",
+    "name": "Spyce Chili Hot Oil 8.5oz",
+    "old_price": 7.99,
+    "new_price": 5.95,
+    "recorded_at": "2026-10-09T23:51:00.787649+00:00"
+  },
+  {
+    "upc": "850006018239",
+    "name": "Garlic 5-Pack",
+    "old_price": 3.49,
+    "new_price": 3.99,
+    "recorded_at": "2026-10-09T23:51:00.787649+00:00"
+  },
+  {
+    "upc": "TG-C82980998E05",
+    "name": "Bhakti Navgrah Pooja Cloth 1pc",
+    "old_price": 13.49,
+    "new_price": 12.95,
+    "recorded_at": "2026-10-09T23:51:00.787649+00:00"
   }
 ]
