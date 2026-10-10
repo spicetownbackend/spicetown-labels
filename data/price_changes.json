@@ -1,72 +1,184 @@
 [
   {
-    "upc": "011433117340",
-    "name": "Deep Ginger Garlic Paste 25.5oz",
-    "old_price": 7.99,
-    "new_price": 8.95,
-    "recorded_at": "2026-10-10T04:45:52.447078+00:00"
+    "upc": "079836251518",
+    "name": "Canola Fry Oil ADM 35LB",
+    "old_price": 39.24,
+    "new_price": 59.24,
+    "recorded_at": "2026-10-10T16:11:32.189490+00:00"
   },
   {
-    "upc": "011433120531",
-    "name": "Bansi Peanut Chikki 3.5oz",
-    "old_price": 0.99,
-    "new_price": 1.25,
-    "recorded_at": "2026-10-10T04:45:52.447078+00:00"
+    "upc": "4860126930096",
+    "name": "American Drop Kombucha Original 330ml",
+    "old_price": 3.49,
+    "new_price": 4.25,
+    "recorded_at": "2026-10-10T16:11:32.189490+00:00"
   },
   {
-    "upc": "011433156158",
-    "name": "Deep Hot Mango Pickle 25.4oz",
-    "old_price": 6.99,
-    "new_price": 7.95,
-    "recorded_at": "2026-10-10T04:45:52.447078+00:00"
-  },
-  {
-    "upc": "011433160766",
-    "name": "Deep Masala Para 11.5oz",
-    "old_price": 6.99,
-    "new_price": 7.95,
-    "recorded_at": "2026-10-10T04:45:52.447078+00:00"
-  },
-  {
-    "upc": "788821007148",
-    "name": "Shan Chicken Masala 50gm",
+    "upc": "5000159557771",
+    "name": "Bounty Choclate 57g",
     "old_price": 1.99,
-    "new_price": 1.79,
-    "recorded_at": "2026-10-10T04:45:52.447078+00:00"
+    "new_price": 2.45,
+    "recorded_at": "2026-10-10T16:11:32.189490+00:00"
   },
   {
-    "upc": "788821007544",
-    "name": "Shan Chicken 65 Masala",
+    "upc": "714760051010",
+    "name": "Preema Basmati Rice 10lb",
+    "old_price": 16.99,
+    "new_price": 15.99,
+    "recorded_at": "2026-10-10T16:11:32.189490+00:00"
+  },
+  {
+    "upc": "714760330283",
+    "name": "Sundelight Cup Dates 24oz",
+    "old_price": 4.99,
+    "new_price": 4.95,
+    "recorded_at": "2026-10-10T16:11:32.189490+00:00"
+  },
+  {
+    "upc": "723246170381",
+    "name": "Laxmi Peanuts 800g",
+    "old_price": 4.49,
+    "new_price": 4.95,
+    "recorded_at": "2026-10-10T16:11:32.189490+00:00"
+  },
+  {
+    "upc": "723246176130",
+    "name": "Laxmi Black Pepper Whole 100g",
+    "old_price": 2.99,
+    "new_price": 3.45,
+    "recorded_at": "2026-10-10T16:11:32.189490+00:00"
+  },
+  {
+    "upc": "723246177137",
+    "name": "Laxmi Cumin Seeds 800g",
+    "old_price": 8.99,
+    "new_price": 9.95,
+    "recorded_at": "2026-10-10T16:11:32.189490+00:00"
+  },
+  {
+    "upc": "723246211381",
+    "name": "Laxmi Phool Makhana 200gm",
+    "old_price": 9.99,
+    "new_price": 10.95,
+    "recorded_at": "2026-10-10T16:11:32.189490+00:00"
+  },
+  {
+    "upc": "723246285078",
+    "name": "Laxmi Tamarind Date Chutney 8oz",
+    "old_price": 4.99,
+    "new_price": 5.95,
+    "recorded_at": "2026-10-10T16:11:32.189490+00:00"
+  },
+  {
+    "upc": "723246285658",
+    "name": "Laxmi Jaggery Cube 2lb",
+    "old_price": 4.99,
+    "new_price": 5.45,
+    "recorded_at": "2026-10-10T16:11:32.189490+00:00"
+  },
+  {
+    "upc": "723246287737",
+    "name": "Laxmi Grated Coconut 400g",
+    "old_price": 4.49,
+    "new_price": 4.95,
+    "recorded_at": "2026-10-10T16:11:32.189490+00:00"
+  },
+  {
+    "upc": "723246290119",
+    "name": "Laxmi Mixed Veg Paratha 100g",
+    "old_price": 3.99,
+    "new_price": 3.45,
+    "recorded_at": "2026-10-10T16:11:32.189490+00:00"
+  },
+  {
+    "upc": "723246292014",
+    "name": "Laxmi Peanut Oil 2lt",
+    "old_price": 14.99,
+    "new_price": 16.99,
+    "recorded_at": "2026-10-10T16:11:32.189490+00:00"
+  },
+  {
+    "upc": "723246293790",
+    "name": "Laxmi Fresh Paneer 12oz",
+    "old_price": 4.99,
+    "new_price": 5.95,
+    "recorded_at": "2026-10-10T16:11:32.189490+00:00"
+  },
+  {
+    "upc": "723246295848",
+    "name": "Laxmi Wet Tamarind 400g",
+    "old_price": 4.99,
+    "new_price": 5.45,
+    "recorded_at": "2026-10-10T16:11:32.189490+00:00"
+  },
+  {
+    "upc": "755270000365",
+    "name": "Maaza Mango 1LT",
+    "old_price": 4.99,
+    "new_price": 5.45,
+    "recorded_at": "2026-10-10T16:11:32.189490+00:00"
+  },
+  {
+    "upc": "788821034021",
+    "name": "Shan Malay Chicken Biryani Mix 60gm",
     "old_price": 1.99,
-    "new_price": 1.79,
-    "recorded_at": "2026-10-10T04:45:52.447078+00:00"
+    "new_price": 2.25,
+    "recorded_at": "2026-10-10T16:11:32.189490+00:00"
   },
   {
-    "upc": "8901063151475",
-    "name": "Britannia Good Day Cashew Cookies FP 600g",
-    "old_price": 6.99,
+    "upc": "788821044020",
+    "name": "Shan Bihari Kabab 50gm",
+    "old_price": 1.79,
+    "new_price": 1.99,
+    "recorded_at": "2026-10-10T16:11:32.189490+00:00"
+  },
+  {
+    "upc": "810347001581",
+    "name": "Kohinoor Silver Basmati 10lb",
+    "old_price": 18.99,
+    "new_price": 14.99,
+    "recorded_at": "2026-10-10T16:11:32.189490+00:00"
+  },
+  {
+    "upc": "810347001659",
+    "name": "Kohinoor Gold BasmatiRice 10lb (Xtra Long)",
+    "old_price": 13.99,
+    "new_price": 15.99,
+    "recorded_at": "2026-10-10T16:11:32.189490+00:00"
+  },
+  {
+    "upc": "841905061631",
+    "name": "Sunfeast Dark Fantasy Big Choco Nutfills 150g",
+    "old_price": 2.49,
+    "new_price": 2.95,
+    "recorded_at": "2026-10-10T16:11:32.189490+00:00"
+  },
+  {
+    "upc": "8901207054433",
+    "name": "Dabur Mustard Oil 1ltr",
+    "old_price": 12.99,
     "new_price": 7.95,
-    "recorded_at": "2026-10-10T04:45:52.447078+00:00"
+    "recorded_at": "2026-10-10T16:11:32.189490+00:00"
   },
   {
-    "upc": "8901063151499",
-    "name": "Britannia Good Day Pista & Almond FP 600g",
-    "old_price": 6.99,
-    "new_price": 7.45,
-    "recorded_at": "2026-10-10T04:45:52.447078+00:00"
+    "upc": "8961008217635",
+    "name": "Nestle Tea Powder 1.8kg",
+    "old_price": 26.99,
+    "new_price": 25.95,
+    "recorded_at": "2026-10-10T16:11:32.189490+00:00"
   },
   {
-    "upc": "Chetak",
-    "name": "Britanni Marie Gold5.3oz*8",
-    "old_price": 7.99,
-    "new_price": 8.95,
-    "recorded_at": "2026-10-10T04:45:52.447078+00:00"
+    "upc": "8961103600691",
+    "name": "Tapal Danedar Jar 1kg",
+    "old_price": 13.99,
+    "new_price": 12.95,
+    "recorded_at": "2026-10-10T16:11:32.189490+00:00"
   },
   {
-    "upc": "TG-303B65E0A60B",
-    "name": "Vedic Aloe Vera Juice 1lt",
-    "old_price": 20.49,
-    "new_price": 17.99,
-    "recorded_at": "2026-10-10T04:45:52.447078+00:00"
+    "upc": "9555646900326",
+    "name": "Besbite Fruity Pudding with Nata de coco 100gm",
+    "old_price": 4.49,
+    "new_price": 4.45,
+    "recorded_at": "2026-10-10T16:11:32.189490+00:00"
   }
 ]
