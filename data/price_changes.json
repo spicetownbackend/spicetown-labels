@@ -1,44 +1,72 @@
 [
   {
-    "upc": "021121691236",
-    "name": "Anar Fresh (Pomogrenade)",
-    "old_price": 5.99,
-    "new_price": 1.99,
-    "recorded_at": "2026-10-09T23:51:00.787649+00:00"
-  },
-  {
-    "upc": "021125510977",
-    "name": "Anar Fresh - Buy 3",
-    "old_price": 7.49,
-    "new_price": 5.49,
-    "recorded_at": "2026-10-09T23:51:00.787649+00:00"
-  },
-  {
-    "upc": "617230911985",
-    "name": "Spyce Buffalo Sauce 12oz",
+    "upc": "011433117340",
+    "name": "Deep Ginger Garlic Paste 25.5oz",
     "old_price": 7.99,
-    "new_price": 5.95,
-    "recorded_at": "2026-10-09T23:51:00.787649+00:00"
+    "new_price": 8.95,
+    "recorded_at": "2026-10-10T04:45:52.447078+00:00"
   },
   {
-    "upc": "617230911985",
-    "name": "Spyce Chili Hot Oil 8.5oz",
+    "upc": "011433120531",
+    "name": "Bansi Peanut Chikki 3.5oz",
+    "old_price": 0.99,
+    "new_price": 1.25,
+    "recorded_at": "2026-10-10T04:45:52.447078+00:00"
+  },
+  {
+    "upc": "011433156158",
+    "name": "Deep Hot Mango Pickle 25.4oz",
+    "old_price": 6.99,
+    "new_price": 7.95,
+    "recorded_at": "2026-10-10T04:45:52.447078+00:00"
+  },
+  {
+    "upc": "011433160766",
+    "name": "Deep Masala Para 11.5oz",
+    "old_price": 6.99,
+    "new_price": 7.95,
+    "recorded_at": "2026-10-10T04:45:52.447078+00:00"
+  },
+  {
+    "upc": "788821007148",
+    "name": "Shan Chicken Masala 50gm",
+    "old_price": 1.99,
+    "new_price": 1.79,
+    "recorded_at": "2026-10-10T04:45:52.447078+00:00"
+  },
+  {
+    "upc": "788821007544",
+    "name": "Shan Chicken 65 Masala",
+    "old_price": 1.99,
+    "new_price": 1.79,
+    "recorded_at": "2026-10-10T04:45:52.447078+00:00"
+  },
+  {
+    "upc": "8901063151475",
+    "name": "Britannia Good Day Cashew Cookies FP 600g",
+    "old_price": 6.99,
+    "new_price": 7.95,
+    "recorded_at": "2026-10-10T04:45:52.447078+00:00"
+  },
+  {
+    "upc": "8901063151499",
+    "name": "Britannia Good Day Pista & Almond FP 600g",
+    "old_price": 6.99,
+    "new_price": 7.45,
+    "recorded_at": "2026-10-10T04:45:52.447078+00:00"
+  },
+  {
+    "upc": "Chetak",
+    "name": "Britanni Marie Gold5.3oz*8",
     "old_price": 7.99,
-    "new_price": 5.95,
-    "recorded_at": "2026-10-09T23:51:00.787649+00:00"
+    "new_price": 8.95,
+    "recorded_at": "2026-10-10T04:45:52.447078+00:00"
   },
   {
-    "upc": "850006018239",
-    "name": "Garlic 5-Pack",
-    "old_price": 3.49,
-    "new_price": 3.99,
-    "recorded_at": "2026-10-09T23:51:00.787649+00:00"
-  },
-  {
-    "upc": "TG-C82980998E05",
-    "name": "Bhakti Navgrah Pooja Cloth 1pc",
-    "old_price": 13.49,
-    "new_price": 12.95,
-    "recorded_at": "2026-10-09T23:51:00.787649+00:00"
+    "upc": "TG-303B65E0A60B",
+    "name": "Vedic Aloe Vera Juice 1lt",
+    "old_price": 20.49,
+    "new_price": 17.99,
+    "recorded_at": "2026-10-10T04:45:52.447078+00:00"
   }
 ]
