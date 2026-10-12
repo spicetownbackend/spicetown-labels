@@ -1,16 +1,9 @@
 [
   {
-    "upc": "841165149971",
-    "name": "Mithai SOAN PAPDI 185gm",
-    "old_price": 3.99,
-    "new_price": 4.45,
-    "recorded_at": "2026-10-12T15:54:11.620921+00:00"
-  },
-  {
-    "upc": "841165149988",
-    "name": "Mithai SOAN PAPDI 485GM",
-    "old_price": 5.99,
-    "new_price": 6.95,
-    "recorded_at": "2026-10-12T15:54:11.620921+00:00"
+    "upc": "8901262020039",
+    "name": "Amul Processed Cheese 200 G",
+    "old_price": 4.99,
+    "new_price": 5.49,
+    "recorded_at": "2026-10-12T22:45:26.396868+00:00"
   }
 ]
