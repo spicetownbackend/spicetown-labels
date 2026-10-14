@@ -1,1 +1,93 @@
-[]
+[
+  {
+    "upc": "023625724656",
+    "name": "Tomato Plum in LBs",
+    "old_price": 1.99,
+    "new_price": 2.29,
+    "recorded_at": "2026-10-14T01:39:22.598501+00:00"
+  },
+  {
+    "upc": "173991213923",
+    "name": "Bell Pepper Green in LBs",
+    "old_price": 1.79,
+    "new_price": 2.25,
+    "recorded_at": "2026-10-14T01:39:22.598501+00:00"
+  },
+  {
+    "upc": "173998829400",
+    "name": "Bell Pepper Red in lbs",
+    "old_price": 1.99,
+    "new_price": 2.45,
+    "recorded_at": "2026-10-14T01:39:22.598501+00:00"
+  },
+  {
+    "upc": "179146298258",
+    "name": "Beet Root in LBs",
+    "old_price": 1.79,
+    "new_price": 1.45,
+    "recorded_at": "2026-10-14T01:39:22.598501+00:00"
+  },
+  {
+    "upc": "7290018208595",
+    "name": "Gadid Medjool Dates 32oz",
+    "old_price": 16.99,
+    "new_price": 13.95,
+    "recorded_at": "2026-10-14T01:39:22.598501+00:00"
+  },
+  {
+    "upc": "7290018208601",
+    "name": "Gadid Medjool Dates 16oz",
+    "old_price": 9.99,
+    "new_price": 8.45,
+    "recorded_at": "2026-10-14T01:39:22.598501+00:00"
+  },
+  {
+    "upc": "8904067703367",
+    "name": "Jabson Falhari Chivda 140g",
+    "old_price": 1.99,
+    "new_price": 1.29,
+    "recorded_at": "2026-10-14T01:39:22.598501+00:00"
+  },
+  {
+    "upc": "8904067711539",
+    "name": "Jabson Namkeen Sundried Potato Masala 110g",
+    "old_price": 1.99,
+    "new_price": 1.0,
+    "recorded_at": "2026-10-14T01:39:22.598501+00:00"
+  },
+  {
+    "upc": "8904067712918",
+    "name": "Jabson Namkeen Sundried Chips Salted 110g",
+    "old_price": 1.99,
+    "new_price": 1.0,
+    "recorded_at": "2026-10-14T01:39:22.598501+00:00"
+  },
+  {
+    "upc": "8906005502742",
+    "name": "Bikaji Falhari Mix 200gm",
+    "old_price": 3.49,
+    "new_price": 2.29,
+    "recorded_at": "2026-10-14T01:39:22.598501+00:00"
+  },
+  {
+    "upc": "8906005503732",
+    "name": "Bikaji Shahi Mixture 200g",
+    "old_price": 3.49,
+    "new_price": 2.49,
+    "recorded_at": "2026-10-14T01:39:22.598501+00:00"
+  },
+  {
+    "upc": "8906005505361",
+    "name": "Bikaji Kaju Kismis Mix 200g",
+    "old_price": 3.49,
+    "new_price": 2.29,
+    "recorded_at": "2026-10-14T01:39:22.598501+00:00"
+  },
+  {
+    "upc": "8906005507877",
+    "name": "Bikaji Crusties 200gm",
+    "old_price": 3.49,
+    "new_price": 2.29,
+    "recorded_at": "2026-10-14T01:39:22.598501+00:00"
+  }
+]
