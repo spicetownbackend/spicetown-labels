@@ -1,16 +1,1 @@
-[
-  {
-    "upc": "021123675814",
-    "name": "Banana Apple (Small)",
-    "old_price": 2.99,
-    "new_price": 1.99,
-    "recorded_at": "2026-10-17T00:14:04.852662+00:00"
-  },
-  {
-    "upc": "837654132869",
-    "name": "Jain Foods Orange Jalebi 14oz",
-    "old_price": 9.95,
-    "new_price": 8.99,
-    "recorded_at": "2026-10-17T00:14:04.852662+00:00"
-  }
-]
+[]
