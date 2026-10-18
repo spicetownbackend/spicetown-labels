@@ -1,1 +1,254 @@
-[]
+[
+  {
+    "upc": "011433115537",
+    "name": "Deep Besan 4lb",
+    "old_price": 7.99,
+    "new_price": 7.45,
+    "recorded_at": "2026-10-18T18:48:03.616650+00:00"
+  },
+  {
+    "upc": "011433119269",
+    "name": "Mirch Masala Paratha 25FP",
+    "old_price": 10.99,
+    "new_price": 12.95,
+    "recorded_at": "2026-10-18T18:48:03.616650+00:00"
+  },
+  {
+    "upc": "011433131596",
+    "name": "Deep Peanuts Jumbo 4lb",
+    "old_price": 7.49,
+    "new_price": 6.95,
+    "recorded_at": "2026-10-18T18:48:03.616650+00:00"
+  },
+  {
+    "upc": "011433135580",
+    "name": "Deep Walnuts 7oz",
+    "old_price": 4.49,
+    "new_price": 3.95,
+    "recorded_at": "2026-10-18T18:48:03.616650+00:00"
+  },
+  {
+    "upc": "011433150286",
+    "name": "Deep Bhatura 5 PC",
+    "old_price": 3.99,
+    "new_price": 4.45,
+    "recorded_at": "2026-10-18T18:48:03.616650+00:00"
+  },
+  {
+    "upc": "011433151290",
+    "name": "Bansi Dal Yellow Vatana 2lb",
+    "old_price": 2.49,
+    "new_price": 2.65,
+    "recorded_at": "2026-10-18T18:48:03.616650+00:00"
+  },
+  {
+    "upc": "011433152686",
+    "name": "Deep SI Jaggery Powder 1lb",
+    "old_price": 5.49,
+    "new_price": 3.75,
+    "recorded_at": "2026-10-18T18:48:03.616650+00:00"
+  },
+  {
+    "upc": "011433157742",
+    "name": "Deep Bay Leaves 1oz",
+    "old_price": 1.99,
+    "new_price": 1.75,
+    "recorded_at": "2026-10-18T18:48:03.616650+00:00"
+  },
+  {
+    "upc": "011433161282",
+    "name": "Deep FP Garlic Naan 12pcs",
+    "old_price": 9.49,
+    "new_price": 9.95,
+    "recorded_at": "2026-10-18T18:48:03.616650+00:00"
+  },
+  {
+    "upc": "011433162654",
+    "name": "Deep FP Paneer Paratha 16pc",
+    "old_price": 13.99,
+    "new_price": 14.45,
+    "recorded_at": "2026-10-18T18:48:03.616650+00:00"
+  },
+  {
+    "upc": "049000553567",
+    "name": "Fanta VP 12oz",
+    "old_price": 0.99,
+    "new_price": 1.25,
+    "recorded_at": "2026-10-18T18:48:03.616650+00:00"
+  },
+  {
+    "upc": "04913207",
+    "name": "Sprite Can 12oz",
+    "old_price": 0.99,
+    "new_price": 1.25,
+    "recorded_at": "2026-10-18T18:48:03.616650+00:00"
+  },
+  {
+    "upc": "04963406",
+    "name": "Coke Classic Can 12oz",
+    "old_price": 0.99,
+    "new_price": 1.25,
+    "recorded_at": "2026-10-18T18:48:03.616650+00:00"
+  },
+  {
+    "upc": "075720431151",
+    "name": "Water Bottle 700ml",
+    "old_price": 0.99,
+    "new_price": 1.25,
+    "recorded_at": "2026-10-18T18:48:03.616650+00:00"
+  },
+  {
+    "upc": "6291007906318",
+    "name": "Britannia Nice Time FP 480g",
+    "old_price": 4.99,
+    "new_price": 5.25,
+    "recorded_at": "2026-10-18T18:48:03.616650+00:00"
+  },
+  {
+    "upc": "723246009063",
+    "name": "Laxmi Ginger Paste 8oz",
+    "old_price": 3.79,
+    "new_price": 4.45,
+    "recorded_at": "2026-10-18T18:48:03.616650+00:00"
+  },
+  {
+    "upc": "723246009155",
+    "name": "LX. Ginger Garlic Paste 8oz",
+    "old_price": 3.99,
+    "new_price": 4.45,
+    "recorded_at": "2026-10-18T18:48:03.616650+00:00"
+  },
+  {
+    "upc": "723246116143",
+    "name": "Laxmi Sona Masoori Rice 10lb",
+    "old_price": 10.99,
+    "new_price": 12.95,
+    "recorded_at": "2026-10-18T18:48:03.616650+00:00"
+  },
+  {
+    "upc": "723246121000",
+    "name": "Laxmi Besan Gram Flour 10lb",
+    "old_price": 15.99,
+    "new_price": 16.95,
+    "recorded_at": "2026-10-18T18:48:03.616650+00:00"
+  },
+  {
+    "upc": "723246176352",
+    "name": "Laxmi Whole Clove 100g",
+    "old_price": 3.99,
+    "new_price": 4.45,
+    "recorded_at": "2026-10-18T18:48:03.616650+00:00"
+  },
+  {
+    "upc": "723246183084",
+    "name": "Laxmi VSD Madhi Toor Dal 2lb",
+    "old_price": 4.99,
+    "new_price": 4.75,
+    "recorded_at": "2026-10-18T18:48:03.616650+00:00"
+  },
+  {
+    "upc": "723246188188",
+    "name": "Laxmi Bay Leaves 2oz",
+    "old_price": 1.49,
+    "new_price": 1.75,
+    "recorded_at": "2026-10-18T18:48:03.616650+00:00"
+  },
+  {
+    "upc": "723246282114",
+    "name": "Laxmi Milk Rusk 300g",
+    "old_price": 1.99,
+    "new_price": 2.75,
+    "recorded_at": "2026-10-18T18:48:03.616650+00:00"
+  },
+  {
+    "upc": "723246285221",
+    "name": "PARLE KRACKJACK BOX PACK 480 GM (8X60 GM)",
+    "old_price": 3.99,
+    "new_price": 4.95,
+    "recorded_at": "2026-10-18T18:48:03.616650+00:00"
+  },
+  {
+    "upc": "723246288048",
+    "name": "Laxmi Mahab RST Chana Salt Tur Jar 400g",
+    "old_price": 5.49,
+    "new_price": 6.49,
+    "recorded_at": "2026-10-18T18:48:03.616650+00:00"
+  },
+  {
+    "upc": "723246292700",
+    "name": "LX. Frozen Drumstick Cut 908gm",
+    "old_price": 6.99,
+    "new_price": 7.45,
+    "recorded_at": "2026-10-18T18:48:03.616650+00:00"
+  },
+  {
+    "upc": "723246310336",
+    "name": "Parle Krack Jack 9.31oz",
+    "old_price": 1.99,
+    "new_price": 2.25,
+    "recorded_at": "2026-10-18T18:48:03.616650+00:00"
+  },
+  {
+    "upc": "755270000563",
+    "name": "Maaza Mango - Glass Bottle 330ml",
+    "old_price": 2.29,
+    "new_price": 2.75,
+    "recorded_at": "2026-10-18T18:48:03.616650+00:00"
+  },
+  {
+    "upc": "760695031191",
+    "name": "Towel Terry 75pk Qualit",
+    "old_price": 3.49,
+    "new_price": 0.95,
+    "recorded_at": "2026-10-18T18:48:03.616650+00:00"
+  },
+  {
+    "upc": "872198003510",
+    "name": "Vidhya Pani Puri 260gm (Sooji)",
+    "old_price": 5.99,
+    "new_price": 6.95,
+    "recorded_at": "2026-10-18T18:48:03.616650+00:00"
+  },
+  {
+    "upc": "8901063136250",
+    "name": "Britannia Little Hearts 2.6oz",
+    "old_price": 0.99,
+    "new_price": 1.25,
+    "recorded_at": "2026-10-18T18:48:03.616650+00:00"
+  },
+  {
+    "upc": "8901063136465",
+    "name": "Britannia Milk Rusk 19.75oz",
+    "old_price": 6.49,
+    "new_price": 6.75,
+    "recorded_at": "2026-10-18T18:48:03.616650+00:00"
+  },
+  {
+    "upc": "8901063136762",
+    "name": "Britannia Milkrusk 9.87oz",
+    "old_price": 3.49,
+    "new_price": 3.75,
+    "recorded_at": "2026-10-18T18:48:03.616650+00:00"
+  },
+  {
+    "upc": "8901063151321",
+    "name": "Britannia Good Day Cashew 2.6oz",
+    "old_price": 0.99,
+    "new_price": 1.25,
+    "recorded_at": "2026-10-18T18:48:03.616650+00:00"
+  },
+  {
+    "upc": "8901063151482",
+    "name": "Britannia Good Day Butter Cookies FP 600g",
+    "old_price": 6.99,
+    "new_price": 7.95,
+    "recorded_at": "2026-10-18T18:48:03.616650+00:00"
+  },
+  {
+    "upc": "8901063242029",
+    "name": "Britannia Jim Jam100gm",
+    "old_price": 0.99,
+    "new_price": 1.25,
+    "recorded_at": "2026-10-18T18:48:03.616650+00:00"
+  }
+]
