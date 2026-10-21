@@ -221,6 +221,16 @@ class PrintJob(db.Model):
     # "price_change" -> queued from the price-change review panel. Lets the
     # print-history view distinguish the two without joining PriceHistory.
     reason: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    # The price printed on the label (the product's effective price - sale
+    # price when on sale - at the moment the job was queued). Lets the apps
+    # warn "already printed at this price" before a duplicate reprint. NULL
+    # for jobs queued before this column existed (read paths infer it from
+    # PriceHistory and flag it as inferred).
+    price_at_print: Mapped[float | None] = mapped_column(Float, nullable=True)
+    # For reason="price_change": the PriceHistory row this label was printed
+    # for (the newest one when several were folded into one label), so print
+    # history can show old -> new price without a fuzzy join. NULL otherwise.
+    price_history_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, default=utcnow, nullable=False
     )
@@ -231,6 +241,8 @@ class PrintJob(db.Model):
 
     __table_args__ = (
         Index("ix_print_jobs_status", "status"),
+        # "When was this product last printed?" (scan-time duplicate warning).
+        Index("ix_print_jobs_product", "product_id"),
         UniqueConstraint("id", name="uq_print_jobs_id"),
     )
 
@@ -245,6 +257,8 @@ class PrintJob(db.Model):
             "status": self.status,
             "error": self.error,
             "reason": self.reason,
+            "price_at_print": self.price_at_print,
+            "price_history_id": self.price_history_id,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "claimed_at": self.claimed_at.isoformat() if self.claimed_at else None,
             "completed_at": (

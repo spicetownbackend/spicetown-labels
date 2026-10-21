@@ -195,11 +195,19 @@ def _apply_micro_migrations(app: Flask) -> None:
             ("product_id", "ALTER TABLE print_jobs ADD COLUMN product_id INTEGER"),
             ("fields", "ALTER TABLE print_jobs ADD COLUMN fields VARCHAR(120)"),
             ("reason", "ALTER TABLE print_jobs ADD COLUMN reason VARCHAR(20)"),
+            ("price_at_print", "ALTER TABLE print_jobs ADD COLUMN price_at_print FLOAT"),
+            ("price_history_id", "ALTER TABLE print_jobs ADD COLUMN price_history_id INTEGER"),
         ):
             if col not in cols:
                 db.session.execute(text(ddl))
                 db.session.commit()
                 app.logger.info("migrated: print_jobs.%s added", col)
+        if not any(ix.get("name") == "ix_print_jobs_product" for ix in insp.get_indexes("print_jobs")):
+            db.session.execute(
+                text("CREATE INDEX IF NOT EXISTS ix_print_jobs_product ON print_jobs (product_id)")
+            )
+            db.session.commit()
+            app.logger.info("migrated: index ix_print_jobs_product added")
 
         ph_cols = {c["name"] for c in insp.get_columns("price_history")}
         for col, ddl in (
@@ -306,8 +314,25 @@ def _import_price_change_diffs(app: Flask) -> None:
     lost, and commits it here. The file always holds just the latest sync's
     changes (not an accumulating backlog), so this import is safe to re-run
     on every boot: rows already imported are skipped via a dedupe query.
+
+    Only for the CSV ("file") provider. With a live provider (toast - the
+    store Mac since 2026-09-07) the startup/periodic sync records every
+    price change itself, so importing the GitHub Action's diff on top
+    created a second PriceHistory row for the same change and the
+    auto-print printed that label twice. A diff is also skipped when any
+    source already logged the same change in the last 7 days, or when the
+    product's price has since moved on (stale diff).
     """
+    from datetime import timedelta
+
     from .models import PriceHistory, Product, utcnow
+
+    if str(app.config.get("DATA_PROVIDER", "file")).lower() != "file":
+        app.logger.info(
+            "price change import skipped: provider %s records its own changes",
+            app.config.get("DATA_PROVIDER"),
+        )
+        return
 
     path = Path(app.config["PRODUCTS_FILE"]).parent / "price_changes.json"
     if not path.exists():
@@ -330,6 +355,8 @@ def _import_price_change_diffs(app: Flask) -> None:
             )
             if product is None:
                 continue
+            if abs(float(product.price) - float(d["new_price"])) >= 0.005:
+                continue  # stale: the price has changed again since
             exists = (
                 db.session.query(PriceHistory)
                 .filter_by(
@@ -341,6 +368,17 @@ def _import_price_change_diffs(app: Flask) -> None:
                 .first()
             )
             if exists is not None:
+                continue
+            same_change_recently = (
+                db.session.query(PriceHistory)
+                .filter(
+                    PriceHistory.product_id == product.id,
+                    PriceHistory.new_price == d["new_price"],
+                    PriceHistory.recorded_at >= utcnow() - timedelta(days=7),
+                )
+                .first()
+            )
+            if same_change_recently is not None:
                 continue
             db.session.add(
                 PriceHistory(

@@ -9,6 +9,7 @@ Implemented (Stage 1-4):
   POST /api/print              -> enqueue a label print job (single-worker queue)
   GET  /api/print/<job_id>     -> poll print job status
   GET  /api/print-history      -> print jobs (manual + price-change), optional date range
+  GET  /api/products/<id>/last-print -> last label printed for a product (dup-print check)
   GET  /api/preview/<upc>.png  -> render label PNG (no print) for the scanner UI
   GET  /api/search?q=...       -> fuzzy search (rapidfuzz) for bad barcodes
   GET  /api/price-changes      -> unreviewed price changes needing a fresh label
@@ -25,6 +26,7 @@ from types import SimpleNamespace
 from zoneinfo import ZoneInfo
 
 from flask import Blueprint, Response, current_app, jsonify, request
+from sqlalchemy import or_
 
 from ..extensions import db
 from ..models import PriceHistory, PrintJob, Product, utcnow
@@ -34,6 +36,11 @@ from ..services.loader import (
     RefreshInProgress,
     bulk_load_guarded,
     is_refresh_running,
+)
+from ..services.print_history import (
+    describe_jobs,
+    last_prints_for,
+    products_with_last_print,
 )
 from ..services.print_queue import QueueFull
 
@@ -135,7 +142,7 @@ def lookup(upc: str):
                     "found": False,
                     "upc": upc,
                     "outcome": result.outcome,
-                    "message": "UPC not in catalog",
+                    "message": f"Not in the catalog yet: {upc}",
                     "suggestions": suggestions,
                 }
             ),
@@ -143,14 +150,19 @@ def lookup(upc: str):
         )
 
     products = result.products or [result.product]
+    # Each product carries `last_print` (None if never printed): when, why
+    # (price_change | manual) and at what price its last label was printed,
+    # so the apps can warn before a duplicate reprint.
+    dicts = products_with_last_print(list({p.id: p for p in [result.product, *products]}.values()))
+    by_id = {d["id"]: d for d in dicts}
     return jsonify(
         {
             "found": True,
             "outcome": result.outcome,  # hit | refreshed | stale
-            "product": result.product.to_dict(),
+            "product": by_id[result.product.id],
             # Shared barcodes (e.g. "XYZ" vs "XYZ B1G1") return every match;
             # the UI shows a picker when there is more than one.
-            "products": [p.to_dict() for p in products],
+            "products": [by_id[p.id] for p in products],
             "multiple": len(products) > 1,
         }
     )
@@ -303,9 +315,14 @@ def _enqueue_for_product(
     copies: int = 1,
     fields_csv: str | None = None,
     reason: str | None = None,
+    price_history_id: int | None = None,
 ):
     """Queue a print job for `product`. Shared by /api/print and the
     price-change review/print flow.
+
+    Every job records `price_at_print` (the product's effective price - the
+    price the label shows) so the apps can warn before a duplicate reprint,
+    and a price-change job records the PriceHistory row it was printed for.
 
     `reason` tags why the job exists (None = manual scan/search print,
     "price_change" = queued from the price-change review panel) so the
@@ -327,6 +344,8 @@ def _enqueue_for_product(
             fields=fields_csv,
             status="queued",
             reason=reason,
+            price_at_print=product.effective_price(),
+            price_history_id=price_history_id,
         )
         db.session.add(job)
         db.session.commit()
@@ -345,6 +364,8 @@ def _enqueue_for_product(
         product_id=product.id,
         fields=fields_csv,
         reason=reason,
+        price_at_print=product.effective_price(),
+        price_history_id=price_history_id,
     )
 
 
@@ -483,6 +504,10 @@ def enqueue_print():
             )
         product = result.product
 
+    # The label printed before this one (None if never), returned so a
+    # client can tell staff "this was already printed ..." after the fact.
+    previous_print = last_prints_for([product]).get(product.id)
+
     pq = current_app.extensions["print_queue"]
     try:
         enq = _enqueue_for_product(
@@ -531,6 +556,7 @@ def enqueue_print():
                 "job_id": enq.job_id,
                 "queue_depth": enq.queue_depth,
                 "product": product.to_dict(),
+                "previous_print": previous_print,
             }
         ),
         202,
@@ -560,8 +586,17 @@ def print_history():
       start, end : optional inclusive local-calendar-date range (YYYY-MM-DD,
                    store timezone America/New_York) filtered on created_at.
                    Both must be given together.
+      product_id : optional; only this product's labels.
+
+    Each row also carries (additive): price_at_print (+ price_inferred when
+    it was reconstructed for a job queued before prices were recorded), and
+    for price-change labels old_price/new_price/price_history_id. The
+    response also carries `counts` {"price_change", "manual", "total"} for
+    the same date range / product (ignoring `reason` and `limit`), so a
+    client can label its filter chips.
     """
     reason = request.args.get("reason")
+    product_id = request.args.get("product_id", type=int)
     start = request.args.get("start")
     end = request.args.get("end")
 
@@ -570,35 +605,94 @@ def print_history():
     max_limit = 2000 if ranged else 500
     limit = min(request.args.get("limit", default_limit, type=int) or default_limit, max_limit)
 
-    q = db.session.query(PrintJob)
-    if reason == "price_change":
-        q = q.filter(PrintJob.reason == "price_change")
-    elif reason == "manual":
-        q = q.filter(PrintJob.reason.is_(None))
-
+    base = db.session.query(PrintJob)
+    if product_id is not None:
+        base = base.filter(PrintJob.product_id == product_id)
     if ranged:
         utc_start, _ = _local_day_bounds_utc(start)
         _, utc_end = _local_day_bounds_utc(end)
-        q = q.filter(PrintJob.created_at >= utc_start, PrintJob.created_at <= utc_end)
+        base = base.filter(PrintJob.created_at >= utc_start, PrintJob.created_at <= utc_end)
+
+    q = base
+    if reason == "price_change":
+        q = q.filter(PrintJob.reason == "price_change")
+    elif reason == "manual":
+        q = q.filter(or_(PrintJob.reason.is_(None), PrintJob.reason == ""))
 
     rows = q.order_by(PrintJob.id.desc()).limit(limit).all()
 
     # PrintJob has no name column — attach it from the product for display.
     product_ids = {r.product_id for r in rows if r.product_id is not None}
-    names = {}
+    products = {}
     if product_ids:
-        names = {
-            p.id: p.name
+        products = {
+            p.id: p
             for p in db.session.query(Product).filter(Product.id.in_(product_ids)).all()
         }
+    extras = describe_jobs(rows, products)
 
     out = []
     for r in rows:
         d = r.to_dict()
-        d["name"] = names.get(r.product_id)
+        p = products.get(r.product_id)
+        d["name"] = p.name if p else None
+        d.update(extras.get(r.id, {}))
         out.append(d)
 
-    return jsonify({"count": len(out), "jobs": out})
+    pc = base.filter(PrintJob.reason == "price_change").count()
+    total = base.count()
+    return jsonify(
+        {
+            "count": len(out),
+            "jobs": out,
+            "counts": {"price_change": pc, "manual": total - pc, "total": total},
+        }
+    )
+
+
+@bp.get("/products/<int:product_id>/last-print")
+def product_last_print(product_id: int):
+    """"Was a label for this product already printed - at this price?"
+
+    For a client to call right before printing. Returns
+      {"product_id", "upc", "name", "current_price",
+       "last_print": {...} | null,           # same object lookup/search carry
+       "printed_at_current_price": bool,      # last label shows today's price
+       "recent": [up to 5 latest labels, newest first]}
+    `last_print` ignores failed jobs (no label came out).
+    """
+    product = db.session.get(Product, product_id)
+    if product is None:
+        return (
+            jsonify({"error": "not_found", "product_id": product_id, "message": PRODUCT_GONE_MESSAGE}),
+            404,
+        )
+    last = last_prints_for([product]).get(product.id)
+    recent_jobs = (
+        db.session.query(PrintJob)
+        .filter(PrintJob.product_id == product.id)
+        .order_by(PrintJob.id.desc())
+        .limit(5)
+        .all()
+    )
+    extras = describe_jobs(recent_jobs, {product.id: product})
+    recent = []
+    for j in recent_jobs:
+        d = j.to_dict()
+        d.update(extras.get(j.id, {}))
+        d["reason"] = "price_change" if j.reason == "price_change" else "manual"
+        recent.append(d)
+    return jsonify(
+        {
+            "product_id": product.id,
+            "upc": product.upc,
+            "name": product.name,
+            "current_price": product.effective_price(),
+            "last_print": last,
+            "printed_at_current_price": bool(last and last["matches_current_price"]),
+            "recent": recent,
+        }
+    )
 
 
 # ── Price-change review (Stage 6) ───────────────────────────────────────────
@@ -651,6 +745,9 @@ def print_price_changes():
         return jsonify(err), 400
 
     results = []
+    # One label per product: selecting two changes for the same item (e.g. a
+    # live sync row and an imported one) used to print it twice.
+    printed_job_for_product: dict[int, int] = {}
     for pid in ids:
         row = db.session.get(PriceHistory, pid)
         if row is None or row.reviewed_at is not None:
@@ -660,9 +757,20 @@ def print_price_changes():
         if product is None:
             results.append({"id": pid, "ok": False, "error": "product_missing"})
             continue
+        if product.id in printed_job_for_product:
+            row.reviewed_at = utcnow()
+            row.label_printed = True
+            db.session.commit()
+            results.append(
+                {"id": pid, "ok": True, "job_id": printed_job_for_product[product.id], "merged": True}
+            )
+            continue
         try:
             enq = _enqueue_for_product(
-                product, variant=product.label_variant(), reason="price_change"
+                product,
+                variant=product.label_variant(),
+                reason="price_change",
+                price_history_id=row.id,
             )
         except RuntimeError:
             results.append({"id": pid, "ok": False, "error": "unavailable"})
@@ -673,6 +781,7 @@ def print_price_changes():
         row.reviewed_at = utcnow()
         row.label_printed = True
         db.session.commit()
+        printed_job_for_product[product.id] = enq.job_id
         results.append({"id": pid, "ok": True, "job_id": enq.job_id})
 
     return jsonify({"results": results})
@@ -767,12 +876,19 @@ def fuzzy_search():
     else:
         hits = search.search_by_name(q, limit=limit, score_cutoff=cutoff)
 
+    # Each result's product carries `last_print`, like /api/lookup.
+    last = last_prints_for([h.product for h in hits])
+    results = []
+    for h in hits:
+        d = h.to_dict()
+        d["product"]["last_print"] = last.get(h.product.id)
+        results.append(d)
     return jsonify(
         {
             "query": q,
             "by": by,
             "count": len(hits),
-            "results": [h.to_dict() for h in hits],
+            "results": results,
         }
     )
 

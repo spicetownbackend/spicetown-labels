@@ -51,6 +51,10 @@ input:focus, select:focus { outline: 2px solid var(--red); outline-offset: 0; }
 #product-info .price { font-size: 2rem; font-weight: 800; }
 #product-info .was { color: var(--muted); text-decoration: line-through; margin-left: .4rem; font-size: 1.1rem; }
 #product-info .meta { color: var(--muted); font-size: .9rem; }
+/* "Already printed" note under the product (stops duplicate reprints). */
+.last-print { margin-top: .5rem; padding: .5rem .7rem; border-radius: 10px; font-size: .85rem; font-weight: 600; }
+.last-print.same { background: #eaf6ec; color: var(--ok); border: 1px solid #b7dfc0; }
+.last-print.changed { background: #fff8e8; color: var(--warn); border: 1px solid #f0d9a8; }
 .variant-tag { display: inline-block; font-size: .72rem; font-weight: 700;
   text-transform: uppercase; padding: .12rem .5rem; border-radius: 999px; margin-left: .4rem; vertical-align: middle; }
 .variant-sale { background: var(--red); color: #fff; }

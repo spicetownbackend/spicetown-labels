@@ -135,6 +135,8 @@ class PrintQueue:
         product_id: int | None = None,
         fields: str | None = None,
         reason: str | None = None,
+        price_at_print: float | None = None,
+        price_history_id: int | None = None,
     ) -> EnqueueResult:
         """Create a PrintJob row (status=queued) and enqueue its id.
 
@@ -144,13 +146,19 @@ class PrintQueue:
         (sale/clearance/standard) so labels reflect current pricing. `reason`
         tags why the job exists (None = manual print, "price_change" = queued
         from the price-change review panel) for the print-history view. Raises
-        QueueFull if the bounded queue is saturated.
+        QueueFull if the bounded queue is saturated. `price_at_print` records
+        the price on the label (defaults to the product's effective price) and
+        `price_history_id` links a price-change label to its PriceHistory row.
         """
         copies = max(1, min(int(copies), 50))  # clamp absurd values
 
-        if variant is None:
+        product = None
+        if variant is None or price_at_print is None:
             product = _resolve_product(product_id, upc)
+        if variant is None:
             variant = product.label_variant() if product is not None else "standard"
+        if price_at_print is None and product is not None:
+            price_at_print = product.effective_price()
 
         job = PrintJob(
             upc=upc,
@@ -160,6 +168,8 @@ class PrintQueue:
             fields=fields,
             status="queued",
             reason=reason,
+            price_at_print=price_at_print,
+            price_history_id=price_history_id,
         )
         db.session.add(job)
         db.session.commit()
@@ -206,7 +216,7 @@ class PrintQueue:
         product = _resolve_product(job.product_id, job.upc)
         if product is None:
             job.status = "error"
-            job.error = f"UPC {job.upc} not in catalog at print time"
+            job.error = f"Not in the catalog any more when it was time to print: {job.upc}"
             job.completed_at = utcnow()
             db.session.commit()
             self.failed += 1

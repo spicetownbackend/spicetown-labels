@@ -1,7 +1,8 @@
 # 🌶️ Spice Town Labels — Owner's Runbook
 
 *Everything you need to check, test, fix, and operate the label-printing
-system, end to end. Last updated: July 5, 2026.*
+system, end to end. Last updated: October 21, 2026 (section 9: duplicate
+label fix).*
 
 ---
 
@@ -236,9 +237,95 @@ Everything important is in the GitHub repo:
 | `/api/preview/<upc>.png[?id=&variant=]` | label image, no printing |
 | `/api/print` (POST) | queue a print job |
 | `/api/print/<job_id>` | job status |
+| `/api/print-history[?reason=&start=&end=&product_id=]` | labels printed (by hand + by price update), with old → new price and counts |
+| `/api/products/<id>/last-print` | "was this label already printed, at this price?" |
 | `/api/refresh` (POST) | force catalog reload from the CSV |
 | `/api/bridge/*` | tablet-only (requires the bridge token) |
 
 Repo docs: `README.md` (overview) · `docs/BRIDGE.md` (tablet/bridge setup) ·
 `docs/TOAST.md` (inventory sync) · `DEPLOY.md` (hosting options) ·
 `docs/ENGINEERING_HANDOFF.md` (deep engineering guide).
+
+
+---
+
+## 9. Duplicate label fix ("label sync issue") — October 2026
+
+### 9.1 The problem
+
+When a price changes in Toast, the sync prints a new shelf label for it
+**automatically**. Staff could not see that anywhere, so they scanned the
+item and printed the same label **again by hand**. The live database showed
+about 20 items printed by hand within hours of the automatic label, and one
+item the sync itself printed twice in a single run (the same change had been
+logged twice).
+
+### 9.2 What changed
+
+Printing is the same for staff - nothing to learn - except:
+
+- **One automatic label per item.** However many times a price change was
+  logged, the sync prints one label for the item, and never one that someone
+  already printed after the change. Two syncs finishing at the same moment
+  can no longer both print it.
+- **"Already printed" note.** When staff scan an item that was already
+  printed at today's price, the scanner page (and the apps, once updated)
+  shows a green note: *"A label at this price was already printed
+  automatically by the price update (Oct 20, 12:02 PM). Only print again if
+  the shelf label is missing or damaged."* If the price has changed since the
+  last label, the note is amber and says to print a new one.
+- **Ask before a repeat.** Tapping Print on an item printed at the same
+  price in the last 7 days asks "Print it again?" first (one extra tap, only
+  in that case).
+- **Print history shows prices.** Each row shows the price on the label;
+  price-update rows show old → new (e.g. `$6.45 → $5.49`), and the Show
+  filter shows how many of each kind were printed in the chosen range.
+- Every label now records the price printed on it. Labels printed before
+  this update show a best-guess price worked out from the price log.
+
+For app developers (all additive - older app builds keep working):
+`last_print` on every product in `/api/lookup` and `/api/search`;
+`GET /api/products/<id>/last-print`; `previous_print` in the `/api/print`
+reply; `price_at_print`, `old_price`, `new_price` on `/api/print-history`
+rows plus `counts {price_change, manual, total}` and a `product_id` filter.
+Details in the docstrings of `app/routes/api.py` and
+`app/services/print_history.py`.
+
+### 9.3 Deploy (owner, ~5 minutes, on the store Mac)
+
+The code is on branch `label-dup-fix` (not on `main` yet). The Mac's
+15-minute sync job pulls `main` with a fast-forward only, so put the change
+on GitHub's `main` first instead of merging only on this Mac:
+
+1. Back up the database (safe while the app runs):
+
+       cd ~/spicetown-labels
+       mkdir -p backups
+       sqlite3 spicetown.db ".backup backups/spicetown-before-dupfix.db"
+
+2. Push the branch and merge it on GitHub (Pull request → Merge):
+
+       git push origin label-dup-fix
+
+   (If the old Render service is still connected to the repo, merging
+   redeploys it too; that is harmless.)
+3. Bring this Mac's copy up to date (or just wait up to 15 minutes for the
+   sync job to do it):
+
+       git checkout main && git pull --ff-only origin main
+
+4. Restart the label app so it loads the new code (asks for your Mac
+   password):
+
+       sudo bash scripts/restart_daemon.sh
+
+   On start it adds two columns (`price_at_print`, `price_history_id`) and an
+   index to the `print_jobs` table by itself - nothing to run by hand. The
+   sync job (`com.spicetown.labels.sync`) does not need a restart.
+5. Check: open `https://labels.spicetown.shop/api/health` (status ok), then
+   scan an item that was printed today by a price change - the green
+   "already printed" note should appear above Print label.
+
+**Undo:** revert the merge on GitHub, `git pull --ff-only` here, and run
+`sudo bash scripts/restart_daemon.sh` again. The two new columns can stay;
+the old code ignores them.
