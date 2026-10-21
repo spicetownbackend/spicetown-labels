@@ -303,9 +303,14 @@ def _enqueue_for_product(
     copies: int = 1,
     fields_csv: str | None = None,
     reason: str | None = None,
+    price_history_id: int | None = None,
 ):
     """Queue a print job for `product`. Shared by /api/print and the
     price-change review/print flow.
+
+    Every job records `price_at_print` (the product's effective price - the
+    price the label shows) so the apps can warn before a duplicate reprint,
+    and a price-change job records the PriceHistory row it was printed for.
 
     `reason` tags why the job exists (None = manual scan/search print,
     "price_change" = queued from the price-change review panel) so the
@@ -327,6 +332,8 @@ def _enqueue_for_product(
             fields=fields_csv,
             status="queued",
             reason=reason,
+            price_at_print=product.effective_price(),
+            price_history_id=price_history_id,
         )
         db.session.add(job)
         db.session.commit()
@@ -345,6 +352,8 @@ def _enqueue_for_product(
         product_id=product.id,
         fields=fields_csv,
         reason=reason,
+        price_at_print=product.effective_price(),
+        price_history_id=price_history_id,
     )
 
 
@@ -651,6 +660,9 @@ def print_price_changes():
         return jsonify(err), 400
 
     results = []
+    # One label per product: selecting two changes for the same item (e.g. a
+    # live sync row and an imported one) used to print it twice.
+    printed_job_for_product: dict[int, int] = {}
     for pid in ids:
         row = db.session.get(PriceHistory, pid)
         if row is None or row.reviewed_at is not None:
@@ -660,9 +672,20 @@ def print_price_changes():
         if product is None:
             results.append({"id": pid, "ok": False, "error": "product_missing"})
             continue
+        if product.id in printed_job_for_product:
+            row.reviewed_at = utcnow()
+            row.label_printed = True
+            db.session.commit()
+            results.append(
+                {"id": pid, "ok": True, "job_id": printed_job_for_product[product.id], "merged": True}
+            )
+            continue
         try:
             enq = _enqueue_for_product(
-                product, variant=product.label_variant(), reason="price_change"
+                product,
+                variant=product.label_variant(),
+                reason="price_change",
+                price_history_id=row.id,
             )
         except RuntimeError:
             results.append({"id": pid, "ok": False, "error": "unavailable"})
@@ -673,6 +696,7 @@ def print_price_changes():
         row.reviewed_at = utcnow()
         row.label_printed = True
         db.session.commit()
+        printed_job_for_product[product.id] = enq.job_id
         results.append({"id": pid, "ok": True, "job_id": enq.job_id})
 
     return jsonify({"results": results})

@@ -46,6 +46,12 @@ def _seed_with_change(app, upc="ap1", name="Cumin", old=4.99, new=5.99, reviewed
         return p.id, hist.id
 
 
+def _core(result: dict) -> dict:
+    """The original three result keys (the pass also reports additive
+    already_printed / merged counts, asserted in test_label_dup_fix.py)."""
+    return {k: result[k] for k in ("printed", "failed", "skipped")}
+
+
 def _wait_status(app, job_id, target=("done", "error"), timeout=5.0):
     deadline = time.time() + timeout
     while time.time() < deadline:
@@ -66,7 +72,7 @@ def test_auto_print_enqueues_and_marks_reviewed(app):
     try:
         with app.app_context():
             result = auto_print_price_changes(app)
-        assert result == {"printed": 1, "failed": 0, "skipped": False}
+        assert _core(result) == {"printed": 1, "failed": 0, "skipped": False}
 
         with app.app_context():
             row = db.session.get(PriceHistory, hist_id)
@@ -87,7 +93,7 @@ def test_auto_print_enqueues_and_marks_reviewed(app):
 def test_auto_print_noop_when_nothing_unreviewed(app):
     with app.app_context():
         result = auto_print_price_changes(app)
-    assert result == {"printed": 0, "failed": 0, "skipped": False}
+    assert _core(result) == {"printed": 0, "failed": 0, "skipped": False}
 
 
 def test_auto_print_disabled_via_config(app):
@@ -95,7 +101,7 @@ def test_auto_print_disabled_via_config(app):
     _, hist_id = _seed_with_change(app)
     with app.app_context():
         result = auto_print_price_changes(app)
-    assert result == {"printed": 0, "failed": 0, "skipped": True}
+    assert _core(result) == {"printed": 0, "failed": 0, "skipped": True}
     with app.app_context():
         row = db.session.get(PriceHistory, hist_id)
         assert row.reviewed_at is None  # untouched
@@ -115,7 +121,7 @@ def test_auto_print_skips_row_with_no_product(app):
         hist_id = hist.id
     with app.app_context():
         result = auto_print_price_changes(app)
-    assert result == {"printed": 0, "failed": 0, "skipped": False}
+    assert _core(result) == {"printed": 0, "failed": 0, "skipped": False}
     with app.app_context():
         row = db.session.get(PriceHistory, hist_id)
         assert row is not None
@@ -131,7 +137,7 @@ def test_auto_print_worker_down_leaves_row_unreviewed_for_retry(app):
     _, hist_id = _seed_with_change(app)
     with app.app_context():
         result = auto_print_price_changes(app)
-    assert result == {"printed": 0, "failed": 1, "skipped": False}
+    assert _core(result) == {"printed": 0, "failed": 1, "skipped": False}
     with app.app_context():
         row = db.session.get(PriceHistory, hist_id)
         assert row.reviewed_at is None
@@ -148,7 +154,7 @@ def test_auto_print_multiple_changes_all_handled(app):
     try:
         with app.app_context():
             result = auto_print_price_changes(app)
-        assert result == {"printed": 3, "failed": 0, "skipped": False}
+        assert _core(result) == {"printed": 3, "failed": 0, "skipped": False}
         with app.app_context():
             still_unreviewed = (
                 db.session.query(PriceHistory)
