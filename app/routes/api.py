@@ -142,7 +142,7 @@ def lookup(upc: str):
                     "found": False,
                     "upc": upc,
                     "outcome": result.outcome,
-                    "message": "UPC not in catalog",
+                    "message": f"Not in the catalog yet: {upc}",
                     "suggestions": suggestions,
                 }
             ),

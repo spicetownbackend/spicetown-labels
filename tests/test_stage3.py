@@ -206,7 +206,7 @@ def test_queue_unknown_upc_errors(app):
         assert _wait_status(app, enq.job_id) == "error"
         with app.app_context():
             job = db.session.get(PrintJob, enq.job_id)
-            assert "not in catalog" in (job.error or "")
+            assert "Not in the catalog" in (job.error or "")
     finally:
         pq.stop()
 

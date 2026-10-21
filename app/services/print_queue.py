@@ -216,7 +216,7 @@ class PrintQueue:
         product = _resolve_product(job.product_id, job.upc)
         if product is None:
             job.status = "error"
-            job.error = f"UPC {job.upc} not in catalog at print time"
+            job.error = f"Not in the catalog any more when it was time to print: {job.upc}"
             job.completed_at = utcnow()
             db.session.commit()
             self.failed += 1
