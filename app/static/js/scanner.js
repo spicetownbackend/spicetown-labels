@@ -16,6 +16,7 @@
   let lastAt = 0;
   let currentUpc = null;
   let currentProductId = null; // pins the exact product on shared barcodes
+  let currentLastPrint = null; // last label printed for the shown product (dup-print check)
 
   // ── helpers ────────────────────────────────────────────────────────────
   function toast(msg, ms = 2200) {
@@ -40,9 +41,33 @@
   }
 
   // ── product view ───────────────────────────────────────────────────────
+  // How long ago a label at today's price still counts as "just printed":
+  // printing again within this window asks first.
+  const RECENT_PRINT_DAYS = 7;
+
+  function isRecent(iso, days) {
+    if (!iso) return false;
+    const hasZone = /Z$|[+-]\d\d:\d\d$/.test(iso);
+    const t = new Date(hasZone ? iso : iso + "Z").getTime();
+    return Date.now() - t < days * 86400000;
+  }
+
+  // Plain-language note about the last label printed for this product, so
+  // staff don't reprint a label the price update already printed.
+  function lastPrintNote(lp) {
+    if (!lp) return "";
+    const who = lp.reason === "price_change" ? "automatically by the price update" : "from the scanner";
+    const when = estString(lp.at);
+    if (lp.matches_current_price) {
+      return `<div class="last-print same">✓ A label at this price was already printed ${who} (${escapeHtml(when)}). Only print again if the shelf label is missing or damaged.</div>`;
+    }
+    return `<div class="last-print changed">Last label (${escapeHtml(when)}) showed ${money(lp.price_at_print)}. The price has changed since - print a new label.</div>`;
+  }
+
   function renderProduct(p) {
     currentUpc = p.upc;
     currentProductId = p.id != null ? p.id : null;
+    currentLastPrint = p.last_print || null;
     const variant = p.label_variant || "standard";
     const wasPrice =
       (p.on_sale || p.clearance) && p.sale_price != null
@@ -53,7 +78,8 @@
         <span class="variant-tag variant-${variant}">${variant}</span></h2>
       <div class="meta">${escapeHtml([p.department, p.size, p.unit].filter(Boolean).join(" · "))}</div>
       <div><span class="price">${money(p.effective_price ?? p.price)}</span>${wasPrice}</div>
-      <div class="meta">UPC ${escapeHtml(p.upc)}</div>`;
+      <div class="meta">UPC ${escapeHtml(p.upc)}</div>
+      ${lastPrintNote(currentLastPrint)}`;
     refreshPreview();
     $("print-status").textContent = "";
     $("print-status").className = "print-status";
@@ -193,6 +219,11 @@
   // ── printing ───────────────────────────────────────────────────────────
   async function doPrint() {
     if (!currentUpc) return;
+    const lp = currentLastPrint;
+    if (lp && lp.matches_current_price && isRecent(lp.at, RECENT_PRINT_DAYS)) {
+      const who = lp.reason === "price_change" ? "by the price update" : "already";
+      if (!window.confirm(`This label was printed ${who} on ${estString(lp.at)} at ${money(lp.price_at_print)}. Print it again?`)) return;
+    }
     const copies = Math.max(1, parseInt($("copies-input").value || "1", 10));
     const variant = $("variant-select").value || undefined;
     const st = $("print-status");
@@ -220,6 +251,13 @@
       return;
     }
     const job = body && body.job;
+    if (job && job.status !== "error") {
+      // This print is now the latest one for the product.
+      currentLastPrint = {
+        at: job.created_at, reason: "manual", copies: job.copies,
+        price_at_print: job.price_at_print, matches_current_price: true, status: job.status,
+      };
+    }
     if (ok && job && job.status === "done") {
       st.className = "print-status ok";
       st.textContent = `✓ Printed ${copies} label(s).`;
@@ -423,13 +461,20 @@
     const when = j.completed_at || j.claimed_at || j.created_at;
     const whenStr = estString(when);
     const tag = j.reason === "price_change" ? `<span class="pc-tag">price change</span>` : "";
+    // Price on the label: "$5.99 → $6.49" for a price change, else the price.
+    let priceStr = "";
+    if (j.reason === "price_change" && j.new_price != null) {
+      priceStr = (j.old_price != null ? `${money(j.old_price)} → ` : "") + money(j.price_at_print ?? j.new_price);
+    } else if (j.price_at_print != null) {
+      priceStr = money(j.price_at_print);
+    }
     const icon = STATUS_ICON[j.status] || j.status;
     const div = document.createElement("div");
     div.className = "pc-row ph-row";
     div.innerHTML = `
       <span class="pc-info">
         <span class="pc-name">${icon} ${escapeHtml(j.name || j.upc)} ${tag}</span>
-        <span class="pc-meta">UPC ${escapeHtml(j.upc || "")} · ${j.variant || "standard"} × ${j.copies || 1} · ${whenStr}${j.error ? " · " + escapeHtml(j.error) : ""}</span>
+        <span class="pc-meta">${priceStr ? priceStr + " · " : ""}UPC ${escapeHtml(j.upc || "")} · ${j.variant || "standard"} × ${j.copies || 1} · ${whenStr}${j.error ? " · " + escapeHtml(j.error) : ""}</span>
       </span>
       <button class="btn ph-reprint" ${j.product_id ? "" : "disabled title=\"product no longer in catalog\""}>🖨️ Reprint</button>`;
     if (j.product_id) {
@@ -516,6 +561,12 @@
     const { body } = await getJSON(`/api/print-history${qs}`);
     if (seq !== phRequestSeq) return; // a newer request already started - discard this stale one
     const jobs = (body && body.jobs) || [];
+    // Counts per kind for the range (server-side, ignores the Show filter).
+    const counts = body && body.counts;
+    if (counts) {
+      const labels = { "": `All prints (${counts.total})`, manual: `Manual/scan only (${counts.manual})`, price_change: `Price-change only (${counts.price_change})` };
+      for (const opt of $("ph-filter").options) if (opt.value in labels) opt.textContent = labels[opt.value];
+    }
     list.innerHTML = "";
     if (!jobs.length) {
       list.innerHTML = `<p class="hint">No print jobs in this range.</p>`;
