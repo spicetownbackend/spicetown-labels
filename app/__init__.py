@@ -120,11 +120,13 @@ def create_app(
     # 6) Blueprints.
     from .routes.api import bp as api_bp
     from .routes.bridge import bp as bridge_bp
+    from .routes.kloudc import bp as kloudc_bp
     from .routes.views import bp as views_bp
 
     app.register_blueprint(api_bp)
     app.register_blueprint(bridge_bp)
     app.register_blueprint(views_bp)
+    app.register_blueprint(kloudc_bp)
 
     # 6b) Gate every request on a valid spicetown-backend dashboard session
     # (no-op unless REQUIRE_DASHBOARD_LOGIN is set - see config.py and
@@ -254,10 +256,47 @@ def _register_dashboard_auth_gate(app: Flask) -> None:
     cookie - a page request redirects to the dashboard's login, an API
     request gets a plain 401 JSON body instead (a fetch() call can't follow
     a cross-origin redirect usefully).
+
+    KloudC sign-in (services/kloudc_auth.py, off unless STL_KLOUDC_AUTH_ENABLED):
+    only when the dashboard cookie check above fails is a KloudC identity
+    tried - first the website hand-off cookie `kc_labels`, then a KloudC
+    token sent as `Authorization: Bearer` or, for installed app builds, as a
+    KloudC-shaped `session_token` cookie. `/kloudc/enter` (the hand-off) is
+    exempt. On success `g.auth_source = "kloudc"` and `g.kloudc` = identity.
     """
-    from flask import jsonify, redirect, request
+    from flask import g, jsonify, redirect, request
 
     from .services.dashboard_auth import is_valid_dashboard_session
+    from .services.kloudc_auth import (
+        HANDOFF_COOKIE,
+        Identity,
+        build_kloudc_auth,
+        handoff_secret,
+        is_kloudc_token,
+        read_handoff_cookie,
+    )
+
+    kloudc = build_kloudc_auth(app.config)
+    app.extensions["kloudc_auth"] = kloudc
+
+    def _kloudc_identity():
+        """Identity | Refusal | Unavailable | None (no KloudC credential sent)."""
+        ident = read_handoff_cookie(
+            handoff_secret(app), request.cookies.get(HANDOFF_COOKIE), kloudc.store_code
+        )
+        if ident is not None:
+            return ident
+        scheme, _, value = (request.headers.get("Authorization") or "").partition(" ")
+        raw = value.strip() if scheme.lower() == "bearer" else ""
+        if not is_kloudc_token(raw):
+            cookie = request.cookies.get(app.config.get("DASHBOARD_SESSION_COOKIE_NAME", "session_token"))
+            raw = cookie if is_kloudc_token(cookie) else ""
+        if not raw:
+            return None
+        return kloudc.check(raw)
+
+    def _on_kloudc_host() -> bool:
+        return (request.host or "").split(":", 1)[0].lower().endswith(".kloudc.com")
 
     @app.before_request
     def _require_dashboard_login():
@@ -266,11 +305,25 @@ def _register_dashboard_auth_gate(app: Flask) -> None:
         path = request.path
         if path == "/healthz" or path.startswith("/api/bridge") or path.startswith("/static"):
             return None
+        if kloudc.enabled and path == "/kloudc/enter":
+            return None
         token = request.cookies.get(app.config.get("DASHBOARD_SESSION_COOKIE_NAME", "session_token"))
         if is_valid_dashboard_session(app.config.get("DASHBOARD_DB_PATH", ""), token):
             return None
+        if kloudc.enabled:
+            result = _kloudc_identity()
+            if isinstance(result, Identity):
+                g.auth_source = "kloudc"
+                g.kloudc = result
+                return None
+            if result is not None:
+                if path.startswith("/api"):
+                    return jsonify(result.body()), result.status
+                return redirect(kloudc.login_url if _on_kloudc_host() else app.config.get("DASHBOARD_LOGIN_URL", "/"))
         if path.startswith("/api"):
             return jsonify({"error": "unauthorized", "message": "Log into the dashboard first"}), 401
+        if kloudc.enabled and _on_kloudc_host():
+            return redirect(kloudc.login_url)
         return redirect(app.config.get("DASHBOARD_LOGIN_URL", "/"))
 
 
