@@ -25,7 +25,7 @@ from datetime import date, datetime, time, timezone
 from types import SimpleNamespace
 from zoneinfo import ZoneInfo
 
-from flask import Blueprint, Response, current_app, jsonify, request
+from flask import Blueprint, Response, current_app, g, jsonify, request
 from sqlalchemy import or_
 
 from ..extensions import db
@@ -391,8 +391,19 @@ DEMO_CHECK_UNAVAILABLE = "Printing is paused: we couldn't check your login. Try 
 
 def _demo_status() -> str:
     """dashboard_auth.demo_session_status for this request (demo / real /
-    unknown - see config.DEMO_USERNAMES)."""
-    from ..services.dashboard_auth import demo_session_status
+    unknown - see config.DEMO_USERNAMES).
+
+    A KloudC sign-in (g.auth_source == "kloudc", set by the auth gate) is
+    answered from the KloudC identity instead: DEMO for a demo login, the
+    DEMO store, or anyone KloudC says can't print (can_print false), else
+    REAL. The older dashboard DB is not consulted for it."""
+    from ..services.dashboard_auth import DEMO, REAL, demo_session_status
+
+    if getattr(g, "auth_source", None) == "kloudc":
+        ident = getattr(g, "kloudc", None)
+        if ident is None or ident.demo or not ident.can_print:
+            return DEMO
+        return REAL
 
     return demo_session_status(
         current_app.config.get("DASHBOARD_DB_PATH", ""),
@@ -444,6 +455,12 @@ def _demo_write_refusal():
         jsonify({"error": DEMO_WRITE_CHECK_UNAVAILABLE, "message": DEMO_WRITE_CHECK_UNAVAILABLE}),
         503,
     )
+
+
+def _log_printed_by(what: str) -> None:
+    """KloudC sign-ins: log who asked for a print (log only, no DB column)."""
+    if getattr(g, "auth_source", None) == "kloudc" and getattr(g, "kloudc", None) is not None:
+        current_app.logger.info("print requested (%s) printed_by=%s", what, g.kloudc.username)
 
 
 @bp.post("/print")
@@ -507,6 +524,7 @@ def enqueue_print():
     # The label printed before this one (None if never), returned so a
     # client can tell staff "this was already printed ..." after the fact.
     previous_print = last_prints_for([product]).get(product.id)
+    _log_printed_by(f"upc={product.upc}")
 
     pq = current_app.extensions["print_queue"]
     try:
@@ -743,6 +761,7 @@ def print_price_changes():
     ids, err = _resolve_price_change_ids()
     if err:
         return jsonify(err), 400
+    _log_printed_by(f"price changes={len(ids)}")
 
     results = []
     # One label per product: selecting two changes for the same item (e.g. a

@@ -112,6 +112,28 @@ class Config:
     # against the dashboard session (DASHBOARD_DB_PATH) whenever one is sent.
     DEMO_USERNAMES = os.getenv("STL_DEMO_USERNAMES", "app_store_review,appreview")
 
+    # ── KloudC sign-in (second way in; see docs/KLOUDC_AUTH.md) ────────────────
+    # Off by default: with these unset the site behaves exactly as before. When
+    # on, a request that fails the dashboard cookie check above may still pass
+    # with a KloudC session token, checked by asking the KloudC server
+    # (GET /api/labels/session). Only checked when REQUIRE_DASHBOARD_LOGIN is on.
+    KLOUDC_AUTH_ENABLED = _as_bool(os.getenv("STL_KLOUDC_AUTH_ENABLED"), False)
+    # Must be on the built-in allow-list (services/kloudc_auth.py), else
+    # KloudC sign-in stays off: https://app.kloudc.com, http://127.0.0.1:<port>,
+    # http://localhost:<port> or https://<name>.<tailnet>.ts.net[:<port>].
+    KLOUDC_API_BASE = os.getenv("STL_KLOUDC_API_BASE", "")
+    # The one KloudC store this labels site serves (upper case).
+    KLOUDC_STORE_CODE = os.getenv("STL_KLOUDC_STORE_CODE", "")
+    # Where a signed-out page request on a *.kloudc.com host is sent.
+    KLOUDC_LOGIN_URL = os.getenv(
+        "STL_KLOUDC_LOGIN_URL", "https://app.kloudc.com/#/label-printing/open"
+    )
+    KLOUDC_CACHE_SECONDS = _as_int(os.getenv("STL_KLOUDC_CACHE_SECONDS"), 60)  # capped at 120
+    KLOUDC_NEGATIVE_CACHE_SECONDS = _as_int(os.getenv("STL_KLOUDC_NEGATIVE_CACHE_SECONDS"), 30)
+    KLOUDC_STALE_GRACE_SECONDS = _as_int(os.getenv("STL_KLOUDC_STALE_GRACE_SECONDS"), 300)
+    KLOUDC_TIMEOUT_SECONDS = _as_float(os.getenv("STL_KLOUDC_TIMEOUT_SECONDS"), 3.0)  # read
+    KLOUDC_MAX_CHECKS_PER_MINUTE = _as_int(os.getenv("STL_KLOUDC_MAX_CHECKS_PER_MINUTE"), 120)
+
     # ── Cache TTL strategy ────────────────────────────────────────────────────
     # SQLite is authoritative; the data source is only consulted when a UPC is
     # missing or its cached record has expired.
