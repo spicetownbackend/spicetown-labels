@@ -16,7 +16,8 @@ KloudC:
 2. **The KloudC website** never puts a token in a link. It asks KloudC for a
    one-time code (60 seconds, single use) and opens
    `/kloudc/enter?code=...`. This site trades the code with KloudC, then sets
-   its own signed cookie `kc_labels` for 2 hours.
+   its own signed cookie `kc_labels` for 2 hours, or less when the person's
+   KloudC session ends sooner (the cookie never outlives that session).
 
 The dashboard cookie check still runs first and is unchanged. The KloudC
 check runs only when that fails.
@@ -36,8 +37,11 @@ check runs only when that fails.
   that was a yes in the last 5 minutes still works. Otherwise the answer is
   503. A 401 or 403 from KloudC always wins at once.
 - At most 120 uncached checks a minute; above that the answer is 429 and no
-  call is made. A token that was a yes in the last 5 minutes still works
-  during such a flood, so fake tokens can't lock real staff out.
+  call is made. One caller address may use at most half of them (60): behind
+  the Cloudflare tunnel that is the `CF-Connecting-IP` address, read only
+  when the request comes from this machine. So one stranger sending made-up
+  tokens can't use up the checks for the store's staff. A token that was a
+  yes in the last 5 minutes still works during such a flood.
 - The cache key is `sha256(token)`. The raw token is never stored and never
   logged. Logs show the first 8 characters of the hash and the username.
 - Nothing is written to any database for sign-in.
@@ -105,9 +109,15 @@ feature off in KloudC (KloudC users are refused within 60 s).
 
 ## Known limit
 
-The website's 2-hour `kc_labels` cookie can outlive a KloudC sign-out or the
-feature being turned off by up to 2 hours. The app path does not have this
-limit (60 s).
+The website's `kc_labels` cookie (2 hours at most, never past the end of the
+KloudC session it came from) can outlive a KloudC sign-out or the feature
+being turned off by up to 2 hours. The app path does not have this limit
+(60 s).
+
+Many different addresses sending made-up tokens together can still use up
+the 120 checks a minute. Then staff who have not been checked in the last 5
+minutes see "Too many sign-in checks" until the flood stops. The Spice Town
+dashboard cookie is never affected (it is checked first, with no limit).
 
 ## Files
 

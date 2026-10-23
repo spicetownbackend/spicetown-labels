@@ -16,14 +16,16 @@ gate (app/__init__.py).
 from __future__ import annotations
 
 import logging
+import time
 
 from flask import Blueprint, current_app, jsonify, redirect, request
 
 from ..services.kloudc_auth import (
     HANDOFF_COOKIE,
-    HANDOFF_COOKIE_MAX_AGE,
     Identity,
+    handoff_cookie_end,
     handoff_secret,
+    kloudc_client_key,
     make_handoff_cookie,
 )
 
@@ -49,16 +51,21 @@ def enter():
         logger.error("kloudc_auth: STL_SECRET_KEY is not set - website hand-off refused")
         return _no_store(redirect(kloudc.login_url, code=303))
 
-    result = kloudc.redeem(request.args.get("code", ""))
+    result = kloudc.redeem(request.args.get("code", ""), client=kloudc_client_key(request))
     if not isinstance(result, Identity):
         return _no_store(redirect(kloudc.login_url, code=303))
 
+    # 2 hours, or less when the KloudC session behind it ends sooner.
+    now = int(time.time())
+    max_age = handoff_cookie_end(result, now) - now
+    if max_age <= 0:
+        return _no_store(redirect(kloudc.login_url, code=303))
     logger.info("kloudc_auth: website hand-off ok user=%s", result.username)
     resp = redirect("/", code=303)
     resp.set_cookie(
         HANDOFF_COOKIE,
-        make_handoff_cookie(secret, result),
-        max_age=HANDOFF_COOKIE_MAX_AGE,
+        make_handoff_cookie(secret, result, now),
+        max_age=max_age,
         path="/",
         secure=True,
         httponly=True,

@@ -25,7 +25,9 @@ Rules (the shared contract is docs/KLOUDC_AUTH.md):
     wins straight away: no grace after a no.
   * At most MAX_CHECKS_PER_MINUTE uncached calls a minute; above that the
     answer is 429 with no outside call (a recently-good token still gets the
-    stale grace, so a flood of fake tokens can't lock real staff out).
+    stale grace, so a flood of fake tokens can't lock real staff out). One
+    caller address (CF-Connecting-IP behind the tunnel) may use at most half
+    of that, so one stranger sending made-up tokens can't use it all up.
   * Nothing is written to any database.
 """
 
@@ -54,6 +56,7 @@ HANDOFF_CODE_RE = re.compile(r"^[A-Za-z0-9_-]{20,128}$")
 CONNECT_TIMEOUT_SECONDS = 2.0
 MAX_CACHE_SECONDS = 120
 MAX_CACHE_ENTRIES = 2000
+MAX_TRACKED_CLIENTS = 5000
 USER_AGENT = "labels-site-kloudc-auth/1"
 DEFAULT_LOGIN_URL = "https://app.kloudc.com/#/label-printing/open"
 
@@ -272,11 +275,14 @@ class KloudcAuth:
         self.stale_grace_seconds = max(0, int(stale_grace_seconds))
         self.timeout_seconds = float(timeout_seconds) if timeout_seconds and timeout_seconds > 0 else 3.0
         self.max_checks_per_minute = max(0, int(max_checks_per_minute))
+        # One caller address may use at most half of the minute's checks.
+        self.max_checks_per_client = max(1, self.max_checks_per_minute // 2)
         self._clock = clock
         self._http = http or _http_call
         self._lock = threading.Lock()
         self._cache: "collections.OrderedDict[str, dict]" = collections.OrderedDict()
         self._calls: "collections.deque[float]" = collections.deque()
+        self._client_calls: "collections.OrderedDict[str, collections.deque]" = collections.OrderedDict()
 
         self.enabled = False
         if not enabled:
@@ -296,8 +302,10 @@ class KloudcAuth:
         logger.info("kloudc_auth: on (api=%s store=%s)", self.api_base, self.store_code)
 
     # ── public ──────────────────────────────────────────────────────────────
-    def check(self, token: Optional[str]) -> Result:
-        """Who is this KloudC token? Identity, Refusal or Unavailable."""
+    def check(self, token: Optional[str], client: Optional[str] = None) -> Result:
+        """Who is this KloudC token? Identity, Refusal or Unavailable.
+
+        `client` is the caller's address when known (rate-limit key only)."""
         if not self.enabled or not is_kloudc_token(token):
             return REFUSED_SIGN_IN
         if token_store_code(token) != self.store_code:
@@ -313,7 +321,7 @@ class KloudcAuth:
                         return entry["refused"]
                 elif now < entry["fresh_until"]:
                     return entry["identity"]
-            if not self._take_call_slot(now):
+            if not self._take_call_slot(now, client):
                 stale = self._stale_identity(entry, now)
                 if stale is not None:
                     logger.info("kloudc_auth stale_grace (check cap) key=%s user=%s", key[:8], stale.username)
@@ -344,12 +352,12 @@ class KloudcAuth:
                 return stale
             return result
 
-    def redeem(self, code: Optional[str]) -> Result:
+    def redeem(self, code: Optional[str], client: Optional[str] = None) -> Result:
         """Trade a one-time website hand-off code for an identity. Never cached."""
         if not self.enabled or not isinstance(code, str) or not HANDOFF_CODE_RE.match(code):
             return REFUSED_SIGN_IN
         with self._lock:
-            if not self._take_call_slot(self._clock()):
+            if not self._take_call_slot(self._clock(), client):
                 return REFUSED_RATE
         return self._ask(
             "POST",
@@ -363,20 +371,36 @@ class KloudcAuth:
         with self._lock:
             self._cache.clear()
             self._calls.clear()
+            self._client_calls.clear()
 
     def cache_keys(self) -> list:
         with self._lock:
             return list(self._cache.keys())
 
     # ── internals ───────────────────────────────────────────────────────────
-    def _take_call_slot(self, now: float) -> bool:
-        """Count one uncached outside call against the per-minute ceiling.
-        Caller holds the lock."""
+    def _take_call_slot(self, now: float, client: Optional[str] = None) -> bool:
+        """Count one uncached outside call against the per-minute ceiling and,
+        when the caller's address is known, its own share. Caller holds the lock."""
         while self._calls and self._calls[0] <= now - 60:
             self._calls.popleft()
         if len(self._calls) >= self.max_checks_per_minute:
             return False
+        mine = None
+        if client:
+            mine = self._client_calls.get(client)
+            if mine is not None:
+                while mine and mine[0] <= now - 60:
+                    mine.popleft()
+                if len(mine) >= self.max_checks_per_client:
+                    return False
         self._calls.append(now)
+        if client:
+            if mine is None:
+                mine = self._client_calls[client] = collections.deque()
+            mine.append(now)
+            self._client_calls.move_to_end(client)
+            while len(self._client_calls) > MAX_TRACKED_CLIENTS:
+                self._client_calls.popitem(last=False)
         return True
 
     def _stale_identity(self, entry: Optional[dict], now: float) -> Optional[Identity]:
@@ -466,6 +490,33 @@ def _http_call(method: str, url: str, *, headers: dict, json_body, timeout):
         )
 
 
+def kloudc_client_key(request) -> Optional[str]:
+    """The caller's address for the per-caller check limit, or None (then
+    only the overall limit applies, as before).
+
+    Behind the Cloudflare tunnel every request comes from this machine
+    (127.0.0.1 / ::1) and Cloudflare writes the real address in
+    CF-Connecting-IP; only then is that header used. A request from any other
+    peer is keyed by the peer itself. A bad header value means "unknown"."""
+    import ipaddress
+
+    peer = (getattr(request, "remote_addr", None) or "").strip()
+    try:
+        peer_ip = ipaddress.ip_address(peer)
+    except ValueError:
+        return None
+    mapped = getattr(peer_ip, "ipv4_mapped", None)
+    if mapped is not None:
+        peer_ip = mapped  # ::ffff:127.0.0.1 is this machine too
+    if not peer_ip.is_loopback:
+        return str(peer_ip)
+    header = (request.headers.get("CF-Connecting-IP") or "").strip()
+    try:
+        return str(ipaddress.ip_address(header))
+    except ValueError:
+        return None
+
+
 def build_kloudc_auth(config) -> KloudcAuth:
     """KloudcAuth from a Flask config mapping (all STL_KLOUDC_* settings)."""
     get = config.get
@@ -507,14 +558,27 @@ def _serializer(secret_key: str):
     return URLSafeTimedSerializer(secret_key, salt=HANDOFF_COOKIE_SALT)
 
 
+def handoff_cookie_end(ident: Identity, now: Optional[float] = None) -> int:
+    """When a kc_labels cookie for `ident` stops working: 2 hours from now,
+    or the end of the KloudC session behind it when that comes sooner (a
+    session with 10 minutes left must not open the site for 2 hours)."""
+    iat = int(now if now is not None else time.time())
+    end = iat + HANDOFF_COOKIE_MAX_AGE
+    if ident.session_expires_at is not None:
+        end = min(end, int(ident.session_expires_at.timestamp()))
+    return end
+
+
 def make_handoff_cookie(secret_key: str, ident: Identity, now: Optional[float] = None) -> str:
+    iat = int(now if now is not None else time.time())
     payload = {
         "store": ident.store_code,
         "user_id": ident.user_id,
         "username": ident.username,
         "demo": bool(ident.demo),
         "can_print": bool(ident.can_print),
-        "iat": int(now if now is not None else time.time()),
+        "iat": iat,
+        "exp": handoff_cookie_end(ident, iat),
     }
     return _serializer(secret_key).dumps(payload)
 
@@ -540,6 +604,11 @@ def read_handoff_cookie(
     current = now if now is not None else time.time()
     if not isinstance(iat, int) or iat > current + 60 or current - iat > HANDOFF_COOKIE_MAX_AGE:
         return None
+    end = iat + HANDOFF_COOKIE_MAX_AGE
+    exp = payload.get("exp", end)
+    if not isinstance(exp, int) or isinstance(exp, bool) or current >= exp:
+        return None  # the KloudC session behind the cookie has ended
+    end = min(end, exp)
     username = payload.get("username")
     if not isinstance(username, str) or not username or payload.get("user_id") is None:
         return None
@@ -550,5 +619,5 @@ def read_handoff_cookie(
         username=username,
         demo=demo,
         can_print=payload.get("can_print") is True and not demo,
-        session_expires_at=dt.datetime.fromtimestamp(iat + HANDOFF_COOKIE_MAX_AGE, dt.timezone.utc),
+        session_expires_at=dt.datetime.fromtimestamp(end, dt.timezone.utc),
     )

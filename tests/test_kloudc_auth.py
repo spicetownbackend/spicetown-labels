@@ -531,7 +531,7 @@ CODE_EXPIRED = "e" * 43
 
 
 def test_13_handoff_good_code_sets_cookie(client, fake):
-    fake.redeem[CODE_OK] = (200, session_body())
+    fake.redeem[CODE_OK] = (200, session_body(session_expires_at=_future(3 * 3600)))
     r = client.get(f"/kloudc/enter?code={CODE_OK}", base_url=KC_HOST)
     assert r.status_code == 303 and r.headers["Location"] == "/"
     assert r.headers["Referrer-Policy"] == "no-referrer"
@@ -687,3 +687,114 @@ def test_13f_dev_secret_never_signs_or_accepts_cookies(tmp_path, fake):
     )
     c.set_cookie("kc_labels", forged, domain="labels-teststore.kloudc.com")
     assert c.get("/api/health", base_url=KC_HOST).status_code == 401
+
+
+# ── Security check (2026-10-22) ─────────────────────────────────────────────
+def _from(ip):
+    """Headers for a request that came through the tunnel from `ip`."""
+    return {"CF-Connecting-IP": ip}
+
+
+def test_sec_one_address_cannot_use_up_every_check(client, fake):
+    # A stranger sends made-up tokens through the tunnel from one address.
+    for i in range(200):
+        client.get("/api/health", headers={**bearer(f"{STORE}.flood{i:04d}{SECRET}"), **_from("203.0.113.9")})
+    assert len(session_calls(fake)) == 60  # half of the minute's 120
+    r = client.get("/api/health", headers={**bearer(f"{STORE}.more{SECRET}"), **_from("203.0.113.9")})
+    assert r.status_code == 429 and r.get_json()["error"] == "rate_limited"
+    # Staff in the store (another address), never checked before, still get in.
+    r = client.get(f"/api/lookup/{UPC}", headers={**bearer(GOOD), **_from("198.51.100.7")})
+    assert r.status_code == 200
+
+
+def test_sec_caller_address_rule():
+    class Req:
+        def __init__(self, peer, header=None):
+            self.remote_addr = peer
+            self.headers = {"CF-Connecting-IP": header} if header is not None else {}
+
+    assert ka.kloudc_client_key(Req("127.0.0.1", "203.0.113.9")) == "203.0.113.9"
+    assert ka.kloudc_client_key(Req("::1", "2001:db8::1")) == "2001:db8::1"
+    assert ka.kloudc_client_key(Req("::ffff:127.0.0.1", "203.0.113.9")) == "203.0.113.9"
+    # Not from the tunnel: the header is ignored, the peer is the key.
+    assert ka.kloudc_client_key(Req("192.168.1.20", "203.0.113.9")) == "192.168.1.20"
+    # From the tunnel with no or a bad header: unknown (overall limit only).
+    assert ka.kloudc_client_key(Req("127.0.0.1")) is None
+    assert ka.kloudc_client_key(Req("127.0.0.1", "1.2.3.4, 5.6.7.8")) is None
+    assert ka.kloudc_client_key(Req("127.0.0.1", "evil\r\nX: y")) is None
+    assert ka.kloudc_client_key(Req(None)) is None
+
+
+def test_sec_no_address_keeps_the_overall_limit(client, fake):
+    # Without CF-Connecting-IP (e.g. a call on this machine) only the overall
+    # 120 a minute applies, exactly as before.
+    for i in range(130):
+        client.get("/api/health", headers=bearer(f"{STORE}.flood{i:04d}{SECRET}"))
+    assert len(session_calls(fake)) == 120
+
+
+def test_sec_handoff_cookie_never_outlives_the_kloudc_session(client, fake):
+    fake.redeem[CODE_OK] = (200, session_body(session_expires_at=_future(600)))
+    r = client.get(f"/kloudc/enter?code={CODE_OK}", base_url=KC_HOST)
+    assert r.status_code == 303 and r.headers["Location"] == "/"
+    cookie = r.headers["Set-Cookie"]
+    max_age = int(cookie.split("Max-Age=", 1)[1].split(";", 1)[0])
+    assert 590 <= max_age <= 600
+    value = cookie.split("kc_labels=", 1)[1].split(";", 1)[0]
+    secret = client.application.config["SECRET_KEY"]
+    now = time.time()
+    assert ka.read_handoff_cookie(secret, value, STORE, now=now + 500) is not None
+    assert ka.read_handoff_cookie(secret, value, STORE, now=now + 601) is None
+
+
+def test_sec_cookie_with_ended_exp_refused(app):
+    secret = app.config["SECRET_KEY"]
+    now = time.time()
+    ident = ka.Identity(
+        store_code=STORE, user_id=12, username="maria", demo=False, can_print=True,
+        session_expires_at=dt.datetime.fromtimestamp(now + 30, dt.timezone.utc),
+    )
+    value = ka.make_handoff_cookie(secret, ident, now=now)
+    got = ka.read_handoff_cookie(secret, value, STORE, now=now + 10)
+    assert got is not None and got.session_expires_at.timestamp() <= now + 30
+    assert ka.read_handoff_cookie(secret, value, STORE, now=now + 31) is None
+
+
+@pytest.mark.parametrize(
+    "token",
+    [
+        f"{STORE}.abc\tX-Evil: 1{SECRET}",
+        f"{STORE}.{SECRET} extra",
+        f"{STORE.lower()}.{SECRET}",
+        f"{STORE}.short",
+        f"{STORE}..{SECRET}",
+        f"{STORE}.{SECRET}/../../admin",
+        f"{STORE}.{SECRET}@evil.example",
+        "PLATFORM." + SECRET,
+    ],
+    ids=["tab", "space", "lower", "short", "double_dot", "path", "at", "other_prefix"],
+)
+def test_sec_odd_tokens_never_reach_kloudc(client, fake, token):
+    r = client.get(f"/api/lookup/{UPC}", headers={"Authorization": f"Bearer {token}"})
+    assert r.status_code == 401
+    assert session_calls(fake) == []
+
+
+def test_sec_kloudc_answer_for_another_user_store_is_not_trusted(client, fake):
+    # KloudC (or something in the middle) answering for another store, or
+    # with the feature off, never signs anyone in - and nothing is cached as a yes.
+    fake.answer(GOOD, body=session_body(store_code="OTHERSTORE"))
+    assert client.get(f"/api/lookup/{UPC}", headers=bearer(GOOD)).status_code == 401
+    assert client.post("/api/print", json={"upc": UPC}, headers=bearer(GOOD)).status_code == 401
+
+
+def test_sec_legacy_cookie_unchanged_when_kloudc_is_on(client, fake):
+    # The existing dashboard cookie: a bad one is still refused with the old
+    # body and never sent to KloudC (it isn't KloudC-shaped).
+    client.set_cookie("session_token", "not-a-real-session")
+    r = client.get(f"/api/lookup/{UPC}")
+    assert r.status_code == 401
+    assert r.get_json() == {"error": "unauthorized", "message": "Log into the dashboard first"}
+    client.set_cookie("session_token", "legacytoken")
+    assert client.get(f"/api/lookup/{UPC}").status_code == 200
+    assert fake.calls == []

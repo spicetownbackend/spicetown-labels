@@ -273,6 +273,7 @@ def _register_dashboard_auth_gate(app: Flask) -> None:
         build_kloudc_auth,
         handoff_secret,
         is_kloudc_token,
+        kloudc_client_key,
         read_handoff_cookie,
     )
 
@@ -293,7 +294,7 @@ def _register_dashboard_auth_gate(app: Flask) -> None:
             raw = cookie if is_kloudc_token(cookie) else ""
         if not raw:
             return None
-        return kloudc.check(raw)
+        return kloudc.check(raw, client=kloudc_client_key(request))
 
     def _on_kloudc_host() -> bool:
         return (request.host or "").split(":", 1)[0].lower().endswith(".kloudc.com")
