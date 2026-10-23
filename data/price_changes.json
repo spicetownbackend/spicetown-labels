@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "upc": "356616",
+    "name": "Romaine Hearts",
+    "old_price": 6.99,
+    "new_price": 16.99,
+    "recorded_at": "2026-10-23T16:50:29.883761+00:00"
+  },
+  {
+    "upc": "8698915234317",
+    "name": "Chef Seasons - Gyros Seasoning 110g",
+    "old_price": 3.49,
+    "new_price": 100.0,
+    "recorded_at": "2026-10-23T16:50:29.883761+00:00"
+  }
+]
