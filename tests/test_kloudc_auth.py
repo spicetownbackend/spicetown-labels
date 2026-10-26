@@ -798,3 +798,22 @@ def test_sec_legacy_cookie_unchanged_when_kloudc_is_on(client, fake):
     client.set_cookie("session_token", "legacytoken")
     assert client.get(f"/api/lookup/{UPC}").status_code == 200
     assert fake.calls == []
+
+
+def test_15_open_page_reloads_when_the_website_sign_in_ends(client, fake):
+    # The website hand-off cookie lasts at most 2 hours. On a page that stays
+    # open, the API then answers 401 and a known barcode used to show "No
+    # similar items found". The scanner page reloads instead (the gate sends
+    # the browser through KloudC and back), only on a KloudC host, and at most
+    # once a minute; the older labels address keeps its old behaviour.
+    js = client.get("/static/js/scanner.js", base_url=KC_HOST)
+    assert js.status_code == 200
+    body = js.data.decode()
+    assert "const KLOUDC_HOST = /\\.kloudc\\.com$/i.test(location.hostname);" in body
+    assert "if (r.status === 401 && KLOUDC_HOST) {" in body
+    assert "location.reload();" in body
+    assert "Date.now() - last < 60000" in body
+    assert 'const KLOUDC_SIGN_IN_AGAIN = "Sign in again to use label printing.";' in body
+    # The API answer it reacts to: a signed-out call on the KloudC host is a 401.
+    assert client.get(f"/api/lookup/{UPC}", base_url=KC_HOST).status_code == 401
+    assert fake.calls == []
