@@ -33,10 +33,31 @@
   function money(v) {
     return v == null ? "" : "$" + Number(v).toFixed(2);
   }
+  // KloudC website sign-in (docs/KLOUDC_AUTH.md): the hand-off cookie lasts
+  // at most 2 hours. When it runs out on a page that is still open, every API
+  // call answers 401 and a known barcode showed "No similar items found".
+  // On a KloudC host, reload instead: the sign-in gate sends the browser
+  // through KloudC and straight back. At most once a minute, so a sign-in
+  // problem can't loop. The older labels address behaves exactly as before.
+  const KLOUDC_HOST = /\.kloudc\.com$/i.test(location.hostname);
+  const KLOUDC_SIGN_IN_AGAIN = "Sign in again to use label printing.";
+  function kloudcSignInAgain() {
+    try {
+      const last = Number(sessionStorage.getItem("kc_labels_reload_at") || 0);
+      if (Date.now() - last < 60000) return false;
+      sessionStorage.setItem("kc_labels_reload_at", String(Date.now()));
+    } catch (_) {}
+    location.reload();
+    return true;
+  }
   async function getJSON(url, opts) {
     const r = await fetch(url, opts);
     let body = null;
     try { body = await r.json(); } catch (_) {}
+    if (r.status === 401 && KLOUDC_HOST) {
+      if (kloudcSignInAgain()) return new Promise(() => {}); // the page is reloading
+      toast(KLOUDC_SIGN_IN_AGAIN, 4000);
+    }
     return { ok: r.ok, status: r.status, body };
   }
 
