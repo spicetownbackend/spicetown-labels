@@ -1,1 +1,37 @@
-[]
+[
+  {
+    "upc": "027736003747",
+    "name": "Purple Rain FTN J07",
+    "old_price": 4.0,
+    "new_price": 3.0,
+    "recorded_at": "2026-10-27T23:34:33.769708+00:00"
+  },
+  {
+    "upc": "027736025411",
+    "name": "PYRO Pak Bag SS Com J10",
+    "old_price": 34.0,
+    "new_price": 25.0,
+    "recorded_at": "2026-10-27T23:34:33.769708+00:00"
+  },
+  {
+    "upc": "027736025435",
+    "name": "Independence Tray SS Com J10",
+    "old_price": 49.0,
+    "new_price": 35.0,
+    "recorded_at": "2026-10-27T23:34:33.769708+00:00"
+  },
+  {
+    "upc": "027736048724",
+    "name": "#36 Morning Glory",
+    "old_price": 8.0,
+    "new_price": 6.0,
+    "recorded_at": "2026-10-27T23:34:33.769708+00:00"
+  },
+  {
+    "upc": "8906147054796",
+    "name": "Deccan Jeerasamba Rice 10lb",
+    "old_price": 18.99,
+    "new_price": 13.99,
+    "recorded_at": "2026-10-27T23:34:33.769708+00:00"
+  }
+]
