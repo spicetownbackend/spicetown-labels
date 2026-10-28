@@ -1,37 +1,30 @@
 [
   {
-    "upc": "027736003747",
-    "name": "Purple Rain FTN J07",
-    "old_price": 4.0,
-    "new_price": 3.0,
-    "recorded_at": "2026-10-27T23:34:33.769708+00:00"
+    "upc": "033383536101",
+    "name": "Potato Idaho 5lb",
+    "old_price": 3.99,
+    "new_price": 3.29,
+    "recorded_at": "2026-10-28T04:29:14.536540+00:00"
   },
   {
-    "upc": "027736025411",
-    "name": "PYRO Pak Bag SS Com J10",
-    "old_price": 34.0,
-    "new_price": 25.0,
-    "recorded_at": "2026-10-27T23:34:33.769708+00:00"
+    "upc": "179143831892",
+    "name": "Potato Red 5lb",
+    "old_price": 5.99,
+    "new_price": 4.99,
+    "recorded_at": "2026-10-28T04:29:14.536540+00:00"
   },
   {
-    "upc": "027736025435",
-    "name": "Independence Tray SS Com J10",
-    "old_price": 49.0,
-    "new_price": 35.0,
-    "recorded_at": "2026-10-27T23:34:33.769708+00:00"
+    "upc": "179146028015",
+    "name": "Potato White in LBs",
+    "old_price": 1.79,
+    "new_price": 1.69,
+    "recorded_at": "2026-10-28T04:29:14.536540+00:00"
   },
   {
-    "upc": "027736048724",
-    "name": "#36 Morning Glory",
-    "old_price": 8.0,
-    "new_price": 6.0,
-    "recorded_at": "2026-10-27T23:34:33.769708+00:00"
-  },
-  {
-    "upc": "8906147054796",
-    "name": "Deccan Jeerasamba Rice 10lb",
-    "old_price": 18.99,
-    "new_price": 13.99,
-    "recorded_at": "2026-10-27T23:34:33.769708+00:00"
+    "upc": "179319037738",
+    "name": "Cauliflower Each",
+    "old_price": 4.99,
+    "new_price": 2.99,
+    "recorded_at": "2026-10-28T04:29:14.536540+00:00"
   }
 ]
