@@ -600,7 +600,8 @@ def print_history():
     Query params:
       limit  : default 100 (default 1000 when start/end given), max 500
                (max 2000 when start/end given).
-      reason : filter to "price_change" or "manual" (manual = reason is NULL).
+      reason : filter to "price_change", "new_item" (new items and barcode
+               changes) or "manual" (manual = reason is NULL).
       start, end : optional inclusive local-calendar-date range (YYYY-MM-DD,
                    store timezone America/New_York) filtered on created_at.
                    Both must be given together.
@@ -634,6 +635,8 @@ def print_history():
     q = base
     if reason == "price_change":
         q = q.filter(PrintJob.reason == "price_change")
+    elif reason == "new_item":
+        q = q.filter(PrintJob.reason.in_(("new_item", "barcode_change")))
     elif reason == "manual":
         q = q.filter(or_(PrintJob.reason.is_(None), PrintJob.reason == ""))
 
@@ -658,14 +661,42 @@ def print_history():
         out.append(d)
 
     pc = base.filter(PrintJob.reason == "price_change").count()
+    new = base.filter(PrintJob.reason.in_(("new_item", "barcode_change"))).count()
     total = base.count()
     return jsonify(
         {
             "count": len(out),
             "jobs": out,
-            "counts": {"price_change": pc, "manual": total - pc, "total": total},
+            # Additive (Oct 31 2026): new_item = new items + barcode changes.
+            "counts": {"price_change": pc, "new_item": new, "manual": total - pc - new, "total": total},
         }
     )
+
+
+@bp.get("/auto-print-settings")
+def get_auto_print_settings():
+    """The "Automatic labels" switches: {new_items, barcode_changes}, plus
+    price_changes (read-only here: STL_AUTO_PRINT_PRICE_CHANGES)."""
+    from ..services.label_settings import auto_print_switches
+
+    out = auto_print_switches()
+    out["price_changes"] = bool(current_app.config.get("AUTO_PRINT_PRICE_CHANGES", True))
+    return jsonify(out)
+
+
+@bp.post("/auto-print-settings")
+def save_auto_print_settings():
+    """Body {new_items?: bool, barcode_changes?: bool}. Refused for a demo login."""
+    refused = _demo_write_refusal()
+    if refused is not None:
+        return refused
+    from ..services.label_settings import set_auto_print_switches
+
+    body = request.get_json(silent=True) or {}
+    out = set_auto_print_switches(body)
+    out["price_changes"] = bool(current_app.config.get("AUTO_PRINT_PRICE_CHANGES", True))
+    current_app.logger.info("automatic label switches saved: %s", out)
+    return jsonify(out)
 
 
 @bp.get("/products/<int:product_id>/last-print")

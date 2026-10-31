@@ -198,7 +198,7 @@ def test_print_history_price_change_rows_and_counts(client, ctx):
     _job(q, price=3.0)
 
     body = client.get("/api/print-history").get_json()
-    assert body["counts"] == {"price_change": 1, "manual": 2, "total": 3}
+    assert body["counts"] == {"price_change": 1, "new_item": 0, "manual": 2, "total": 3}
     pc = [j for j in body["jobs"] if j["reason"] == "price_change"][0]
     assert pc["old_price"] == pytest.approx(5.99)
     assert pc["new_price"] == pytest.approx(6.49)
@@ -214,7 +214,7 @@ def test_print_history_price_change_rows_and_counts(client, ctx):
 
     by_product = client.get(f"/api/print-history?product_id={q.id}").get_json()
     assert by_product["count"] == 2
-    assert by_product["counts"] == {"price_change": 0, "manual": 2, "total": 2}
+    assert by_product["counts"] == {"price_change": 0, "new_item": 0, "manual": 2, "total": 2}
 
 
 def test_print_history_legacy_rows_get_inferred_values(client, ctx):

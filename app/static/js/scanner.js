@@ -75,9 +75,17 @@
 
   // Plain-language note about the last label printed for this product, so
   // staff don't reprint a label the price update already printed.
+  // Why an automatic label was printed (print history reasons).
+  const AUTO_WHO = {
+    price_change: "by the price update",
+    new_item: "when the item was added",
+    barcode_change: "when the barcode changed",
+  };
+  const AUTO_TAG = { price_change: "price change", new_item: "new item", barcode_change: "new barcode" };
+
   function lastPrintNote(lp) {
     if (!lp) return "";
-    const who = lp.reason === "price_change" ? "automatically by the price update" : "from the scanner";
+    const who = AUTO_WHO[lp.reason] ? `automatically ${AUTO_WHO[lp.reason]}` : "from the scanner";
     const when = estString(lp.at);
     if (lp.matches_current_price) {
       return `<div class="last-print same">✓ A label at this price was already printed ${who} (${escapeHtml(when)}). Only print again if the shelf label is missing or damaged.</div>`;
@@ -242,7 +250,7 @@
     if (!currentUpc) return;
     const lp = currentLastPrint;
     if (lp && lp.matches_current_price && isRecent(lp.at, RECENT_PRINT_DAYS)) {
-      const who = lp.reason === "price_change" ? "by the price update" : "already";
+      const who = AUTO_WHO[lp.reason] || "already";
       if (!window.confirm(`This label was printed ${who} on ${estString(lp.at)} at ${money(lp.price_at_print)}. Print it again?`)) return;
     }
     const copies = Math.max(1, parseInt($("copies-input").value || "1", 10));
@@ -481,7 +489,7 @@
   function phRow(j) {
     const when = j.completed_at || j.claimed_at || j.created_at;
     const whenStr = estString(when);
-    const tag = j.reason === "price_change" ? `<span class="pc-tag">price change</span>` : "";
+    const tag = AUTO_TAG[j.reason] ? `<span class="pc-tag">${AUTO_TAG[j.reason]}</span>` : "";
     // Price on the label: "$5.99 → $6.49" for a price change, else the price.
     let priceStr = "";
     if (j.reason === "price_change" && j.new_price != null) {
@@ -522,7 +530,34 @@
 
   async function openPrintHistory() {
     show(printHistoryCard);
+    loadAutoSwitches();
     await refreshPrintHistory();
+  }
+
+  // ── "Automatic labels" switches (Oct 31 2026) ─────────────────────────
+  async function loadAutoSwitches() {
+    const { ok, body } = await getJSON("/api/auto-print-settings");
+    if (!ok || !body) return;
+    $("auto-new-items").checked = !!body.new_items;
+    $("auto-barcode-changes").checked = !!body.barcode_changes;
+  }
+
+  async function saveAutoSwitch(e) {
+    const box = e.target;
+    const name = box.id === "auto-new-items" ? "new_items" : "barcode_changes";
+    box.disabled = true;
+    const { ok, body } = await getJSON("/api/auto-print-settings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ [name]: box.checked }),
+    });
+    box.disabled = false;
+    if (!ok) {
+      box.checked = !box.checked;
+      toast((body && (body.message || body.error)) || "Couldn't save. Try again.");
+      return;
+    }
+    toast(box.checked ? "Saved: these labels print automatically." : "Saved: these labels won't print automatically.");
   }
 
   // Same shape as the dashboard's date-range pickers: fixed presets (days
@@ -585,7 +620,12 @@
     // Counts per kind for the range (server-side, ignores the Show filter).
     const counts = body && body.counts;
     if (counts) {
-      const labels = { "": `All prints (${counts.total})`, manual: `Manual/scan only (${counts.manual})`, price_change: `Price-change only (${counts.price_change})` };
+      const labels = {
+        "": `All prints (${counts.total})`,
+        manual: `Manual/scan only (${counts.manual})`,
+        price_change: `Price-change only (${counts.price_change})`,
+        new_item: `New items & barcodes (${counts.new_item ?? 0})`,
+      };
       for (const opt of $("ph-filter").options) if (opt.value in labels) opt.textContent = labels[opt.value];
     }
     list.innerHTML = "";
@@ -739,6 +779,8 @@
   };
   $("btn-print-history").onclick = openPrintHistory;
   $("btn-ph-refresh").onclick = refreshPrintHistory;
+  $("auto-new-items").onchange = saveAutoSwitch;
+  $("auto-barcode-changes").onchange = saveAutoSwitch;
   $("ph-filter").onchange = refreshPrintHistory;
   $("ph-range").onchange = handlePhRangeChange;
   $("ph-start").onchange = handlePhCustomDateChange;

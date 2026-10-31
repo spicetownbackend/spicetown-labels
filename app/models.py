@@ -265,3 +265,37 @@ class PrintJob(db.Model):
                 self.completed_at.isoformat() if self.completed_at else None
             ),
         }
+
+
+class LabelEvent(db.Model):
+    """An item a sync added (`new_item`) or found under a new barcode
+    (`barcode_change`), waiting for its automatic label (owner, Oct 31 2026:
+    "print labels for newly added items ... and if the barcode is updated").
+    services.auto_print prints one label per event after each sync."""
+
+    __tablename__ = "label_events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    product_id: Mapped[int] = mapped_column(
+        ForeignKey("products.id", ondelete="CASCADE"), nullable=False
+    )
+    kind: Mapped[str] = mapped_column(String(20), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow, nullable=False)
+    # Set once a label is queued, one was already printed, or it was dropped
+    # (switch off, too old); `outcome` says which.
+    handled_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    outcome: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    job_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+
+    __table_args__ = (Index("ix_label_events_open", "handled_at"),)
+
+
+class AppSetting(db.Model):
+    """Small key/value settings changed from the scanner page (the automatic
+    label switches). A missing key falls back to config.py."""
+
+    __tablename__ = "app_settings"
+
+    key: Mapped[str] = mapped_column(String(60), primary_key=True)
+    value: Mapped[str] = mapped_column(String(200), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)

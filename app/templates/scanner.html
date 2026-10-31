@@ -138,12 +138,18 @@
     <section id="print-history-card" class="card" hidden>
       <button id="btn-back5" class="btn btn-link">← Back</button>
       <h2>Print history</h2>
+      <fieldset class="auto-labels">
+        <legend>Print automatically</legend>
+        <label><input type="checkbox" id="auto-new-items"> New items <span class="hint">when Toast adds an item (no barcode = label without one)</span></label>
+        <label><input type="checkbox" id="auto-barcode-changes"> Barcode changes <span class="hint">when an item gets a new barcode</span></label>
+      </fieldset>
       <div class="price-changes-actions">
         <label class="field">Show
           <select id="ph-filter">
             <option value="">All prints</option>
             <option value="manual">Manual/scan only</option>
             <option value="price_change">Price-change only</option>
+            <option value="new_item">New items &amp; barcodes</option>
           </select>
         </label>
         <label class="field">Range

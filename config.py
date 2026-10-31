@@ -237,6 +237,13 @@ class Config:
     # log it to print_jobs (reason="price_change") — no staff review click
     # needed. Set false to fall back to the manual Price Changes review panel.
     AUTO_PRINT_PRICE_CHANGES = _as_bool(os.getenv("STL_AUTO_PRINT_PRICE_CHANGES"), True)
+    # Automatic labels for items a sync adds, and for items that get a new
+    # barcode (Oct 31 2026). Defaults only: the scanner page's "Automatic
+    # labels" switches (app_settings) win. At most this many per sync; the
+    # rest print after the next sync.
+    AUTO_PRINT_NEW_ITEMS = _as_bool(os.getenv("STL_AUTO_PRINT_NEW_ITEMS"), True)
+    AUTO_PRINT_BARCODE_CHANGES = _as_bool(os.getenv("STL_AUTO_PRINT_BARCODE_CHANGES"), True)
+    AUTO_PRINT_EVENTS_PER_PASS = int(os.getenv("STL_AUTO_PRINT_EVENTS_PER_PASS", "60"))
 
     # ── Logging (rotating file handlers) ──────────────────────────────────────
     LOG_DIR = LOG_DIR

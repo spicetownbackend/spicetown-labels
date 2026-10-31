@@ -90,6 +90,7 @@ def upsert_record(
     shorten_max_chars: int = DEFAULT_MAX_CHARS,
     existing: Product | None = None,
     stats: LoadStats | None = None,
+    record_events: bool = False,
 ) -> Product:
     """Insert or update a single product from a ProductRecord.
 
@@ -108,6 +109,11 @@ def upsert_record(
         When None, the function queries by UPC itself (single-lookup path).
     stats:
         Optional LoadStats to tally into.
+    record_events:
+        A sync of an existing catalog (not a first load, not a scan-time
+        lookup): an inserted item gets a LabelEvent for its automatic label -
+        `barcode_change` when an item of the same name is already on file
+        under another code, else `new_item`.
 
     The caller is responsible for committing the session (callers batch commits).
     """
@@ -157,6 +163,8 @@ def upsert_record(
         db.session.add(product)
         if stats is not None:
             stats.inserted += 1
+        if record_events:
+            _record_label_event(product)
         return product
 
     # ── UPDATE ──────────────────────────────────────────────────────────────
@@ -299,6 +307,8 @@ def bulk_load(
                     shorten_max_chars=shorten_max_chars,
                     existing=existing_map.get(key),
                     stats=stats,
+                    # A first load into an empty catalog is not "new items".
+                    record_events=bool(existing_map),
                 )
             except Exception:  # pragma: no cover - per-record resilience
                 stats.errors += 1
@@ -334,6 +344,20 @@ def bulk_load(
         stats.duration_seconds,
     )
     return stats
+
+
+def _record_label_event(product: Product) -> None:
+    from ..models import LabelEvent
+
+    db.session.flush()  # the new row's id
+    earlier = (
+        db.session.query(Product.id)
+        .filter(Product.name == product.name, Product.id != product.id, Product.upc != product.upc)
+        .first()
+    )
+    db.session.add(
+        LabelEvent(product_id=product.id, kind="barcode_change" if earlier else "new_item")
+    )
 
 
 def retire_supplier_keys() -> int:

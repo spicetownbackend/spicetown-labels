@@ -38,9 +38,13 @@ _LEGACY_MATCH_BEFORE = timedelta(seconds=5)
 _LEGACY_MATCH_AFTER = timedelta(seconds=60)
 
 
+AUTO_REASONS = ("price_change", "new_item", "barcode_change")
+
+
 def reason_key(reason: str | None) -> str:
-    """Public reason name: "price_change" or "manual" (NULL/"" = manual)."""
-    return "price_change" if reason == "price_change" else "manual"
+    """Public reason name: "price_change", "new_item", "barcode_change" (the
+    automatic labels) or "manual" (NULL/"" or anything else)."""
+    return reason if reason in AUTO_REASONS else "manual"
 
 
 def same_price(a: float | None, b: float | None) -> bool:
