@@ -1,1 +1,611 @@
-[]
+[
+  {
+    "upc": "011433073172",
+    "name": "Deep Fennel Seeds 7oz",
+    "old_price": 2.49,
+    "new_price": 2.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "011433114752",
+    "name": "Deep Red Chilli Pwd 28oz",
+    "old_price": 6.99,
+    "new_price": 6.49,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "011433119733",
+    "name": "Deep Dahi Low Fat 5lb",
+    "old_price": 7.49,
+    "new_price": 7.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "011433119757",
+    "name": "Deep Dahi Whole Milk 5lb",
+    "old_price": 6.99,
+    "new_price": 7.49,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "011433133432",
+    "name": "Deep Golden Raisins 198g/7oz",
+    "old_price": 3.99,
+    "new_price": 2.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "011433134323",
+    "name": "Deep Cumin Powder 400gm",
+    "old_price": 6.99,
+    "new_price": 5.49,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "011433134439",
+    "name": "Deep Cinnamon Stick 3.5oz",
+    "old_price": 1.99,
+    "new_price": 2.19,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "011433137003",
+    "name": "Deep Dry Pumpkin Seeds 7oz",
+    "old_price": 3.49,
+    "new_price": 3.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "011433150149",
+    "name": "Deep Jumbo Punjabi Samosa 8PC",
+    "old_price": 8.49,
+    "new_price": 9.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "011433151672",
+    "name": "Deep Alphonso Mango Pulp 30oz",
+    "old_price": 3.49,
+    "new_price": 3.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "011433160421",
+    "name": "Deep Bhatura FP 20 pcs",
+    "old_price": 11.99,
+    "new_price": 12.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "011433161091",
+    "name": "Deep Cloves Bottle 100g",
+    "old_price": 5.99,
+    "new_price": 4.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "021121691236",
+    "name": "Anar Fresh (Pomogrenade)",
+    "old_price": 1.99,
+    "new_price": 3.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "023623590758",
+    "name": "Dudhi Desi - Long in LBs",
+    "old_price": 2.29,
+    "new_price": 1.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "023623991913",
+    "name": "Dudhi Short in LBs",
+    "old_price": 1.99,
+    "new_price": 2.09,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "023627991957",
+    "name": "Okra Indian in LBs",
+    "old_price": 2.99,
+    "new_price": 2.49,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "023628013030",
+    "name": "String Bean in LBs",
+    "old_price": 2.45,
+    "new_price": 3.95,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "033383605005",
+    "name": "Scallion Bunch",
+    "old_price": 1.99,
+    "new_price": 1.29,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "051179174009",
+    "name": "SWAD Sooji Coarse 2lb",
+    "old_price": 2.95,
+    "new_price": 2.75,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "053600102568",
+    "name": "Desi Dahi LowFat 2LB",
+    "old_price": 3.99,
+    "new_price": 4.29,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "053600164061",
+    "name": "Desi Dahi Low Fat 2LB",
+    "old_price": 3.99,
+    "new_price": 4.49,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "053600164337",
+    "name": "Desi Dahi Low Fat 4LB",
+    "old_price": 6.99,
+    "new_price": 7.49,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "081864202168",
+    "name": "Roasted Peanut 16oz",
+    "old_price": 2.99,
+    "new_price": 3.49,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "1287",
+    "name": "Karela in LBs",
+    "old_price": 2.99,
+    "new_price": 2.29,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "174367547246",
+    "name": "Eggplant CH. (Long) in LBs",
+    "old_price": 1.79,
+    "new_price": 1.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "179146498177",
+    "name": "Sweet Potato in LBs",
+    "old_price": 3.79,
+    "new_price": 3.49,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "3305520",
+    "name": "Dettol Liquid 250ml",
+    "old_price": 4.99,
+    "new_price": 5.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "628950001238",
+    "name": "Mampster Suji Pani Puri 290g",
+    "old_price": 6.99,
+    "new_price": 7.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "6291103750143",
+    "name": "MDH Deggi Chilli Powder 3.5oz",
+    "old_price": 2.99,
+    "new_price": 3.49,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "6291103750167",
+    "name": "MDH Garam Masala 100G",
+    "old_price": 3.49,
+    "new_price": 2.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "723246176574",
+    "name": "Laxmi Garam Masala 400g",
+    "old_price": 5.99,
+    "new_price": 6.49,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "723246176604",
+    "name": "Laxmi Ginger Powder 200g",
+    "old_price": 2.99,
+    "new_price": 3.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "723246176710",
+    "name": "Laxmi Methi Seeds 400g",
+    "old_price": 2.79,
+    "new_price": 2.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "723246176994",
+    "name": "Laxmi Turmeric Powder 200g",
+    "old_price": 2.29,
+    "new_price": 1.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "723246177625",
+    "name": "Laxmi Whole Clove 200g",
+    "old_price": 7.49,
+    "new_price": 7.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "723246232034",
+    "name": "Laxmi Kabuli Chana 4lb - Each",
+    "old_price": 6.49,
+    "new_price": 6.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "723246285085",
+    "name": "Laxmi Tamarind Date Chutney 16oz",
+    "old_price": 7.99,
+    "new_price": 8.49,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "723246290096",
+    "name": "Laxmi Aloo Paratha 100g",
+    "old_price": 2.99,
+    "new_price": 3.49,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "723246291765",
+    "name": "Laxmi Poha Red 400g",
+    "old_price": 2.49,
+    "new_price": 2.79,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "723246297033",
+    "name": "Laxmi Laddo Besan 2lb",
+    "old_price": 4.49,
+    "new_price": 5.49,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "755270000310",
+    "name": "Maaza Lychee Glass Bottle 1lt",
+    "old_price": 4.99,
+    "new_price": 5.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "755270000518",
+    "name": "Maaza Lychee Glass Bottle 330ml",
+    "old_price": 2.49,
+    "new_price": 3.49,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "846203004625",
+    "name": "Chitale Bhakarwadi 250g",
+    "old_price": 2.99,
+    "new_price": 3.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "872198003510",
+    "name": "Vidhya Pani Puri 260gm (Sooji)",
+    "old_price": 5.99,
+    "new_price": 6.95,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "8901030893599",
+    "name": "Brookbond Red Label Tea 500g",
+    "old_price": 5.99,
+    "new_price": 6.49,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "8901063151024",
+    "name": "Britannia Digestive Original 14oz",
+    "old_price": 3.99,
+    "new_price": 4.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "8901123005403",
+    "name": "Lotte Choco Pie 336g",
+    "old_price": 4.99,
+    "new_price": 5.49,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "8901155110212",
+    "name": "Gits Rava Dosa 200g",
+    "old_price": 2.79,
+    "new_price": 2.29,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "8901242107514",
+    "name": "Bambino Roasted Vermicelli 800g",
+    "old_price": 3.99,
+    "new_price": 4.79,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "8901595852338",
+    "name": "Ching's Green Chilli Sauce 680g",
+    "old_price": 3.99,
+    "new_price": 2.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "8901595852345",
+    "name": "Ching's Red Chilli Sauce 650ml",
+    "old_price": 3.49,
+    "new_price": 2.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "8901595862726",
+    "name": "Chings Dark Soy Sauce 210gm",
+    "old_price": 2.49,
+    "new_price": 1.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "8901595862733",
+    "name": "Chings Green Chilli Sauce 190g",
+    "old_price": 2.49,
+    "new_price": 1.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "8901595862740",
+    "name": "Chings Red Chilli Sauce 200g",
+    "old_price": 2.79,
+    "new_price": 1.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "8904013000007",
+    "name": "Telephone Isabgol 200g",
+    "old_price": 7.99,
+    "new_price": 8.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "8904063202291",
+    "name": "Haldiram's Aloo Paratha 1.6 kg",
+    "old_price": 11.99,
+    "new_price": 10.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "8904063207593",
+    "name": "Haldiram's Vada for Dahi Vada 365g",
+    "old_price": 3.49,
+    "new_price": 3.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "8904063209764",
+    "name": "Haldiram's Khaman Dhokla 283g",
+    "old_price": 3.29,
+    "new_price": 2.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "8904063209924",
+    "name": "Haldiram's Tandoori Naan 1.28kg/16pc",
+    "old_price": 9.99,
+    "new_price": 7.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "8904063211613",
+    "name": "Haldiram Mix Veg Paratha Value Pack 1.6kg",
+    "old_price": 14.99,
+    "new_price": 13.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "8904063213297",
+    "name": "Haldiram's Gujiya 380g",
+    "old_price": 7.49,
+    "new_price": 5.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "8904063225290",
+    "name": "Haldiram's Sweet Delicacies 500g",
+    "old_price": 16.99,
+    "new_price": 12.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "8904063252814",
+    "name": "Haldiram's Punjabi Samosa 1.4kg (70gm x 20pc)",
+    "old_price": 14.99,
+    "new_price": 13.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "8904063253675",
+    "name": "Haldiram's Homestyle Paratha 20PC/1.2kg",
+    "old_price": 9.99,
+    "new_price": 7.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "8904063253682",
+    "name": "Haldiram's Phulka Roti 900g",
+    "old_price": 7.99,
+    "new_price": 6.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "8904063253941",
+    "name": "Haldiram Paneer SLAB 360g",
+    "old_price": 8.49,
+    "new_price": 6.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "8904063255006",
+    "name": "Haldiram's Punjabi Samosa 650g - 8pc",
+    "old_price": 8.99,
+    "new_price": 7.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "8904063255020",
+    "name": "Haldiram's Cocktail Samosa 650g",
+    "old_price": 9.9,
+    "new_price": 7.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "8904063256775",
+    "name": "Haldiram's Jumbo Punjabi Samosa 1.4kg (100gm x 14pc)",
+    "old_price": 15.99,
+    "new_price": 13.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "8904063281180",
+    "name": "Haldiram's Onion Paratha 400g",
+    "old_price": 3.99,
+    "new_price": 4.49,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "8904063281197",
+    "name": "Haldiram's Homestyle Paratha 360g/6PC",
+    "old_price": 3.29,
+    "new_price": 2.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "8904063281302",
+    "name": "Haldiram's Tandoori Naan 400g",
+    "old_price": 3.49,
+    "new_price": 2.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "8904063281388",
+    "name": "Haldiram's Dodha Burfee 340g",
+    "old_price": 8.49,
+    "new_price": 7.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "8904063281531",
+    "name": "Haldiram's Mutter Paneer 283gm",
+    "old_price": 5.99,
+    "new_price": 6.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "8904063281579",
+    "name": "Haldirams Palak Paneer 283g",
+    "old_price": 5.49,
+    "new_price": 5.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "8906081382924",
+    "name": "Telugu Sea Salt 2lb",
+    "old_price": 1.99,
+    "new_price": 2.49,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "8906103470424",
+    "name": "Ashwin Clove Oil 20ml",
+    "old_price": 1.99,
+    "new_price": 2.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "8909106049703",
+    "name": "Fair & Lovely Multivitamin 110gm",
+    "old_price": 7.99,
+    "new_price": 8.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "899450002005",
+    "name": "Roti Fresh Chapathi",
+    "old_price": 7.49,
+    "new_price": 5.95,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "899450002159",
+    "name": "Roti Fresh Original",
+    "old_price": 7.49,
+    "new_price": 5.95,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "899450002340",
+    "name": "Organic Tava Fresh",
+    "old_price": 7.49,
+    "new_price": 6.95,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "9556587101674",
+    "name": "Kawan Onion Paratha Blk 25x80g",
+    "old_price": 14.99,
+    "new_price": 15.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "TG-1CCF11A70D5A",
+    "name": "Haldiram's Panner Cubes 900g",
+    "old_price": 19.49,
+    "new_price": 14.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "TG-35328C109F25",
+    "name": "Telugu Raw Mango Dices 300g",
+    "old_price": 4.99,
+    "new_price": 4.49,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "TG-4608649869AF",
+    "name": "Brar Makhani 250g",
+    "old_price": 10.49,
+    "new_price": 8.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "TG-9BD161F3FDA4",
+    "name": "Haldiram's Paneer Kulcha 320g",
+    "old_price": 5.99,
+    "new_price": 5.49,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  },
+  {
+    "upc": "TG-BFCE00232346",
+    "name": "Haldiram's Kaju Katli & Motichoor Laddu 900g",
+    "old_price": 29.49,
+    "new_price": 20.99,
+    "recorded_at": "2026-10-31T19:27:57.965275+00:00"
+  }
+]
