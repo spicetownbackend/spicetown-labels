@@ -32,6 +32,7 @@ MENUS_DOC = {
                         {"guid": "a1b2c3d4-e5f6-7890-abcd-ef0123456789", "name": "No Barcode Item", "sku": "", "price": 3.99},
                         {"guid": "g3", "name": "Open Priced", "sku": "111", "price": 0},
                         {"guid": "g5", "name": "Bulk Basmati Rice", "sku": "", "plu": "4011", "price": 2.50},
+                        {"guid": "abcdef01-2345-6789-abcd-ef0123456789", "name": "Bananas", "sku": "", "plu": "RBest", "price": 0.69},
                     ],
                     "menuGroups": [
                         {
@@ -141,6 +142,7 @@ def test_fetch_all_maps_and_skips(fake):
     # (their labels simply omit the price area).
     assert set(recs) == {
         "041196910184", "085239014288", "4011", "TG-A1B2C3D4E5F6", "111",
+        "TG-ABCDEF012345",
     }
     assert recs["111"].name == "Open Priced"
     assert recs["111"].price == 0.0
@@ -154,6 +156,21 @@ def test_fetch_all_maps_and_skips(fake):
     # No-barcode items stay findable by name; their key is stable run-to-run.
     assert recs["TG-A1B2C3D4E5F6"].name == "No Barcode Item"
     assert recs["4011"].name == "Bulk Basmati Rice"
+    # A supplier name in the PLU is not a barcode: the internal code is used,
+    # and the old key is passed on so the loader can move the row.
+    assert recs["TG-ABCDEF012345"].name == "Bananas"
+    assert recs["TG-ABCDEF012345"].extra["legacy_upc"] == "RBest"
+    assert "legacy_upc" not in recs["4011"].extra
+
+
+def test_plu_code_keeps_codes_drops_supplier_names():
+    from app.providers.toast_provider import plu_code
+
+    for code in ("4011", "001401", "RIM87230", "Cu3211", "TEA0016-2", "MIDR21_"):
+        assert plu_code(code) == code
+    for name in ("Vdyas", "RBest", "ACT_SUP_UPDT", "Radhey Foods", "KP Produce;Raja Foods;Sai Florals",
+                 "Mysha Distributors LLC", "SpiceTown - Street Kitchen", "", "  "):
+        assert plu_code(name) == ""
 
 
 def test_fetch_by_upc_hit_miss_and_doc_reuse(fake):
@@ -169,7 +186,7 @@ def test_fetch_by_upc_hit_miss_and_doc_reuse(fake):
 def test_retries_on_429_then_succeeds(fake):
     fake.scripted["/menus/v2/menus"] = [FakeResponse(429), FakeResponse(200, MENUS_DOC)]
     recs = list(_provider().fetch_all())
-    assert len(recs) == 5
+    assert len(recs) == 6
     assert fake.count("/menus/v2/menus") == 2
 
 

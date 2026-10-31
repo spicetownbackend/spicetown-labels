@@ -119,6 +119,19 @@ def upsert_record(
             .filter_by(upc=rec.upc, name=rec.name)
             .first()
         )
+        legacy = (rec.extra or {}).get("legacy_upc")
+        if existing is None and legacy and legacy != rec.upc:
+            # The item's key changed (a supplier name in the PLU is no longer
+            # used as its barcode, Oct 31 2026): move the old row to the new
+            # key so its print and price history stay with it.
+            existing = (
+                db.session.query(Product)
+                .filter_by(upc=legacy, name=rec.name)
+                .first()
+            )
+            if existing is not None:
+                logger.info("re-keyed '%s': %s -> %s", rec.name, legacy, rec.upc)
+                existing.upc = rec.upc
 
     now = utcnow()
     short = shorten_name(rec.name, max_chars=shorten_max_chars)
@@ -298,6 +311,8 @@ def bulk_load(
                 pending = 0
 
         db.session.commit()
+        if provider.name == "toast":
+            retire_supplier_keys()
     except Exception:
         db.session.rollback()
         logger.exception("bulk_load aborted; rolled back uncommitted batch")
@@ -319,6 +334,32 @@ def bulk_load(
         stats.duration_seconds,
     )
     return stats
+
+
+def retire_supplier_keys() -> int:
+    """Give a safe internal code to leftover rows still keyed on a supplier
+    name from Toast's PLU (items no longer in Toast under that key, so a sync
+    never moves them). Without this, scanning an old label printed with
+    "Vdyas" still listed them, some at old prices. They stay findable by
+    name; their history is kept. Returns how many were changed."""
+    from ..providers.toast_provider import plu_code
+
+    rows = (
+        db.session.query(Product)
+        .filter((Product.sku.is_(None)) | (Product.sku == ""))
+        .filter(~Product.upc.like("TG-%"))
+        .all()
+    )
+    changed = 0
+    for p in rows:
+        if plu_code(p.upc):
+            continue  # a real code: labels printed with it keep scanning
+        logger.info("retired supplier key '%s' on '%s' (id %s)", p.upc, p.name, p.id)
+        p.upc = f"TG-OLD{p.id:08d}"
+        changed += 1
+    if changed:
+        db.session.commit()
+    return changed
 
 
 class RefreshInProgress(Exception):

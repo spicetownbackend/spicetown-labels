@@ -9,8 +9,9 @@ Mapping (per the store's Toast setup):
   * ProductRecord.name  <- item `name`
   * ProductRecord.price <- item `price` (fixed-price items)
   * department          <- the menu group's name (falls back to the menu name)
-Items without a name or any stable key (sku/PLU/GUID) are skipped (logged once
-per sync). Zero/open-priced items ARE kept — their labels omit the price area.
+Items without a name or any stable key (sku/PLU code/GUID) are skipped (logged
+once per sync). The PLU is used only when it looks like a code (see plu_code):
+this store types supplier names into it. Zero/open-priced items ARE kept — their labels omit the price area.
 
 Activation (config only):
     1. Set STL_TOAST_CLIENT_ID / STL_TOAST_CLIENT_SECRET /
@@ -53,6 +54,21 @@ _HTTP_TIMEOUT = 30.0
 
 class ToastAuthError(Exception):
     """Raised when Toast rejects the client credentials."""
+
+
+def plu_code(plu: str) -> str:
+    """The PLU when it can serve as a label code, else "".
+
+    Spice Town types supplier names into Toast's PLU field ("Vdyas",
+    "KP Produce;Raja Foods", "ACT_SUP_UPDT"). Used as a barcode, every item of
+    that supplier printed the same "barcode" and scanning it listed them all
+    (owner, Oct 31 2026). A real code has a digit and no spaces or ";"
+    ("4011", "001401", "RIM87230"); labels already printed with one keep
+    scanning."""
+    plu = (plu or "").strip()
+    if not plu or any(c.isspace() for c in plu) or ";" in plu:
+        return ""
+    return plu if any(c.isdigit() for c in plu) else ""
 
 
 class ToastDataProvider(DataProvider):
@@ -236,25 +252,31 @@ class ToastDataProvider(DataProvider):
         # Open-priced / unpriced items (price 0) are kept: their labels simply
         # omit the price area, so staff can still print name+barcode tags.
 
-        # Barcode key: sku (the store keeps the UPC there), else PLU, else a
-        # stable code derived from the Toast GUID. Items without a real
-        # barcode are still loadable — staff find them by NAME SEARCH in the
-        # scanner UI, and the printed label carries the internal code as a
-        # scannable Code128, so the label itself scans from then on.
+        # Barcode key: sku (the store keeps the UPC there), else a PLU that
+        # looks like a code, else a stable code derived from the Toast GUID.
+        # Items without a real barcode are still loadable — staff find them by
+        # NAME SEARCH in the scanner UI, and the printed label carries the
+        # internal code as a scannable Code128, so the label itself scans from
+        # then on.
         sku = (str(item.get("sku") or "")).strip()
         plu = (str(item.get("plu") or "")).strip()
         guid = (str(item.get("guid") or "")).strip()
-        upc = sku or plu or (f"TG-{guid.replace('-', '')[:12].upper()}" if guid else "")
+        upc = sku or plu_code(plu) or (f"TG-{guid.replace('-', '')[:12].upper()}" if guid else "")
         if not upc:
             return None  # nothing stable to key on
 
+        extra = {"toast_guid": item.get("guid"), "menu": menu_name or None}
+        if not sku and plu and upc != plu:
+            # Before Oct 31 2026 the raw PLU was the key (a supplier name here):
+            # the loader moves that row to the new key, keeping its history.
+            extra["legacy_upc"] = plu
         return ProductRecord(
             upc=upc,
             name=name,
             price=price,
             sku=sku or None,
             department=department or None,
-            extra={"toast_guid": item.get("guid"), "menu": menu_name or None},
+            extra=extra,
         )
 
     # ── DataProvider interface ────────────────────────────────────────────────
