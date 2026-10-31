@@ -14,10 +14,12 @@
 
 name: ci
 
+# Manual only (owner, 2026-10-31: "make it manual only like retailops"), the
+# same as the KloudC RetailOps repos: every failed run emailed the owner. The
+# full suite runs on the store Mac before every push; start this by hand from
+# Actions > ci > Run workflow. The image build/push jobs below only ran on
+# push, so they are off too (the live service runs from the store Mac).
 on:
-  push:
-    branches: [ main ]
-  pull_request:
   workflow_dispatch:
 
 jobs:
