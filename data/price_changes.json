@@ -1,1 +1,44 @@
-[]
+[
+  {
+    "upc": "033383536101",
+    "name": "Potato Idaho 5lb",
+    "old_price": 3.29,
+    "new_price": 3.99,
+    "recorded_at": "2026-11-04T00:06:41.153727+00:00"
+  },
+  {
+    "upc": "179143831892",
+    "name": "Potato Red 5lb",
+    "old_price": 4.99,
+    "new_price": 5.99,
+    "recorded_at": "2026-11-04T00:06:41.153727+00:00"
+  },
+  {
+    "upc": "TG-68D5A56BB18D",
+    "name": "Photo Frame Bubble Crystal 12\" x 18\" - Radha Krishna",
+    "old_price": 14.95,
+    "new_price": 16.95,
+    "recorded_at": "2026-11-04T00:06:41.153727+00:00"
+  },
+  {
+    "upc": "TG-6BEDE8A7D1B9",
+    "name": "3FFB - 25 Artificial Flower Toran 3 Feet",
+    "old_price": 7.95,
+    "new_price": 8.95,
+    "recorded_at": "2026-11-04T00:06:41.153727+00:00"
+  },
+  {
+    "upc": "TG-A47BF7C22188",
+    "name": "Photo Frame Bubble Crystal 12\" x 18\" - Ganesh",
+    "old_price": 12.99,
+    "new_price": 16.95,
+    "recorded_at": "2026-11-04T00:06:41.153727+00:00"
+  },
+  {
+    "upc": "TG-A8FDB1A69F29",
+    "name": "Clay Decorative Assorted Diya 2\"(Ketan/Gulab/Paan/Hawan/ Shree)Set",
+    "old_price": 16.95,
+    "new_price": 10.99,
+    "recorded_at": "2026-11-04T00:06:41.153727+00:00"
+  }
+]
