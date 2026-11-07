@@ -1,9 +1,72 @@
 [
   {
-    "upc": "027736018895",
-    "name": "Pink Diamonds J06",
-    "old_price": 9.0,
-    "new_price": 10.0,
-    "recorded_at": "2026-11-07T04:59:10.824932+00:00"
+    "upc": "023623991913",
+    "name": "Dudhi Short in LBs",
+    "old_price": 2.09,
+    "new_price": 2.29,
+    "recorded_at": "2026-11-07T17:31:28.949992+00:00"
+  },
+  {
+    "upc": "023628553857",
+    "name": "Tindora / Dondakayya in LBs",
+    "old_price": 2.99,
+    "new_price": 4.99,
+    "recorded_at": "2026-11-07T17:31:28.949992+00:00"
+  },
+  {
+    "upc": "027736055081",
+    "name": "Bee Hive F25",
+    "old_price": 6.0,
+    "new_price": 5.0,
+    "recorded_at": "2026-11-07T17:31:28.949992+00:00"
+  },
+  {
+    "upc": "033383605005",
+    "name": "Scallion Bunch",
+    "old_price": 1.29,
+    "new_price": 1.49,
+    "recorded_at": "2026-11-07T17:31:28.949992+00:00"
+  },
+  {
+    "upc": "041331024006",
+    "name": "Goya Red kidney Beans 29oz",
+    "old_price": 5.99,
+    "new_price": 6.99,
+    "recorded_at": "2026-11-07T17:31:28.949992+00:00"
+  },
+  {
+    "upc": "049200045503",
+    "name": "Domino Granulated Sugar 4lb",
+    "old_price": 5.99,
+    "new_price": 6.49,
+    "recorded_at": "2026-11-07T17:31:28.949992+00:00"
+  },
+  {
+    "upc": "051179194403",
+    "name": "Swad Sakar 14oz",
+    "old_price": 2.49,
+    "new_price": 2.59,
+    "recorded_at": "2026-11-07T17:31:28.949992+00:00"
+  },
+  {
+    "upc": "051179340503",
+    "name": "Swad Black Pepper Powder 7oz",
+    "old_price": 4.99,
+    "new_price": 5.99,
+    "recorded_at": "2026-11-07T17:31:28.949992+00:00"
+  },
+  {
+    "upc": "174367547246",
+    "name": "Eggplant CH. (Long) in LBs",
+    "old_price": 1.99,
+    "new_price": 2.29,
+    "recorded_at": "2026-11-07T17:31:28.949992+00:00"
+  },
+  {
+    "upc": "827468100079",
+    "name": "Onion Red Pearl 283g",
+    "old_price": 3.49,
+    "new_price": 2.99,
+    "recorded_at": "2026-11-07T17:31:28.949992+00:00"
   }
 ]
