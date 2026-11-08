@@ -1,23 +1,9 @@
 [
   {
-    "upc": "019502859870",
-    "name": "Rohu Cut Pieces (Fresh) 1lb",
-    "old_price": 20.49,
-    "new_price": 23.99,
-    "recorded_at": "2026-11-07T21:31:34.908883+00:00"
-  },
-  {
-    "upc": "178942385605",
-    "name": "Silver Pomphret/Vavval/Vaval (Fresh) 1lb",
-    "old_price": 26.99,
-    "new_price": 23.99,
-    "recorded_at": "2026-11-07T21:31:34.908883+00:00"
-  },
-  {
-    "upc": "TG-564AC0C3701B",
-    "name": "Thread Fin Fish",
-    "old_price": 19.99,
-    "new_price": 23.99,
-    "recorded_at": "2026-11-07T21:31:34.908883+00:00"
+    "upc": "380246",
+    "name": "Morning Glory #14",
+    "old_price": 1.25,
+    "new_price": 10.0,
+    "recorded_at": "2026-11-08T01:08:23.681688+00:00"
   }
 ]
