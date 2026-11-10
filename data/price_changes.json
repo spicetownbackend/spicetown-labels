@@ -1,1 +1,37 @@
-[]
+[
+  {
+    "upc": "023624240645",
+    "name": "Tomato Regular in LBs",
+    "old_price": 2.99,
+    "new_price": 3.45,
+    "recorded_at": "2026-11-10T19:55:08.534110+00:00"
+  },
+  {
+    "upc": "023625724656",
+    "name": "Tomato Plum in LBs",
+    "old_price": 2.45,
+    "new_price": 2.95,
+    "recorded_at": "2026-11-10T19:55:08.534110+00:00"
+  },
+  {
+    "upc": "173991213923",
+    "name": "Bell Pepper Green in LBs",
+    "old_price": 2.25,
+    "new_price": 2.45,
+    "recorded_at": "2026-11-10T19:55:08.534110+00:00"
+  },
+  {
+    "upc": "173998829400",
+    "name": "Bell Pepper Red in lbs",
+    "old_price": 2.95,
+    "new_price": 3.95,
+    "recorded_at": "2026-11-10T19:55:08.534110+00:00"
+  },
+  {
+    "upc": "179319037738",
+    "name": "Cauliflower Each",
+    "old_price": 2.99,
+    "new_price": 5.99,
+    "recorded_at": "2026-11-10T19:55:08.534110+00:00"
+  }
+]
