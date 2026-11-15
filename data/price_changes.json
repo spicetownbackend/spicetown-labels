@@ -1,58 +1,9 @@
 [
   {
-    "upc": "863329000003",
-    "name": "Shahi Kulfi Malai",
-    "old_price": 2.49,
-    "new_price": 2.75,
-    "recorded_at": "2026-11-15T14:39:29.684343+00:00"
-  },
-  {
-    "upc": "863329000010",
-    "name": "Shahi Kulfi Pistachio",
-    "old_price": 2.49,
-    "new_price": 2.75,
-    "recorded_at": "2026-11-15T14:39:29.684343+00:00"
-  },
-  {
-    "upc": "863329000027",
-    "name": "Shahi Kulfi Mango",
-    "old_price": 2.49,
-    "new_price": 2.75,
-    "recorded_at": "2026-11-15T14:39:29.684343+00:00"
-  },
-  {
-    "upc": "863329000041",
-    "name": "Shahi Kulfi Coconut",
-    "old_price": 2.49,
-    "new_price": 2.75,
-    "recorded_at": "2026-11-15T14:39:29.684343+00:00"
-  },
-  {
-    "upc": "863329000058",
-    "name": "Shahi Kulfi Chocolate",
-    "old_price": 2.49,
-    "new_price": 2.75,
-    "recorded_at": "2026-11-15T14:39:29.684343+00:00"
-  },
-  {
-    "upc": "863329000065",
-    "name": "Shahi Kulfi Strawberry",
-    "old_price": 2.49,
-    "new_price": 2.75,
-    "recorded_at": "2026-11-15T14:39:29.684343+00:00"
-  },
-  {
-    "upc": "872198003510",
-    "name": "Vidhya Pani Puri 260gm (Sooji)",
-    "old_price": 5.99,
-    "new_price": 6.95,
-    "recorded_at": "2026-11-15T14:39:29.684343+00:00"
-  },
-  {
-    "upc": "899450002159",
-    "name": "Roti Fresh Original",
-    "old_price": 5.95,
-    "new_price": 7.95,
-    "recorded_at": "2026-11-15T14:39:29.684343+00:00"
+    "upc": "8904063225290",
+    "name": "Haldiram's Sweet Delicacies 500g",
+    "old_price": 12.99,
+    "new_price": 16.99,
+    "recorded_at": "2026-11-15T20:11:44.226193+00:00"
   }
 ]
