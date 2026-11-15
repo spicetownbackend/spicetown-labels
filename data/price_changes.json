@@ -1,30 +1,58 @@
 [
   {
-    "upc": "011433119757",
-    "name": "Deep Dahi Whole Milk 5lb",
-    "old_price": 7.49,
+    "upc": "863329000003",
+    "name": "Shahi Kulfi Malai",
+    "old_price": 2.49,
+    "new_price": 2.75,
+    "recorded_at": "2026-11-15T14:39:29.684343+00:00"
+  },
+  {
+    "upc": "863329000010",
+    "name": "Shahi Kulfi Pistachio",
+    "old_price": 2.49,
+    "new_price": 2.75,
+    "recorded_at": "2026-11-15T14:39:29.684343+00:00"
+  },
+  {
+    "upc": "863329000027",
+    "name": "Shahi Kulfi Mango",
+    "old_price": 2.49,
+    "new_price": 2.75,
+    "recorded_at": "2026-11-15T14:39:29.684343+00:00"
+  },
+  {
+    "upc": "863329000041",
+    "name": "Shahi Kulfi Coconut",
+    "old_price": 2.49,
+    "new_price": 2.75,
+    "recorded_at": "2026-11-15T14:39:29.684343+00:00"
+  },
+  {
+    "upc": "863329000058",
+    "name": "Shahi Kulfi Chocolate",
+    "old_price": 2.49,
+    "new_price": 2.75,
+    "recorded_at": "2026-11-15T14:39:29.684343+00:00"
+  },
+  {
+    "upc": "863329000065",
+    "name": "Shahi Kulfi Strawberry",
+    "old_price": 2.49,
+    "new_price": 2.75,
+    "recorded_at": "2026-11-15T14:39:29.684343+00:00"
+  },
+  {
+    "upc": "872198003510",
+    "name": "Vidhya Pani Puri 260gm (Sooji)",
+    "old_price": 5.99,
+    "new_price": 6.95,
+    "recorded_at": "2026-11-15T14:39:29.684343+00:00"
+  },
+  {
+    "upc": "899450002159",
+    "name": "Roti Fresh Original",
+    "old_price": 5.95,
     "new_price": 7.95,
-    "recorded_at": "2026-11-15T00:09:19.018375+00:00"
-  },
-  {
-    "upc": "011433131582",
-    "name": "Deep Peanuts Jumbo 2lb",
-    "old_price": 3.99,
-    "new_price": 4.45,
-    "recorded_at": "2026-11-15T00:09:19.018375+00:00"
-  },
-  {
-    "upc": "011433136136",
-    "name": "Deep Dai Mango Lassi 11fl.oz",
-    "old_price": 1.99,
-    "new_price": 2.25,
-    "recorded_at": "2026-11-15T00:09:19.018375+00:00"
-  },
-  {
-    "upc": "760695024810",
-    "name": "Eggs Carton Large WH 15dz",
-    "old_price": 1.49,
-    "new_price": 2.45,
-    "recorded_at": "2026-11-15T00:09:19.018375+00:00"
+    "recorded_at": "2026-11-15T14:39:29.684343+00:00"
   }
 ]
