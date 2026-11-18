@@ -1,1 +1,23 @@
-[]
+[
+  {
+    "upc": "178942385605",
+    "name": "Sardine (Fresh) 1Lb",
+    "old_price": 20.49,
+    "new_price": 23.99,
+    "recorded_at": "2026-11-18T23:58:08.643256+00:00"
+  },
+  {
+    "upc": "475787420349",
+    "name": "Anchovies (Fresh) 1Lb",
+    "old_price": 21.99,
+    "new_price": 23.99,
+    "recorded_at": "2026-11-18T23:58:08.643256+00:00"
+  },
+  {
+    "upc": "807522016829",
+    "name": "Iron Wok 9.5(less Curved#2)",
+    "old_price": 12.0,
+    "new_price": 22.99,
+    "recorded_at": "2026-11-18T23:58:08.643256+00:00"
+  }
+]
